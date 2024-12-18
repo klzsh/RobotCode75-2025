@@ -3,6 +3,8 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 
+import javax.net.ssl.X509TrustManager;
+
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -121,6 +123,12 @@ public class Swerve extends SubsystemBase {
     xController = new PIDController(2.65, 0, 0);
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
+
+    TuningTab.addPIDTuner("Chassis X Controller", xController);
+    TuningTab.addPIDTuner("Chassis Y Controller", yController);
+    TuningTab.addPIDTuner("Chassis R Controller", rController);
+
+
     swerveOdometry =
         new SwerveDrivePoseEstimator(
             DrivetrainConstants.swerveKinematics,
