@@ -4,11 +4,14 @@
 
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Hertz;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.units.measure.Frequency;
 
 /** This class is meant to house the configs for specific motors */
 public final class HardwareConstants {
@@ -75,6 +78,8 @@ public final class HardwareConstants {
     public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
     public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
 
+    public static final Frequency timeSyncFreq = Hertz.of(250);
+
     public static TalonFXConfiguration getDriveConfiguration() {
 
       m_DriveConfig.MotorOutput.Inverted = driveMotorInvert;
@@ -105,6 +110,7 @@ public final class HardwareConstants {
       m_DriveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
       // TODO: see if nessesary
       m_DriveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+      m_DriveConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
       return m_DriveConfig;
     }
@@ -131,6 +137,8 @@ public final class HardwareConstants {
 
       // TODO: try this out
       // m_AngleConfig.ClosedLoopGeneral.ContinuousWrap = true;
+
+      m_AngleConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
       return m_AngleConfig;
     }

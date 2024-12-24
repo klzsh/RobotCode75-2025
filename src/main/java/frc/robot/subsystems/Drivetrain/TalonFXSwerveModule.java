@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -18,6 +19,8 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import frc.lib.math.Conversions;
@@ -91,6 +94,19 @@ public class TalonFXSwerveModule {
 
     lastAngle = getState().angle;
     setpoint = new SwerveModuleState();
+
+    // set control requests to be one shot
+    driveDutyCycle.UpdateFreqHz = 0;
+    driveDutyCycle.UseTimesync = true;
+
+    torqueDrivevelocity.UpdateFreqHz = 0;
+    torqueDrivevelocity.UseTimesync = true;
+
+    torqueAngleCurrent.UpdateFreqHz = 0;
+    torqueAngleCurrent.UseTimesync = true;
+
+    torqueCharacterization.UpdateFreqHz = 0;
+    torqueCharacterization.UseTimesync = true;
   }
 
   /**
@@ -165,9 +181,14 @@ public class TalonFXSwerveModule {
    */
   @Logged(name = "Module Angle", importance = Importance.INFO)
   public Rotation2d getAngle() {
+    Measure<AngleUnit> LatencyCompensatedPosition =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            mAngleMotor.getPosition().refresh(), mAngleMotor.getVelocity().refresh());
+
     return Rotation2d.fromDegrees(
         Conversions.talonToDegrees(
-                mAngleMotor.getPosition().getValue(), DrivetrainConstants.angleGearRatio)
+                Rotations.of(LatencyCompensatedPosition.in(Rotations)),
+                DrivetrainConstants.angleGearRatio)
             .in(Degrees));
   }
 
@@ -240,11 +261,13 @@ public class TalonFXSwerveModule {
    */
   @Logged(name = "Module Position", importance = Importance.DEBUG)
   public SwerveModulePosition getPosition() {
-    // BaseStatusSignal.getLatencyCompensatedValue(mDriveMotor.getPosition(),
-    // mDriveMotor.getVelocity());
+    Measure<AngleUnit> LatencyCompensatedPosition =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            mDriveMotor.getPosition().refresh(), mDriveMotor.getVelocity().refresh());
+
     return new SwerveModulePosition(
         Conversions.talonToMeters(
-            mDriveMotor.getPosition().getValue(),
+            Rotations.of(LatencyCompensatedPosition.in(Rotations)),
             DrivetrainConstants.wheelCircumference,
             DrivetrainConstants.driveGearRatio),
         getAngle());
