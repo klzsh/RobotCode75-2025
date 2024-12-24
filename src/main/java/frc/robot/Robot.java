@@ -4,10 +4,15 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.epilogue.logging.FileLogger;
+import edu.wpi.first.epilogue.logging.NTDataLogger;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,28 +38,41 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    DataLogManager.start();
-    DriverStation.startDataLog(DataLogManager.getLog());
     Epilogue.configure(
         config -> {
 
-          // Log only to disk, instead of the default NetworkTables logging
-          // Note that this means data cannot be analyzed in realtime by a dashboard
-          // config.dataLogger = new FileLogger(DataLogManager.getLog());
+          // log every 100 ms
+          config.loggingPeriod = Seconds.of(0.1); 
+          // period offset is 50 ms
+          config.loggingPeriodOffset = Seconds.of(0.05); 
 
           if (isSimulation()) {
             // If running in simulation, then we'd want to re-throw any errors that
             // occur so we can debug and fix them!
             config.errorHandler = ErrorHandler.crashOnError();
+          } else {
+            config.errorHandler = ErrorHandler.printErrorMessages();
           }
           // Change the root data path
           config.root = "Telemetry";
-          // Only log critical information instead of the default DEBUG level.
-          // This can be helpful in a pinch to reduce network bandwidth or log file size
-          // while still logging important information.
-          // config.loggingPeriod = Time.ofRelativeUnits(2, Seconds);
 
-          config.minimumImportance = Logged.Importance.DEBUG;
+          if (DriverStation.isTest()) {
+            // log all data to NT, do not log to disk to save space
+            config.minimumImportance = Logged.Importance.DEBUG;
+            config.dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
+            DataLogManager.stop();
+          } else if (!DriverStation.isFMSAttached()) {
+            // log INFO and CRITICAL data to NT, NOT DISK
+            config.minimumImportance = Logged.Importance.INFO;
+            config.dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
+            DataLogManager.stop();
+          } else if (DriverStation.isFMSAttached()) {
+            // only disk log during comp
+            // do not log joysticks
+            config.minimumImportance = Logged.Importance.CRITICAL;
+            DriverStation.startDataLog(DataLogManager.getLog(), false);
+            config.dataLogger = new FileLogger(DataLogManager.getLog());
+          }
         });
     Epilogue.bind(this);
   }
