@@ -61,10 +61,6 @@ public class TalonFXSwerveModule {
 
   /* drive motor control requests */
   // TODO: timesync control requests, in CTREConfigs + oneshot in here
-  // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/status-signals.html
-  // TODO: latency compensation
-  // TODO: tune closed loop RampRate
-  // see following link
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   // closed loop control
   private final VelocityTorqueCurrentFOC torqueDrivevelocity =
@@ -78,18 +74,18 @@ public class TalonFXSwerveModule {
 
   public TalonFXSwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
     this.moduleNumber = moduleNumber;
-    this.angleOffset = moduleConstants.angleOffset;
+    this.angleOffset = moduleConstants.angleOffset();
 
     /* Angle Encoder Config */
-    angleEncoder = new CANcoder(moduleConstants.cancoderID, DrivetrainConstants.driveBusName);
+    angleEncoder = new CANcoder(moduleConstants.cancoderID(), DrivetrainConstants.driveBusName);
     configAngleEncoder();
 
     /* Angle Motor Config */
-    mAngleMotor = new TalonFX(moduleConstants.angleMotorID, DrivetrainConstants.driveBusName);
+    mAngleMotor = new TalonFX(moduleConstants.angleMotorID(), DrivetrainConstants.driveBusName);
     configAngleMotor();
 
     /* Drive Motor Config */
-    mDriveMotor = new TalonFX(moduleConstants.driveMotorID, DrivetrainConstants.driveBusName);
+    mDriveMotor = new TalonFX(moduleConstants.driveMotorID(), DrivetrainConstants.driveBusName);
     configDriveMotor();
 
     lastAngle = getState().angle;
@@ -179,7 +175,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the current angle of the angle motor
    */
-  @Logged(name = "Module Angle", importance = Importance.INFO)
+  @Logged(name = "Module Angle", importance = Importance.DEBUG)
   public Rotation2d getAngle() {
     Measure<AngleUnit> LatencyCompensatedPosition =
         BaseStatusSignal.getLatencyCompensatedValue(
@@ -238,7 +234,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the velocity and angle of the module
    */
-  @Logged(name = "Module State", importance = Importance.CRITICAL)
+  @Logged(name = "Module State", importance = Importance.DEBUG)
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         Conversions.talonToMPS(
@@ -251,7 +247,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the setpoint the module is commanded to go to
    */
-  @Logged(name = "Module Setpoint", importance = Importance.CRITICAL)
+  @Logged(name = "Module Setpoint", importance = Importance.DEBUG)
   public SwerveModuleState getSetpoint() {
     return setpoint;
   }

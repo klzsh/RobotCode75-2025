@@ -20,6 +20,7 @@ public class TeleopSwerve extends Command {
   private boolean isOpenLoop;
   private boolean fieldRelative;
 
+  // TODO: tune once new robot is made
   private final double translationStickMapValue = 1.5;
 
   public static final double translationJoystickExpo = 1.46;
@@ -64,10 +65,6 @@ public class TeleopSwerve extends Command {
             ? Math.pow(strafeVal, translationJoystickExpo)
             : -1 * Math.pow(-strafeVal, translationJoystickExpo);
 
-    // rotationVal = Math.pow(translationVal, translationJoystickExpo) *
-    // Math.copySign(1.0,translationVal);
-    // strafeVal = Math.pow(strafeVal, translationJoystickExpo) * Math.copySign(1.0,strafeVal);
-
     /*
      * make the translation to drive the robot
      * Multiply it by max speed as the drive command has units of meters per second
@@ -78,7 +75,6 @@ public class TeleopSwerve extends Command {
         new Translation2d(translationVal, strafeVal)
             .times(DrivetrainConstants.maxSpeed.in(MetersPerSecond));
 
-    // drive the robot. Multiple the rotation value by 0.5 to make the rotation easier to handle
     m_Swerve.drive(
         translation2d,
         rotationVal * DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
