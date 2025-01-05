@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2025.1.1"
+    id 'com.diffplug.spotless' version '6.24.0'
 }
 
 java {
@@ -9,6 +10,20 @@ java {
 }
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
+
+spotless {
+  java {
+    target fileTree('.') {
+      include '**/*.java'
+      exclude '**/build/**', '**/build-*/**'
+    }
+    toggleOffOn()
+    googleJavaFormat()
+    removeUnusedImports()
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+}
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.

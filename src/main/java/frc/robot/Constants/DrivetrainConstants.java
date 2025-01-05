@@ -26,6 +26,17 @@ public final class DrivetrainConstants {
 
   public static final boolean USE_ANGLE_TORQUE = true;
   public static final boolean USE_DRIVE_TORQUE = true;
+
+  /* Drivetrain Constants */
+  // TODO: Find these
+  public static final Distance trackWidth = Inches.of(22.5);
+  public static final Distance wheelBase = Inches.of(22.5);
+  // distance between the center of the wheel to the center of the robot
+  public static final Distance kCenterToWheel =
+      Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
+  public static final Distance wheelDiameter = Inches.of(2);
+  public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
+
   /*
    * Swerve Kinematics
    * No need to ever change this unless you are not doing a traditional
@@ -45,16 +56,6 @@ public final class DrivetrainConstants {
           new Translation2d(
               -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
               -DrivetrainConstants.trackWidth.in(Meters) / 2.0));
-
-  /* Drivetrain Constants */
-  // TODO: Find these
-  public static final Distance trackWidth = Inches.of(22.5);
-  public static final Distance wheelBase = Inches.of(22.5);
-  // distance between the center of the wheel to the center of the robot
-  public static final Distance kCenterToWheel =
-      Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
-  public static final Distance wheelDiameter = Inches.of(2);
-  public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   /* Module Gear Ratios */
   // ratio of motor turns to mechanism turns

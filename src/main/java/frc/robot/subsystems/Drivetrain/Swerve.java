@@ -1,16 +1,16 @@
 package frc.robot.subsystems.Drivetrain;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-
 // import choreo.trajectory.SwerveSample;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
-import com.ctre.phoenix6.hardware.Pigeon2;
 // import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.config.ModuleConfig;
 // import com.pathplanner.lib.config.PIDConstants;
 // import com.pathplanner.lib.config.RobotConfig;
 // import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -123,11 +123,9 @@ public class Swerve extends SubsystemBase {
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
 
-    TuningTab.addPIDTuner("Chassis X Controller", xController);
-    TuningTab.addPIDTuner("Chassis Y Controller", yController);
-    TuningTab.addPIDTuner("Chassis R Controller", rController);
-
-
+    TuningTab.addAutoPIDTuner("Chassis X Controller", xController);
+    TuningTab.addAutoPIDTuner("Chassis Y Controller", yController);
+    TuningTab.addAutoPIDTuner("Chassis R Controller", rController);
 
     swerveOdometry =
         new SwerveDrivePoseEstimator(
