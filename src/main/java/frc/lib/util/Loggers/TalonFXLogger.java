@@ -15,7 +15,7 @@ import edu.wpi.first.epilogue.CustomLoggerFor;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-import edu.wpi.first.epilogue.logging.DataLogger;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
 /** Add your docs here. */
 @CustomLoggerFor(TalonFX.class)
@@ -25,7 +25,7 @@ public class TalonFXLogger extends ClassSpecificLogger<TalonFX> {
   }
 
   @Override
-  public void update(DataLogger logger, TalonFX motor) {
+  public void update(EpilogueBackend logger, TalonFX motor) {
     // list out faults
     // stator current
     if (Epilogue.shouldLog(Importance.DEBUG)) {

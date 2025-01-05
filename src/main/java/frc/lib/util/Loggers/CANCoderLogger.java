@@ -12,7 +12,7 @@ import edu.wpi.first.epilogue.CustomLoggerFor;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.logging.ClassSpecificLogger;
-import edu.wpi.first.epilogue.logging.DataLogger;
+import edu.wpi.first.epilogue.logging.EpilogueBackend;
 
 /** Add your docs here. */
 @CustomLoggerFor(CANcoder.class)
@@ -22,7 +22,7 @@ public class CANCoderLogger extends ClassSpecificLogger<CANcoder> {
   }
 
   @Override
-  public void update(DataLogger logger, CANcoder CANcoder) {
+  public void update(EpilogueBackend logger, CANcoder CANcoder) {
     if (Epilogue.shouldLog(Importance.INFO)) {
       logger.log("Absolute Position", CANcoder.getAbsolutePosition().getValue().in(Degrees));
       logger.log("Magnet Fault", CANcoder.getFault_BadMagnet().getValue());
