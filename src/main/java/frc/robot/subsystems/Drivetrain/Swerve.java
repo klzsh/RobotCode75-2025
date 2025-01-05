@@ -3,9 +3,7 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 
-import javax.net.ssl.X509TrustManager;
-
-import choreo.trajectory.SwerveSample;
+// import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 // import com.pathplanner.lib.auto.AutoBuilder;
@@ -33,6 +31,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TuningTab;
 import frc.robot.Constants.DrivetrainConstants;
 
 /*
@@ -129,6 +128,7 @@ public class Swerve extends SubsystemBase {
     TuningTab.addPIDTuner("Chassis R Controller", rController);
 
 
+
     swerveOdometry =
         new SwerveDrivePoseEstimator(
             DrivetrainConstants.swerveKinematics,
@@ -210,18 +210,18 @@ public class Swerve extends SubsystemBase {
     return DrivetrainConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
   }
 
-  public void followSwerveSample(Pose2d currentPose, SwerveSample sample) {
-    // TODO: some fancy optimization stuff
-    ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(
-                xController.calculate(currentPose.getX(), sample.x) + sample.vx,
-                yController.calculate(currentPose.getY(), sample.y) + sample.vy,
-                rController.calculate(currentPose.getRotation().getRadians(), sample.heading)
-                    + sample.omega),
-            currentPose.getRotation());
-    this.setChassisSpeeds(speeds);
-  }
+  // public void followSwerveSample(Pose2d currentPose, SwerveSample sample) {
+  //   // TODO: some fancy optimization stuff
+  //   ChassisSpeeds speeds =
+  //       ChassisSpeeds.fromFieldRelativeSpeeds(
+  //           new ChassisSpeeds(
+  //               xController.calculate(currentPose.getX(), sample.x) + sample.vx,
+  //               yController.calculate(currentPose.getY(), sample.y) + sample.vy,
+  //               rController.calculate(currentPose.getRotation().getRadians(), sample.heading)
+  //                   + sample.omega),
+  //           currentPose.getRotation());
+  //   this.setChassisSpeeds(speeds);
+  // }
 
   /**
    * Set the module states (used in autos)
