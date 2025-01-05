@@ -34,7 +34,8 @@ public class RobotContainer {
 
   private final JoystickButton robotRelative =
       new JoystickButton(m_RightStick, OIConstants.robotRelativeButton);
-  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
+  private final JoystickButton resetHeading =
+      new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
@@ -72,10 +73,8 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     resetHeading.onTrue(new ResetHeading(m_Swerve));
   }
-  
-  private void configureChooser(){
 
-  }
+  private void configureChooser() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
