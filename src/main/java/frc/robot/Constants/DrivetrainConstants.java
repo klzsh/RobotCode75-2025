@@ -4,10 +4,7 @@
 
 package frc.robot.Constants;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,36 +23,36 @@ public final class DrivetrainConstants {
 
   public static final boolean USE_ANGLE_TORQUE = true;
   public static final boolean USE_DRIVE_TORQUE = true;
-  /*
-   * Swerve Kinematics
-   * No need to ever change this unless you are not doing a traditional
-   * rectangular/square 4 module swerve
-   */
-  public static final SwerveDriveKinematics swerveKinematics =
-      new SwerveDriveKinematics(
-          new Translation2d(
-              DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              DrivetrainConstants.trackWidth.in(Meters) / 2.0),
-          new Translation2d(
-              DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              -DrivetrainConstants.trackWidth.in(Meters) / 2.0),
-          new Translation2d(
-              -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              DrivetrainConstants.trackWidth.in(Meters) / 2.0),
-          new Translation2d(
-              -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              -DrivetrainConstants.trackWidth.in(Meters) / 2.0));
-
+  
   /* Drivetrain Constants */
   // TODO: Find these
   public static final Distance trackWidth = Inches.of(22.5);
   public static final Distance wheelBase = Inches.of(22.5);
   // distance between the center of the wheel to the center of the robot
   public static final Distance kCenterToWheel =
-      Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
+        Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
   public static final Distance wheelDiameter = Inches.of(2);
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
-
+  
+  /*
+  * Swerve Kinematics
+  * No need to ever change this unless you are not doing a traditional
+  * rectangular/square 4 module swerve
+  */
+ public static final SwerveDriveKinematics swerveKinematics =
+     new SwerveDriveKinematics(
+         new Translation2d(
+             DrivetrainConstants.wheelBase.in(Meters) / 2.0,
+             DrivetrainConstants.trackWidth.in(Meters) / 2.0),
+         new Translation2d(
+             DrivetrainConstants.wheelBase.in(Meters) / 2.0,
+             -DrivetrainConstants.trackWidth.in(Meters) / 2.0),
+         new Translation2d(
+             -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
+             DrivetrainConstants.trackWidth.in(Meters) / 2.0),
+         new Translation2d(
+             -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
+             -DrivetrainConstants.trackWidth.in(Meters) / 2.0));
   /* Module Gear Ratios */
   // ratio of motor turns to mechanism turns
   public static final double driveGearRatio = 6.75;
