@@ -9,8 +9,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.FileLogger;
-import edu.wpi.first.epilogue.logging.NTDataLogger;
+import edu.wpi.first.epilogue.logging.FileBackend;
+import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -59,19 +59,19 @@ public class Robot extends TimedRobot {
           if (DriverStation.isTest()) {
             // log all data to NT, do not log to disk to save space
             config.minimumImportance = Logged.Importance.DEBUG;
-            config.dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
+            config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
             DataLogManager.stop();
           } else if (!DriverStation.isFMSAttached()) {
             // log INFO and CRITICAL data to NT, NOT DISK
             config.minimumImportance = Logged.Importance.INFO;
-            config.dataLogger = new NTDataLogger(NetworkTableInstance.getDefault());
+            config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
             DataLogManager.stop();
           } else if (DriverStation.isFMSAttached()) {
             // only disk log during comp
             // do not log joysticks
             config.minimumImportance = Logged.Importance.CRITICAL;
             DriverStation.startDataLog(DataLogManager.getLog(), false);
-            config.dataLogger = new FileLogger(DataLogManager.getLog());
+            config.backend = new FileBackend(DataLogManager.getLog());
           }
         });
     Epilogue.bind(this);
