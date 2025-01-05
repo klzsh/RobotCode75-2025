@@ -119,8 +119,6 @@ public class TalonFXSwerveModule {
 
     desiredState = CTREModuleState.optimize(desiredState, getState().angle);
     setpoint = desiredState;
-    // cosine compensation
-    desiredState.cosineScale(getAngle());
     setAngle(desiredState);
     // will either be percent output or velocity based on open loop
     setSpeed(desiredState, isOpenLoop);
