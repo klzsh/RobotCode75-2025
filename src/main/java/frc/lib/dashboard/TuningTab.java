@@ -11,10 +11,11 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.Constants.HardwareConstants;
+import frc.lib.config.PIDConstants;
 import java.util.EnumSet;
 import java.util.HashMap;
 
@@ -22,14 +23,15 @@ import java.util.HashMap;
 public class TuningTab {
 
   static int col = 0;
-  private static HashMap<String, TalonFX> motors;
-  private static HashMap<String, PIDController> controllers;
-  private static ShuffleboardTab tab;
+  private static HashMap<String, TalonFX> motors = new HashMap<>();
+  private static HashMap<String, PIDController> controllers = new HashMap<>();
+  private static ShuffleboardTab tab = Shuffleboard.getTab("Tuning");
 
   private static NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
   public TuningTab() {
-    tab = Shuffleboard.getTab("Tuning");
+    // ! Do not initalize anything here because all methods are static
+    // tab = Shuffleboard.getTab("Tuning");
 
     /* NOTE: motors is null because addPIDTuner is never called and therefore nothing is put into
     the HashMap */
@@ -38,7 +40,7 @@ public class TuningTab {
   public static void addAutoPIDTuner(String name, PIDController pidController) {
     controllers.put(name, pidController);
     NetworkTable ntTable = inst.getTable("Tuning");
-    ShuffleboardLayout newLayout = tab.getLayout(name).withSize(2, 4);
+    ShuffleboardLayout newLayout = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 4);
     newLayout.add("P", pidController.getP());
     newLayout.add("I", pidController.getI());
     newLayout.add("D", pidController.getD());
@@ -72,18 +74,18 @@ public class TuningTab {
         });
   }
 
-  public static void addPIDTuner(String name, TalonFX motor) {
+  public static void addPIDTuner(String name, TalonFX motor, PIDConstants defaulValues) {
     motors.put(name, motor);
     NetworkTable ntTable = inst.getTable("Tuning");
-    ShuffleboardLayout newLayout = tab.getLayout(name).withSize(2, 4);
+    ShuffleboardLayout newLayout = tab.getLayout(name, BuiltInLayouts.kList).withSize(2, 4);
     Slot0Configs config = new Slot0Configs();
 
     /* Set the config equal to the values in HardwareConstants if empty */
     if (config.kP == 0.0 && config.kI == 0.0 && config.kD == 0.0 && config.kS == 0.0) {
-      config.kP = HardwareConstants.Swerve.driveTorqueKP;
-      config.kI = HardwareConstants.Swerve.driveTorqueKI;
-      config.kD = HardwareConstants.Swerve.driveTorqueKD;
-      config.kS = HardwareConstants.Swerve.driveTorqueKS;
+      config.kP = defaulValues.kP;
+      config.kI = defaulValues.kI;
+      config.kD = defaulValues.kD;
+      config.kS = defaulValues.kF;
     }
 
     newLayout.add("P", config.kP);

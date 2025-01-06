@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
+import frc.lib.config.PIDConstants;
 import frc.lib.dashboard.TuningTab;
 import frc.lib.math.Conversions;
 import frc.lib.util.CTREModuleState;
@@ -84,12 +85,25 @@ public class TalonFXSwerveModule {
 
     /* Angle Motor Config */
     mAngleMotor = new TalonFX(moduleConstants.angleMotorID, DrivetrainConstants.driveBusName);
-    TuningTab.addPIDTuner("Module " + moduleNumber + " Angle Motor", mAngleMotor);
+    TuningTab.addPIDTuner(
+        "Module " + moduleNumber + " Angle Motor",
+        mAngleMotor,
+        new PIDConstants(
+            HardwareConstants.Swerve.angleTorqueKP,
+            HardwareConstants.Swerve.angleTorqueKI,
+            HardwareConstants.Swerve.angleTorqueKD));
     configAngleMotor();
 
     /* Drive Motor Config */
     mDriveMotor = new TalonFX(moduleConstants.driveMotorID, DrivetrainConstants.driveBusName);
-    TuningTab.addPIDTuner("Module " + moduleNumber + " Angle Motor", mDriveMotor);
+    TuningTab.addPIDTuner(
+        "Module " + moduleNumber + " Drive Motor",
+        mDriveMotor,
+        new PIDConstants(
+            HardwareConstants.Swerve.driveTorqueKP,
+            HardwareConstants.Swerve.driveTorqueKI,
+            HardwareConstants.Swerve.driveTorqueKD,
+            HardwareConstants.Swerve.driveTorqueKS));
     configDriveMotor();
 
     lastAngle = getState().angle;
