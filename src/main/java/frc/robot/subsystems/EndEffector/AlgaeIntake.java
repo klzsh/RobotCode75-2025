@@ -35,13 +35,13 @@ public class AlgaeIntake extends SubsystemBase {
     
   }
 
-  public void runAlgaeIntake(int RPM) {
+  public void runAlgaeIntake(double RPM) {
     /* Cannot intake if HASGAMEPIECE */
     m_AlgaeIntakeState = IntakeState.INTAKING;
     m_AlgaeMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(RPM * 60)));
   }
 
-  public void runAlgaeOutake(int RPM) {
+  public void runAlgaeOutake(double RPM) {
     m_AlgaeIntakeState = IntakeState.OUTAKING;
     m_AlgaeMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(-RPM * 60)));
   }
