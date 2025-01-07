@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Util.LEDsDefaultCommand;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Util.CANdleWrapper;
@@ -34,7 +35,9 @@ public class RobotContainer {
 
   private final JoystickButton robotRelative =
       new JoystickButton(m_RightStick, OIConstants.robotRelativeButton);
-  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
+  private final JoystickButton resetHeading =
+      new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
+  private final JoystickButton Xstance = new JoystickButton(m_RightStick, OIConstants.xstance);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
@@ -71,11 +74,10 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     resetHeading.onTrue(new ResetHeading(m_Swerve));
+    Xstance.whileTrue(new XStance(m_Swerve));
   }
-  
-  private void configureChooser(){
 
-  }
+  private void configureChooser() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

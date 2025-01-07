@@ -42,9 +42,9 @@ public class Robot extends TimedRobot {
         config -> {
 
           // log every 100 ms
-          config.loggingPeriod = Seconds.of(0.1); 
+          config.loggingPeriod = Seconds.of(0.1);
           // period offset is 50 ms
-          config.loggingPeriodOffset = Seconds.of(0.05); 
+          config.loggingPeriodOffset = Seconds.of(0.05);
 
           if (isSimulation()) {
             // If running in simulation, then we'd want to re-throw any errors that

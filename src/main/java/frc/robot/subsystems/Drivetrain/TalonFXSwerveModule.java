@@ -111,7 +111,8 @@ public class TalonFXSwerveModule {
    * @param desiredState the velocity and angle of the module
    * @param isOpenLoop wether or not to use PIDF and motor feedback
    */
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+  public void setDesiredState(
+      SwerveModuleState desiredState, boolean isOpenLoop, boolean steerWhenStationary) {
     /*
      * This is a custom optimize function, since default WPILib optimize assumes
      * continuous controller which CTRE and Rev onboard is not
@@ -119,7 +120,7 @@ public class TalonFXSwerveModule {
 
     desiredState = CTREModuleState.optimize(desiredState, getState().angle);
     setpoint = desiredState;
-    setAngle(desiredState);
+    setAngle(desiredState, steerWhenStationary);
     // will either be percent output or velocity based on open loop
     setSpeed(desiredState, isOpenLoop);
   }
@@ -154,13 +155,18 @@ public class TalonFXSwerveModule {
    *
    * @param desiredState the velocity and angle of the module (only uses angle)
    */
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (DrivetrainConstants.maxSpeed.in(MetersPerSecond) * 0.01))
-            ? lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+  private void setAngle(SwerveModuleState desiredState, boolean steerWhenStationary) {
+    Rotation2d angle = new Rotation2d();
+    if (!steerWhenStationary) {
+      angle =
+          (Math.abs(desiredState.speedMetersPerSecond)
+                  <= (DrivetrainConstants.maxSpeed.in(MetersPerSecond) * 0.01))
+              ? lastAngle
+              : desiredState
+                  .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+    } else {
+      angle = desiredState.angle;
+    }
 
     mAngleMotor.setControl(
         torqueAngleCurrent.withPosition(

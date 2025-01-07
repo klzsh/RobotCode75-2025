@@ -8,4 +8,5 @@ public final class OIConstants {
 
   public static final int robotRelativeButton = 1;
   public static final int resetHeadingButton = 3;
+  public static final int xstance = 5;
 }

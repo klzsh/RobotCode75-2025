@@ -1,16 +1,16 @@
 package frc.robot.subsystems.Drivetrain;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-
 // import choreo.trajectory.SwerveSample;
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
-import com.ctre.phoenix6.hardware.Pigeon2;
 // import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.config.ModuleConfig;
 // import com.pathplanner.lib.config.PIDConstants;
 // import com.pathplanner.lib.config.RobotConfig;
 // import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -165,7 +165,7 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DrivetrainConstants.maxSpeed);
 
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, false);
     }
   }
 
@@ -174,7 +174,7 @@ public class Swerve extends SubsystemBase {
     speeds = setpointSpeeds;
     var swerveModuleStates =
         DrivetrainConstants.swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
-    setModuleStates(swerveModuleStates);
+    setModuleStates(swerveModuleStates, false);
   }
 
   public ChassisSpeeds getChassisSpeeds() {
@@ -199,17 +199,17 @@ public class Swerve extends SubsystemBase {
    *
    * @param desiredStates The desired module state to set the wheels
    */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
+  public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxSpeed);
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+      mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
   }
 
   /** stops the swerve modules for autonomous */
   public void stopModules() {
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(new SwerveModuleState(0, mod.getSetpoint().angle), true);
+      mod.setDesiredState(new SwerveModuleState(0, mod.getSetpoint().angle), true, false);
     }
   }
 
