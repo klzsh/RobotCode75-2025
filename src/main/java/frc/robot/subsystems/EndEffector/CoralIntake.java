@@ -32,11 +32,7 @@ public class CoralIntake extends SubsystemBase {
 
   public void runCoral(double RPM) {
     /* Eject if HASGAMEPIECE */
-    if (m_CoralIntakeState == IntakeState.HASGAMEPIECE) {
-      m_CoralIntakeState = IntakeState.OUTAKING;
-    } else {
-      m_CoralIntakeState = IntakeState.INTAKING;
-    }
+    m_CoralIntakeState = (m_CoralIntakeState == IntakeState.HASGAMEPIECE) ? IntakeState.OUTAKING : IntakeState.INTAKING;
     m_CoralMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(RPM * 60)));
   }
 
