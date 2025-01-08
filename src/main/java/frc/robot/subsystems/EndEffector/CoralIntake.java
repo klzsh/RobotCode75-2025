@@ -19,7 +19,7 @@ public class CoralIntake extends SubsystemBase {
   private TalonFX m_CoralMotor;
   private DigitalInput m_CoralBeamBreak;
 
-  private final VelocityTorqueCurrentFOC torqueVelocity =new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+  private final VelocityTorqueCurrentFOC torqueVelocity = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
@@ -28,21 +28,16 @@ public class CoralIntake extends SubsystemBase {
     m_CoralBeamBreak = new DigitalInput(HardwareConstants.EndEffector.coralBeamBreakCanID);
 
     m_CoralMotor.getConfigurator().apply(HardwareConstants.EndEffector.getCoralMotorConfiguration());
-
   }
 
-  public void runCoralIntake(double RPM) {
-    /* Cannot intake if HASGAMEPIECE */
+  public void runCoral(double RPM) {
+    /* Eject if HASGAMEPIECE */
     if (m_CoralIntakeState == IntakeState.HASGAMEPIECE) {
-      return;
+      m_CoralIntakeState = IntakeState.OUTAKING;
+    } else {
+      m_CoralIntakeState = IntakeState.INTAKING;
     }
-    m_CoralIntakeState = IntakeState.INTAKING;
     m_CoralMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(RPM * 60)));
-  }
-
-  public void runCoralOutake(double RPM) {
-    m_CoralIntakeState = IntakeState.OUTAKING;
-    m_CoralMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(-RPM * 60)));
   }
 
   public IntakeState getCoralState() {
@@ -52,9 +47,8 @@ public class CoralIntake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-
-    if (m_CoralBeamBreak.get()) {
-      m_CoralIntakeState = IntakeState.HASGAMEPIECE;
+    if (Math.abs(m_CoralMotor.getVelocity().getValue().in(RotationsPerSecond)) < 0.1) {
+      m_CoralIntakeState = m_CoralBeambreak.get() ? IntakeState.HASGAMEPIECE : IntakeState.NONE;
     }
   }
 }
