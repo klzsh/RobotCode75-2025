@@ -1,14 +1,9 @@
 package frc.robot.subsystems.Drivetrain;
 
-// import choreo.trajectory.SwerveSample;
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.config.ModuleConfig;
-// import com.pathplanner.lib.config.PIDConstants;
-// import com.pathplanner.lib.config.RobotConfig;
-// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
@@ -45,6 +40,9 @@ public class Swerve extends SubsystemBase {
 
   @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
+
+  private Translation2d driverTranslationInput;
+  private double driverRotationInput = 0;
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
@@ -110,41 +108,7 @@ public class Swerve extends SubsystemBase {
             getRotation2D(),
             getModulePositions(),
             initialPose);
-    // ! Uncomment if we decide to use pathplanner
-    // config =
-    //     new RobotConfig(
-    //         Pounds.of(135),
-    //         KilogramSquareMeters.of(6),
-    //         new ModuleConfig(
-    //             Inches.of(2),
-    //             MetersPerSecond.of(3.779),
-    //             1.0,
-    //             DCMotor.getKrakenX60Foc(1),
-    //             Amps.of(80),
-    //             1),
-    //         Inches.of(22.5),
-    //         Inches.of(22.5));
-
-    // AutoBuilder.configure(
-    //     this::getPose,
-    //     this::setPose,
-    //     this::getChassisSpeeds,
-    //     (speeds) -> setChassisSpeeds(speeds),
-    //     new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0)),
-    //     config,
-    //     () -> {
-    //       // Boolean supplier that controls when the path will be mirrored for the red
-    //       // alliance
-    //       // This will flip the path being followed to the red side of the field.
-    //       // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-    //       var alliance = DriverStation.getAlliance();
-    //       if (alliance.isPresent()) {
-    //         return alliance.get() == DriverStation.Alliance.Red;
-    //       }
-    //       return false;
-    //     },
-    //     this);
+    driverTranslationInput = new Translation2d();
   }
 
   /**
@@ -162,6 +126,9 @@ public class Swerve extends SubsystemBase {
                     translation.getX(), translation.getY(), rotation, getRotation2D())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
+    driverTranslationInput = translation;
+    driverRotationInput = rotation;
+
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DrivetrainConstants.maxSpeed);
 
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -170,7 +137,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setChassisSpeeds(ChassisSpeeds speeds) {
-    speeds.omegaRadiansPerSecond = -speeds.omegaRadiansPerSecond;
+    speeds.omegaRadiansPerSecond = speeds.omegaRadiansPerSecond;
     speeds = setpointSpeeds;
     var swerveModuleStates =
         DrivetrainConstants.swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
@@ -181,18 +148,18 @@ public class Swerve extends SubsystemBase {
     return DrivetrainConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
   }
 
-  // public void followSwerveSample(Pose2d currentPose, SwerveSample sample) {
-  //   // TODO: some fancy optimization stuff
-  //   ChassisSpeeds speeds =
-  //       ChassisSpeeds.fromFieldRelativeSpeeds(
-  //           new ChassisSpeeds(
-  //               xController.calculate(currentPose.getX(), sample.x) + sample.vx,
-  //               yController.calculate(currentPose.getY(), sample.y) + sample.vy,
-  //               rController.calculate(currentPose.getRotation().getRadians(), sample.heading)
-  //                   + sample.omega),
-  //           currentPose.getRotation());
-  //   this.setChassisSpeeds(speeds);
-  // }
+  public void followSwerveSample(SwerveSample sample) {
+    // TODO: some fancy optimization stuff
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(
+                xController.calculate(getPose().getX(), sample.x) + sample.vx,
+                yController.calculate(getPose().getY(), sample.y) + sample.vy,
+                rController.calculate(getPose().getRotation().getRadians(), sample.heading)
+                    + sample.omega),
+            getPose().getRotation());
+    this.setChassisSpeeds(speeds);
+  }
 
   /**
    * Set the module states (used in autos)
@@ -218,6 +185,13 @@ public class Swerve extends SubsystemBase {
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.characterizeDrive(current);
     }
+  }
+
+  public Translation2d getDriverTranslationInput(){
+    return driverTranslationInput;
+  }
+  public double getDriverRotationInput(){
+    return driverRotationInput;
   }
 
   /**

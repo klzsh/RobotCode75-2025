@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,6 +29,10 @@ public class RobotContainer {
   private final Swerve m_Swerve = new Swerve();
   private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
+  private final AutoFactory factory =
+      new AutoFactory(
+          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
   private final Joystick m_RightStick = new Joystick(OIConstants.rightStickPort);
   private final CommandXboxController m_Controller =
@@ -43,7 +48,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     // Configure the trigger bindings
     configureDefaultCommands();
     configureBindings();
