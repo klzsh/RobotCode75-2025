@@ -187,10 +187,11 @@ public class Swerve extends SubsystemBase {
     }
   }
 
-  public Translation2d getDriverTranslationInput(){
+  public Translation2d getDriverTranslationInput() {
     return driverTranslationInput;
   }
-  public double getDriverRotationInput(){
+
+  public double getDriverRotationInput() {
     return driverRotationInput;
   }
 

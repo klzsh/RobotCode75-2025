@@ -4,7 +4,13 @@
 
 package frc.robot.subsystems.Drivetrain;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
+import frc.robot.Constants.DrivetrainConstants;
+import java.util.function.Supplier;
 
 /** Add your docs here. */
 
@@ -12,16 +18,51 @@ import edu.wpi.first.units.measure.Angle;
 // https://github.com/Mechanical-Advantage/RobotCode2024/blob/main/src/main/java/org/littletonrobotics/frc2024/subsystems/drive/controllers/HeadingController.java
 
 public class RotationController {
-  // TODO: implement
-  public RotationController() {}
+  private Supplier<Double> kP;
+  private Supplier<Double> kD;
+  private double setpoint;
 
-  public double getSetpoint() {
-    return 0;
+  private final Swerve swerve;
+
+  private ProfiledPIDController controller;
+
+  public RotationController(Swerve swerve) {
+    controller =
+        new ProfiledPIDController(
+            kP.get(),
+            0,
+            kD.get(),
+            new TrapezoidProfile.Constraints(0.0, 0.0),
+            DrivetrainConstants.ControllerConstants.loopPeriodSeconds);
+    controller.enableContinuousInput(-Math.PI, Math.PI);
+
+    controller.setTolerance(DrivetrainConstants.ControllerConstants.toleranceRadians);
+    this.swerve = swerve;
+
+    controller.reset(
+        swerve.getRotation2D().getRadians(), swerve.getChassisSpeeds().omegaRadiansPerSecond);
   }
 
-  public void update(Angle current, Angle setpoint) {}
+  public double getSetpoint() {
+    return setpoint;
+  }
 
-  public boolean atSetpoint(){
-    return false;
+  public double update(Angle setpoint) {
+    // Update controller
+    controller.setPID(kP.get(), 0, kD.get());
+
+    controller.setConstraints(
+        new TrapezoidProfile.Constraints(
+            DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
+            DrivetrainConstants.maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
+
+    double output = controller.calculate(swerve.getRotation2D().getRadians(), setpoint.in(Radians));
+
+    return output;
+  }
+
+  public boolean atSetpoint() {
+    return Math.abs(controller.getGoal().position - controller.getSetpoint().position)
+        < DrivetrainConstants.ControllerConstants.toleranceRadians;
   }
 }

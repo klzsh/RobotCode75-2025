@@ -29,15 +29,20 @@ public class HoldRotation extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_Controller.update(Degrees.of(m_Swerve.getRotation2D().getDegrees()), Degrees.of(headingToHold.getDegrees()));
+    m_Controller.update(
+        Degrees.of(m_Swerve.getRotation2D().getDegrees()), Degrees.of(headingToHold.getDegrees()));
     double rotationSetpoint = m_Controller.getSetpoint();
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(m_Swerve.getDriverTranslationInput().getX(), m_Swerve.getDriverTranslationInput().getY(),rotationSetpoint , m_Swerve.getRotation2D());
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            m_Swerve.getDriverTranslationInput().getX(),
+            m_Swerve.getDriverTranslationInput().getY(),
+            rotationSetpoint,
+            m_Swerve.getRotation2D());
     m_Swerve.setChassisSpeeds(speeds);
   }
 
