@@ -4,11 +4,15 @@
 
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Hertz;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+
+import edu.wpi.first.units.measure.Frequency;
 
 /** This class is meant to house the configs for specific motors */
 public final class HardwareConstants {
@@ -20,13 +24,15 @@ public final class HardwareConstants {
     /* CANIDS */
     public static final int coralMotorCanID = 0;
     public static final int algaeMotorCanID = 0;
-    public static final int coralBeamBreakCanID = 0;
+    public static final int coralBeamBreakCanDIO = 0;
 
     /* Neutral modes / inverts */
     public static final InvertedValue coralMotorInvert = InvertedValue.Clockwise_Positive;
     public static final InvertedValue algaeMotorInvert = InvertedValue.Clockwise_Positive;
     public static final NeutralModeValue coralMotorNuetralMode = NeutralModeValue.Brake;
     public static final NeutralModeValue algaeMotorNuetralMode = NeutralModeValue.Brake;
+
+    public static final Frequency TimeSyncFreq = Hertz.of(250);
 
     
     /* End Effector Current Limiting (Amps) */
@@ -96,6 +102,7 @@ public final class HardwareConstants {
       m_CoralMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
       // TODO: see if nessesary
       m_CoralMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+      m_CoralMotorConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
       return m_CoralMotorConfig;
     }
@@ -120,8 +127,7 @@ public final class HardwareConstants {
       m_AlgaeMotorConfig.Slot0.kI = algaeTorqueKI;
       m_AlgaeMotorConfig.Slot0.kD = algaeTorqueKD;
 
-      // TODO: try this out
-      // m_AngleConfig.ClosedLoopGeneral.ContinuousWrap = true;
+      m_AlgaeMotorConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
       return m_AlgaeMotorConfig;
     }

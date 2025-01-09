@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -25,13 +27,19 @@ public class AlgaeIntake extends SubsystemBase {
   private TalonFX m_AlgaeMotor;
 
   private final VelocityTorqueCurrentFOC torqueVelocity =new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
-
+  private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
 
   /** Creates a new AlgaeIntake. */
   public AlgaeIntake() {
     m_AlgaeMotor = new TalonFX(HardwareConstants.EndEffector.algaeMotorCanID);
     m_AlgaeMotor.getConfigurator().apply(HardwareConstants.EndEffector.getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = IntakeState.NONE;
+
+    torqueVelocity.UpdateFreqHz = 0;
+    torqueVelocity.UseTimesync = true;
+
+    currentOut.UpdateFreqHz = 0;
+    currentOut.UseTimesync = true;
     
   }
 

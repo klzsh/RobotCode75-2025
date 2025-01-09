@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.EndEffector;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -20,12 +22,19 @@ public class CoralIntake extends SubsystemBase {
   private DigitalInput m_CoralBeamBreak;
 
   private final VelocityTorqueCurrentFOC torqueVelocity = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+  private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
     m_CoralMotor = new TalonFX(HardwareConstants.EndEffector.coralMotorCanID);
     m_CoralIntakeState = IntakeState.NONE;
-    m_CoralBeamBreak = new DigitalInput(HardwareConstants.EndEffector.coralBeamBreakCanID);
+    m_CoralBeamBreak = new DigitalInput(HardwareConstants.EndEffector.coralBeamBreakCanDIO);
+    
+    torqueVelocity.UpdateFreqHz = 0;
+    torqueVelocity.UseTimesync = true;
+
+    currentOut.UpdateFreqHz = 0;
+    currentOut.UseTimesync= true;
 
     m_CoralMotor.getConfigurator().apply(HardwareConstants.EndEffector.getCoralMotorConfiguration());
   }
@@ -44,7 +53,7 @@ public class CoralIntake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if (Math.abs(m_CoralMotor.getVelocity().getValue().in(RotationsPerSecond)) < 0.1) {
-      m_CoralIntakeState = m_CoralBeambreak.get() ? IntakeState.HASGAMEPIECE : IntakeState.NONE;
+      m_CoralIntakeState = m_CoralBeamBreak.get() ? IntakeState.HASGAMEPIECE : IntakeState.NONE;
     }
   }
 }
