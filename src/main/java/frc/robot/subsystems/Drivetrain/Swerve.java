@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TuningTab;
 import frc.robot.Constants.DrivetrainConstants;
 
 /*
@@ -122,10 +121,6 @@ public class Swerve extends SubsystemBase {
     xController = new PIDController(2.65, 0, 0);
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
-
-    TuningTab.addAutoPIDTuner("Chassis X Controller", xController);
-    TuningTab.addAutoPIDTuner("Chassis Y Controller", yController);
-    TuningTab.addAutoPIDTuner("Chassis R Controller", rController);
 
     swerveOdometry =
         new SwerveDrivePoseEstimator(
