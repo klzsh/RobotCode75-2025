@@ -1,10 +1,9 @@
 package frc.robot.subsystems.Drivetrain;
 
-import choreo.trajectory.SwerveSample;
-
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
@@ -45,16 +44,16 @@ public class Swerve extends SubsystemBase {
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
 
-  // @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
+  @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
-  // @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
+  @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontRight;
 
-  // @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
+  @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackLeft;
 
-  // @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
+  @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
   @Logged(name = "Drive Characterization Current", importance = Importance.DEBUG)

@@ -64,7 +64,6 @@ public final class DrivetrainConstants {
               -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
               -DrivetrainConstants.trackWidth.in(Meters) / 2.0));
 
-
   /* Module Gear Ratios */
   // ratio of motor turns to mechanism turns
   public static final double driveGearRatio = 6.75;

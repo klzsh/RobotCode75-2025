@@ -6,14 +6,10 @@ package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants.DrivetrainConstants;
-
-import java.io.Console;
-import java.util.function.Supplier;
 
 /** Add your docs here. */
 
@@ -56,15 +52,15 @@ public class RotationController {
             DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
             DrivetrainConstants.maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
     double rotation = swerve.getRotation2D().getRadians();
-    if (Math.abs(rotation + 2 * Math.PI - setpoint.getRadians()) < Math.abs(rotation - setpoint.getRadians())) {
+    if (Math.abs(rotation + 2 * Math.PI - setpoint.getRadians())
+        < Math.abs(rotation - setpoint.getRadians())) {
       rotation += 2 * Math.PI;
     }
-    if (Math.abs(rotation -2 * Math.PI - setpoint.getRadians()) < Math.abs(rotation - setpoint.getRadians())) {
+    if (Math.abs(rotation - 2 * Math.PI - setpoint.getRadians())
+        < Math.abs(rotation - setpoint.getRadians())) {
       rotation -= 2 * Math.PI;
     }
-    this.output =
-        -controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
-
+    this.output = -controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
   }
 
   public void update(Rotation2d setpoint, double p, double d) {

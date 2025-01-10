@@ -19,11 +19,6 @@ public class TeleopSwerve extends Command {
   private boolean isOpenLoop;
   private boolean fieldRelative;
 
-  // TODO: tune once new robot is made
-  private final double translationStickMapValue = 1.5;
-
-  public static final double translationJoystickExpo = 1.46;
-
   public TeleopSwerve(
       Swerve m_Swerve,
       DoubleSupplier translationSup,
@@ -47,17 +42,18 @@ public class TeleopSwerve extends Command {
     /* Get Values, Deadband */
     // add deadbands to prevent jittering on small stick inputs
 
-    double[] state = Joysticks.processJoystick(translationSup, strafeSup, rotationSup);
+    // translation, strafe, rotation is the order
+    double[] DriverInput = Joysticks.processJoystick(translationSup, strafeSup, rotationSup);
 
     // you must negate the translation because FRC coordinates and Joystick axis values are
     // opposite to each other
     Translation2d translation2d =
-        new Translation2d(state[0], state[1])
+        new Translation2d(DriverInput[0], DriverInput[1])
             .times(DrivetrainConstants.maxSpeed.in(MetersPerSecond));
 
     m_Swerve.drive(
         translation2d,
-        state[2] * DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
+        DriverInput[2] * DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
         isOpenLoop,
         fieldRelative);
   }
