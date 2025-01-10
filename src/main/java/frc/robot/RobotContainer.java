@@ -5,6 +5,7 @@
 package frc.robot;
 
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Util.LEDsDefaultCommand;
@@ -43,6 +45,10 @@ public class RobotContainer {
   private final JoystickButton resetHeading =
       new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
   private final JoystickButton Xstance = new JoystickButton(m_RightStick, OIConstants.xstance);
+
+  private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
+  private final JoystickButton holdButton =
+      new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
@@ -79,6 +85,14 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
+    holdButton.whileTrue(
+        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+    alignButton.onTrue(
+        new SnapHoldRotation(
+            m_Swerve,
+            Rotation2d.fromDegrees(90),
+            () -> -m_LeftStick.getY(),
+            () -> -m_LeftStick.getX()));
   }
 
   private void configureChooser() {}

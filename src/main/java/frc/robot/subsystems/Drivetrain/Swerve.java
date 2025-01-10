@@ -41,22 +41,19 @@ public class Swerve extends SubsystemBase {
   @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
-  private Translation2d driverTranslationInput;
-  private double driverRotationInput = 0;
-
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
 
-  @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
-  @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontRight;
 
-  @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackLeft;
 
-  @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
   @Logged(name = "Drive Characterization Current", importance = Importance.DEBUG)
@@ -108,7 +105,6 @@ public class Swerve extends SubsystemBase {
             getRotation2D(),
             getModulePositions(),
             initialPose);
-    driverTranslationInput = new Translation2d();
   }
 
   /**
@@ -125,9 +121,6 @@ public class Swerve extends SubsystemBase {
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getRotation2D())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
-
-    driverTranslationInput = translation;
-    driverRotationInput = rotation;
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DrivetrainConstants.maxSpeed);
 
@@ -185,14 +178,6 @@ public class Swerve extends SubsystemBase {
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.characterizeDrive(current);
     }
-  }
-
-  public Translation2d getDriverTranslationInput() {
-    return driverTranslationInput;
-  }
-
-  public double getDriverRotationInput() {
-    return driverRotationInput;
   }
 
   /**

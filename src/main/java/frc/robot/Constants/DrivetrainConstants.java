@@ -36,10 +36,12 @@ public final class DrivetrainConstants {
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
+    public static final double kp = 0.08;
+    public static final double kd = 0.03;
     public static final double maxVelocityMultiplier = 0.8;
     public static final double maxAccelerationMultiplier = 0.8;
     public static final double loopPeriodSeconds = 0.02;
-    public static final double toleranceRadians = Degrees.of(1.0).in(Radians);
+    public static final double toleranceRadians = .15;
   }
 
   /*
