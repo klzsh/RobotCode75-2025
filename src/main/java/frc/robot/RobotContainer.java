@@ -5,6 +5,8 @@
 package frc.robot;
 
 import choreo.auto.AutoFactory;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,7 +29,9 @@ import frc.robot.subsystems.Util.CANdleWrapper;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
+@Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
+  @Logged(name = "swerve")
   private final Swerve m_Swerve = new Swerve();
   private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 

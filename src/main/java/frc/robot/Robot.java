@@ -8,13 +8,9 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.FileBackend;
-import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
+  @Logged(strategy = Strategy.OPT_IN)
   private final RobotContainer m_robotContainer;
 
   /**
@@ -55,24 +52,22 @@ public class Robot extends TimedRobot {
           }
           // Change the root data path
           config.root = "Telemetry";
+          //! reference
 
-          if (DriverStation.isTest()) {
-            // log all data to NT, do not log to disk to save space
-            config.minimumImportance = Logged.Importance.DEBUG;
-            config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
-            DataLogManager.stop();
-          } else if (!DriverStation.isFMSAttached()) {
-            // log INFO and CRITICAL data to NT, NOT DISK
-            config.minimumImportance = Logged.Importance.INFO;
-            config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
-            DataLogManager.stop();
-          } else if (DriverStation.isFMSAttached()) {
-            // only disk log during comp
-            // do not log joysticks
-            config.minimumImportance = Logged.Importance.CRITICAL;
-            DriverStation.startDataLog(DataLogManager.getLog(), false);
-            config.backend = new FileBackend(DataLogManager.getLog());
-          }
+
+          //! NO FMS
+          //   // log INFO and CRITICAL data to NT, NOT DISK
+          //   config.minimumImportance = Logged.Importance.INFO;
+          //   config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+          //   DataLogManager.stop();
+          //! FMS ATTACHED
+          //   // only disk log during comp
+          //   // do not log joysticks
+          //   config.minimumImportance = Logged.Importance.CRITICAL;
+          //   DriverStation.startDataLog(DataLogManager.getLog(), false);
+          //   config.backend = new FileBackend(DataLogManager.getLog());
+          // }
+          config.minimumImportance = Importance.DEBUG;
         });
     Epilogue.bind(this);
   }
