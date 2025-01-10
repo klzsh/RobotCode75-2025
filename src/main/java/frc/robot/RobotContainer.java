@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import choreo.auto.AutoFactory;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Util.LEDsDefaultCommand;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Util.CANdleWrapper;
@@ -27,6 +31,10 @@ public class RobotContainer {
   private final Swerve m_Swerve = new Swerve();
   private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
+  private final AutoFactory factory =
+      new AutoFactory(
+          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
   private final Joystick m_RightStick = new Joystick(OIConstants.rightStickPort);
   private final CommandXboxController m_Controller =
@@ -34,13 +42,18 @@ public class RobotContainer {
 
   private final JoystickButton robotRelative =
       new JoystickButton(m_RightStick, OIConstants.robotRelativeButton);
-  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
+  private final JoystickButton resetHeading =
+      new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
+  private final JoystickButton Xstance = new JoystickButton(m_RightStick, OIConstants.xstance);
+
+  private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
+  private final JoystickButton holdButton =
+      new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
     // Configure the trigger bindings
     configureDefaultCommands();
     configureBindings();
@@ -71,11 +84,18 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     resetHeading.onTrue(new ResetHeading(m_Swerve));
+    Xstance.whileTrue(new XStance(m_Swerve));
+    holdButton.whileTrue(
+        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+    alignButton.onTrue(
+        new SnapHoldRotation(
+            m_Swerve,
+            Rotation2d.fromDegrees(90),
+            () -> -m_LeftStick.getY(),
+            () -> -m_LeftStick.getX()));
   }
-  
-  private void configureChooser(){
 
-  }
+  private void configureChooser() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
