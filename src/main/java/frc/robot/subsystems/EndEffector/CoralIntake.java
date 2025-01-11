@@ -10,10 +10,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.math.Conversions;
 import frc.robot.Constants.HardwareConstants;
 
 public class CoralIntake extends SubsystemBase {
@@ -21,7 +19,8 @@ public class CoralIntake extends SubsystemBase {
   private TalonFX m_CoralMotor;
   private DigitalInput m_CoralBeamBreak;
 
-  private final VelocityTorqueCurrentFOC torqueVelocity = new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+  private final VelocityTorqueCurrentFOC torqueVelocity =
+      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
 
   /** Creates a new CoralIntake. */
@@ -29,19 +28,24 @@ public class CoralIntake extends SubsystemBase {
     m_CoralMotor = new TalonFX(HardwareConstants.EndEffector.coralMotorCanID);
     m_CoralIntakeState = IntakeState.NONE;
     m_CoralBeamBreak = new DigitalInput(HardwareConstants.EndEffector.coralBeamBreakCanDIO);
-    
+
     torqueVelocity.UpdateFreqHz = 0;
     torqueVelocity.UseTimesync = true;
 
     currentOut.UpdateFreqHz = 0;
-    currentOut.UseTimesync= true;
+    currentOut.UseTimesync = true;
 
-    m_CoralMotor.getConfigurator().apply(HardwareConstants.EndEffector.getCoralMotorConfiguration());
+    m_CoralMotor
+        .getConfigurator()
+        .apply(HardwareConstants.EndEffector.getCoralMotorConfiguration());
   }
 
   public void runCoral(double RPM) {
     /* Eject if HASGAMEPIECE */
-    m_CoralIntakeState = (m_CoralIntakeState == IntakeState.HASGAMEPIECE) ? IntakeState.OUTAKING : IntakeState.INTAKING;
+    m_CoralIntakeState =
+        (m_CoralIntakeState == IntakeState.HASGAMEPIECE)
+            ? IntakeState.OUTAKING
+            : IntakeState.INTAKING;
     m_CoralMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(RPM * 60)));
   }
 

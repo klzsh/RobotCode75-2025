@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HardwareConstants;
 
@@ -26,13 +25,16 @@ public class AlgaeIntake extends SubsystemBase {
   private static IntakeState m_AlgaeIntakeState;
   private TalonFX m_AlgaeMotor;
 
-  private final VelocityTorqueCurrentFOC torqueVelocity =new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+  private final VelocityTorqueCurrentFOC torqueVelocity =
+      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
 
   /** Creates a new AlgaeIntake. */
   public AlgaeIntake() {
     m_AlgaeMotor = new TalonFX(HardwareConstants.EndEffector.algaeMotorCanID);
-    m_AlgaeMotor.getConfigurator().apply(HardwareConstants.EndEffector.getAlgaeMotorConfiguration());
+    m_AlgaeMotor
+        .getConfigurator()
+        .apply(HardwareConstants.EndEffector.getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = IntakeState.NONE;
 
     torqueVelocity.UpdateFreqHz = 0;
@@ -40,7 +42,6 @@ public class AlgaeIntake extends SubsystemBase {
 
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;
-    
   }
 
   public void runAlgaeIntake(double RPM) {

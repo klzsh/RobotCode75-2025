@@ -8,14 +8,16 @@ import static edu.wpi.first.units.Units.Hertz;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Frequency;
 
 /** This class is meant to house the configs for specific motors */
 public final class HardwareConstants {
+  public static final String superstructureCANBusName = " Superstructure";
 
   public static final class EndEffector {
     public static final TalonFXConfiguration m_CoralMotorConfig = new TalonFXConfiguration();
@@ -34,7 +36,6 @@ public final class HardwareConstants {
 
     public static final Frequency TimeSyncFreq = Hertz.of(250);
 
-    
     /* End Effector Current Limiting (Amps) */
     public static final int coralCurrentLimit = 80;
     public static final int coralCurrentLowerThreshold = 40;
@@ -43,7 +44,7 @@ public final class HardwareConstants {
     public static final int coralStatorCurrentLimit = 20;
     public static final int coralStatorCurrentLimitForward = 20;
     public static final int coralStatorCurrentLimitReverse = -20;
-    
+
     // Seconds
     public static final double coralCurrentThresholdTime = 0.50;
     public static final boolean coralEnableCurrentLimit = true;
@@ -68,7 +69,7 @@ public final class HardwareConstants {
     public static final double coralTorqueKP = 2.0;
     public static final double coralTorqueKI = 0.0;
     public static final double coralTorqueKD = 0.0;
-    
+
     public static final double algaeTorqueKP = 2.0;
     public static final double algaeTorqueKI = 0.0;
     public static final double algaeTorqueKD = 0.0;
@@ -258,6 +259,83 @@ public final class HardwareConstants {
     public static CANcoderConfiguration getEncoderConfiguration() {
       m_EncoderConfig.MagnetSensor.SensorDirection = cancoderInvert;
       return m_EncoderConfig;
+    }
+  }
+
+  public static final class Elevator {
+
+    // takes 0.25 seconds to go from 0-100% current output
+    public static final double closedLoopRamp = 0.25;
+
+    // reasonable starting points TODO: make sure these are sane
+    public static final double statorCurrentLimit = 60;
+    public static final double supplyCurrentLimit = 40;
+    // set current limit to 30 amps if supply current limit is exceeded for more than 0.5 seconds
+    public static final double supplyCurrentLowerLimit = 30;
+    public static final double supplyCurrentLowerTime = 0.5;
+
+    // TODO: find these
+    public static final double mmAcceleration = 0;
+    public static final double mmCruiseVelocity = 0;
+    public static final double mmExpoKa = 0;
+    public static final double mmExpoKv = 0;
+    public static final double mmJerk = 0;
+
+    public static final double timeSyncFreq = 250;
+
+    // TODO: find these
+    public static final double kA = 0;
+    public static final double kG = 0;
+    public static final double kS = 0;
+    public static final double kV = 0;
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+
+    // TODO: slowly ramp these up
+    public static final double torqueForwardCurrentLimit = 20;
+    public static final double torqueReverseCurrentLimit = 20;
+
+    public static TalonFXConfiguration getElevatorMotorConfig(boolean inverted) {
+      TalonFXConfiguration m_ElevatorMotorConfig = new TalonFXConfiguration();
+
+      m_ElevatorMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
+
+      m_ElevatorMotorConfig.CurrentLimits.StatorCurrentLimit = statorCurrentLimit;
+      m_ElevatorMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
+      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit;
+      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerTime = supplyCurrentLowerTime;
+
+      // TODO: decide on which motion magic config to use
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = mmAcceleration;
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = mmCruiseVelocity;
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicExpo_kA = mmExpoKa;
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicExpo_kV = mmExpoKv;
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicJerk = mmJerk;
+
+      m_ElevatorMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq;
+      m_ElevatorMotorConfig.MotorOutput.Inverted =
+          inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+      m_ElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+      m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+      m_ElevatorMotorConfig.Slot0.StaticFeedforwardSign =
+          StaticFeedforwardSignValue.UseVelocitySign;
+      m_ElevatorMotorConfig.Slot0.kA = kA;
+      m_ElevatorMotorConfig.Slot0.kG = kG;
+      m_ElevatorMotorConfig.Slot0.kS = kS;
+      m_ElevatorMotorConfig.Slot0.kV = kV;
+      m_ElevatorMotorConfig.Slot0.kP = kP;
+      m_ElevatorMotorConfig.Slot0.kI = kI;
+      m_ElevatorMotorConfig.Slot0.kD = kD;
+
+      m_ElevatorMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent = torqueForwardCurrentLimit;
+      m_ElevatorMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent = torqueReverseCurrentLimit;
+
+      return m_ElevatorMotorConfig;
     }
   }
 }
