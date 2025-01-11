@@ -10,6 +10,8 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -24,8 +26,24 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+/* ACTIONS
+ * 1 for score L1
+ * 2 for dealgify (decide level by last point or apriltag)
+ * 3, 4 for left/right L4
+ * 5 for align + elevator up + processor + elevator down
+ * 6, 7, 8 for align to left/middle/right coral station + elevator up + check for beam break + elevator down
+ */
+
+/* POINTS
+ * ST, SM, SB - top/middle/bottom starting positions
+ * L - arbitrary leave point
+ * P - processor
+ * RTL, RTR, RBL, RBR, RR,  RL - reef points
+ * HT, HB - human player stations
+ */
 
 public class AutoSelector {
 
@@ -38,33 +56,39 @@ public class AutoSelector {
   }
 
   private List<ChoreoTrajectory> m_trajectories = new ArrayList<>();
-  private String m_feedbackValue = "Enter a command!";
   private Command m_autoCommand = Commands.runOnce(() -> {});
   private Field2d m_field;
-  private HashMap<Character, Command> m_actionMap;
+  private Map<Integer, Command> m_actionMap;
   private Swerve m_drivetrain;
   private List<Command> m_startCommands;
   private List<Command> m_endCommands;
-  private HashMap<Character, Pose2d> m_startPositions;
+  private Map<String, Pose2d> m_startPositions;
 
   private GenericEntry autoStringEntry;
-  private GenericEntry safetyEntry;
+  private GenericEntry feedbackEntry;
+  // private GenericEntry safetyEntry;
 
   private final AutoFactory factory;
 
+  private Pose2d m_startPose;
+
   public AutoSelector(
-      HashMap<Character, Command> actionMap,
+      Map<Integer, Command> actionMap,
       Swerve drivetrain,
       List<Command> startCommands,
-      List<Command> endCommands,
-      HashMap<Character, Pose2d> startPositions) {
+      List<Command> endCommands) {
     NetworkTableInstance nt = NetworkTableInstance.getDefault();
-    NetworkTable table = nt.getTable("Shuffleboard").getSubTable("Customize Auto");
-
+    NetworkTable table = nt.getTable("Shuffleboard").getSubTable("Auto");
     autoStringEntry = table.getTopic("Enter Command").getGenericEntry();
-    safetyEntry = table.getTopic("Ignore Safety").getGenericEntry();
+    feedbackEntry = table.getTopic("Feedback").getGenericEntry();
+    feedbackEntry.setString("Enter a command!");
+    // safetyEntry = table.getTopic("Ignore Safety").getGenericEntry();
 
     m_field = new Field2d();
+    m_actionMap = actionMap;
+    m_drivetrain = drivetrain;
+    m_startCommands = startCommands;
+    m_endCommands = endCommands;
 
     // define auto factory for autos
     factory =
@@ -74,14 +98,6 @@ public class AutoSelector {
             m_drivetrain::followSwerveSample,
             true,
             m_drivetrain);
-
-    m_actionMap = actionMap;
-    m_drivetrain = drivetrain;
-    m_startCommands = startCommands;
-    m_endCommands = endCommands;
-    m_startPositions = startPositions;
-
-    setupAutoTab();
   }
 
   public void clearField() {
@@ -91,7 +107,7 @@ public class AutoSelector {
     }
   }
 
-  public void drawPaths() {
+  private void drawPaths() {
     clearField();
     for (int i = 0; i < m_trajectories.size(); i++) {
       ChoreoTrajectory pathTraj = m_trajectories.get(i);
@@ -108,54 +124,85 @@ public class AutoSelector {
     clearField();
   }
 
+  public void reset() {
+    clearAll();
+    autoStringEntry.setString("");
+    feedbackEntry.setString("Enter a command!");
+  }
+
   public void setFeedback(String feedback) {
-    m_feedbackValue = feedback;
+    feedbackEntry.setString(feedback);
   }
 
   public String getFeedback() {
-    return m_feedbackValue;
+    return feedbackEntry.getString("");
   }
 
   public void setupAutoTab() {
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
-
-    autoTab.add("Enter Command", "").withSize(3, 1).withPosition(0, 0);
-    autoTab.add(m_field).withSize(6, 4).withPosition(3, 0);
-    autoTab.addString("Feedback", () -> m_feedbackValue).withSize(3, 1).withPosition(0, 1);
+    
+    autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
+    autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
+    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
 
     autoTab
-        .add("Ignore Safety", false)
-        .withWidget(BuiltInWidgets.kToggleSwitch)
-        .withSize(2, 1)
+        .add("Generate", true)
+        .withWidget(BuiltInWidgets.kToggleButton)
+        .withSize(1, 1)
         .withPosition(0, 2);
+    autoTab
+        .add("Reset", true)
+        .withWidget(BuiltInWidgets.kToggleButton)
+        .withSize(1, 1)
+        .withPosition(1, 2);
 
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable ntTable = inst.getTable("Shuffleboard").getSubTable("Auto");
 
-    ntTable.addListener(
-        "Enter Command",
-        EnumSet.of(Kind.kValueAll),
-        (table, key, event) -> {
-          generatePaths();
-        });
+    // ntTable.addListener(
+    //     "Enter Command",
+    //     EnumSet.of(Kind.kValueAll),
+    //     (table, key, event) -> {
+    //       generatePaths();
+    //     });
 
     ntTable.addListener(
-        "Ignore Safety",
+        "Generate",
         EnumSet.of(Kind.kValueAll),
         (table, key, event) -> {
           generatePaths();
         });
+    ntTable.addListener(
+        "Reset",
+        EnumSet.of(Kind.kValueAll),
+        (table, key, event) -> {
+          reset();
+        });
+
+    // ntTable.addListener(
+    //     "Ignore Safety",
+    //     EnumSet.of(Kind.kValueAll),
+    //     (table, key, event) -> {
+    //       generatePaths();
+    //     });
+
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      m_startPositions = AutoConstants.blueStartPositions;
+    } else {
+      m_startPositions = AutoConstants.redStartPositions;
+    }
   }
 
   public void generatePaths() {
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
-    boolean ignoreSafety = safetyEntry.getBoolean(false);
+    // boolean ignoreSafety = safetyEntry.getBoolean(false);
 
-    if (m_startPositions.get(autoString.charAt(0)) == null) {
+    if (!m_startPositions.containsKey(autoString.split(" ")[0].toLowerCase())) {
       setFeedback("Invalid start position");
       return;
     }
+    m_startPose = m_startPositions.get(autoString.split(" ")[0].toLowerCase());
 
     SequentialCommandGroup finalPath = new SequentialCommandGroup();
     StringBuilder s = new StringBuilder();
@@ -175,36 +222,52 @@ public class AutoSelector {
       return;
     }
 
-    char lastPose = ' ';
+    String lastPose = "";
     for (int i = 0; i < words.length; i++) {
       ParallelCommandGroup group = new ParallelCommandGroup();
+      StringBuilder pointString = new StringBuilder();
+      StringBuilder actionString = new StringBuilder();
       for (int j = 0; j < words[i].length(); j++) {
-        char current = words[i].charAt(j);
-        if (Character.isLetter(current)) {
-          if (i == 0) {
-            lastPose = current;
-            continue;
-          }
-          if (lastPose != ' ') {
-            try {
-              m_trajectories.add(
-                  new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + current).get()));
-              group.addCommands(factory.trajectoryCmd("" + lastPose + "-" + current));
-              s.append("" + lastPose + "-" + current + " ");
-
-            } catch (Exception e) {
-              setFeedback("Path File Not Found");
-              m_autoCommand = Commands.runOnce(() -> {});
-            }
-          }
-        } else if (Character.isDigit(current) && m_actionMap.containsKey(current)) {
-          group.addCommands(m_actionMap.get(current));
-          s.append(m_actionMap.get(current).getName() + " ");
+        char c = words[i].charAt(j);
+        if (Character.isLetter(c)) {
+          pointString.append(c);
+        } else {
+          actionString.append(c);
         }
+      }
+
+      String point = pointString.toString().toLowerCase();
+      int action = actionString.length() > 0 ? Integer.parseInt(actionString.toString()) : -1;
+
+      if (i == 0) {
+        lastPose = point;
+        continue;
+      }
+      if (point != "" && lastPose != "") {
+        try {
+          // m_trajectories.add(
+          //     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+          // group.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
+          // if (DriverStation.getAlliance().get() == Alliance.Red) {
+          //   m_trajectories.set(
+          //       m_trajectories.size() - 1,
+          //       new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() - 1).traj.flipped()));
+          // }
+          s.append("" + lastPose + "-" + point + " ");
+          lastPose = point;
+        } catch (Exception e) {
+          setFeedback("Path File Not Found");
+          m_autoCommand = Commands.runOnce(() -> {});
+        }
+      }
+      if (m_actionMap.containsKey(action)) {
+        group.addCommands(m_actionMap.get(action));
+        s.append(m_actionMap.get(action).getName() + " ");
       }
       finalPath.addCommands(group);
     }
-    setFeedback("Successfully Created Auto Sequence! " + s.toString());
+    setFeedback("Auto Sequence: " + s.toString());
+    drawPaths();
     m_autoCommand = finalPath;
   }
 
@@ -213,6 +276,6 @@ public class AutoSelector {
   }
 
   public Pose2d getStartPose() {
-    return m_startPositions.get(autoStringEntry.getString("").charAt(0));
+    return m_startPose;
   }
 }
