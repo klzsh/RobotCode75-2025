@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.dashboard.AutoSelector;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -21,6 +23,9 @@ import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Util.LEDsDefaultCommand;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Util.CANdleWrapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -54,6 +59,16 @@ public class RobotContainer {
       new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final AutoSelector m_Selector =
+      new AutoSelector(
+          Map.of(
+            1, new ResetHeading(m_Swerve),
+            2, new XStance(m_Swerve),
+            3, new LEDsDefaultCommand(m_Wrapper)
+          ),
+          m_Swerve,
+          new ArrayList<Command>(),
+          new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -99,7 +114,10 @@ public class RobotContainer {
             () -> -m_LeftStick.getX()));
   }
 
-  private void configureChooser() {}
+  private void configureChooser() {
+    m_Selector.setupAutoTab();
+    m_Selector.clearField();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
