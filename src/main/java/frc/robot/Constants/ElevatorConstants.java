@@ -26,14 +26,19 @@ public class ElevatorConstants {
   // TODO: find
   public static final Distance distanceBetweenElevatorZeroAndGround = Inches.of(0);
 
-  // TODO: figure out
+  // TODO: figure out (placeholder values)
   // Distance from
   public static final Distance algaeRemovalOffset = Inches.of(0);
-  public static final Distance l1Position = Inches.of(0);
-  public static final Distance l2Position = Inches.of(0);
-  public static final Distance l3Position = Inches.of(0);
-  public static final Distance l4Position = Inches.of(0);
+  public static final Distance l1Position = Inches.of(8);
+  public static final Distance l2Position = Inches.of(24);
+  public static final Distance l3Position = Inches.of(48);
+  public static final Distance l4Position = Inches.of(72);
   public static final Distance homePosition = Inches.of(0);
-  public static final Distance processorPosition = Inches.of(0);
-  public static final Distance HPStationPosition = Inches.of(0);
+  public static final Distance processorPosition = Inches.of(7);
+  public static final Distance HPStationPosition = Inches.of(1);
+
+  public static double[] profileUp = {50, 200, 1200};
+  public static double[] profileDown = {25, 100, 1200};
+
+  public static final Distance deadband = Inches.of(.5);
 }
