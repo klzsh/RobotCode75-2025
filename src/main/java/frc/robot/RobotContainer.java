@@ -31,19 +31,24 @@ import frc.robot.subsystems.Util.CANdleWrapper;
  */
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
+  // define subsystems first
   @Logged(name = "swerve")
   private final Swerve m_Swerve = new Swerve();
+
   private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
+  // define auto factory for autos
   private final AutoFactory factory =
       new AutoFactory(
           m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
+  // define OI controls
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
   private final Joystick m_RightStick = new Joystick(OIConstants.rightStickPort);
   private final CommandXboxController m_Controller =
       new CommandXboxController(OIConstants.controllerPort);
 
+  // define driver buttons
   private final JoystickButton robotRelative =
       new JoystickButton(m_RightStick, OIConstants.robotRelativeButton);
   private final JoystickButton resetHeading =
@@ -58,7 +63,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
     configureDefaultCommands();
     configureBindings();
     configureChooser();
@@ -68,6 +72,9 @@ public class RobotContainer {
     m_Swerve.setDefaultCommand(
         new TeleopSwerve(
             m_Swerve,
+            // for some reason, the makers of WPILIB decided that joystick coordinates and robot
+            // coordinates should be flipped. I don't know what drove them to do that, but due to
+            // this decision, we have to negate the stick values.
             () -> -m_LeftStick.getY(),
             () -> -m_LeftStick.getX(),
             () -> m_RightStick.getX(),
@@ -86,7 +93,6 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
     holdButton.whileTrue(
@@ -107,7 +113,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     return m_AutoChooser.getSelected();
   }
 }

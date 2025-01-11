@@ -39,14 +39,11 @@ public class TeleopSwerve extends Command {
 
   @Override
   public void execute() {
-    /* Get Values, Deadband */
-    // add deadbands to prevent jittering on small stick inputs
-
     // translation, strafe, rotation is the order
     double[] DriverInput = Joysticks.processJoystick(translationSup, strafeSup, rotationSup);
 
     // you must negate the translation because FRC coordinates and Joystick axis values are
-    // opposite to each other
+    // opposite to each other. This is done in robotContainer
     Translation2d translation2d =
         new Translation2d(DriverInput[0], DriverInput[1])
             .times(DrivetrainConstants.maxSpeed.in(MetersPerSecond));

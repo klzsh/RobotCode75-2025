@@ -52,15 +52,14 @@ public class Robot extends TimedRobot {
           }
           // Change the root data path
           config.root = "Telemetry";
-          //! reference
+          // ! reference
 
-
-          //! NO FMS
+          // ! NO FMS
           //   // log INFO and CRITICAL data to NT, NOT DISK
           //   config.minimumImportance = Logged.Importance.INFO;
           //   config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
           //   DataLogManager.stop();
-          //! FMS ATTACHED
+          // ! FMS ATTACHED
           //   // only disk log during comp
           //   // do not log joysticks
           //   config.minimumImportance = Logged.Importance.CRITICAL;

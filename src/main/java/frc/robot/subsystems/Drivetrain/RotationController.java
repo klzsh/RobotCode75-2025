@@ -15,7 +15,7 @@ import frc.robot.Constants.DrivetrainConstants;
 
 // for implementation look here:
 // https://github.com/Mechanical-Advantage/RobotCode2024/blob/main/src/main/java/org/littletonrobotics/frc2024/subsystems/drive/controllers/HeadingController.java
-//TODO: Document
+// TODO: Document
 public class RotationController {
   private double output;
 

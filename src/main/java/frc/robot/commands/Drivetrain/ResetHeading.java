@@ -9,12 +9,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
+/** resets the heading of the robot (should not be used often) */
 public class ResetHeading extends Command {
   /** Creates a new ResetHeading. */
   private final Swerve m_Swerve;
 
   public ResetHeading(Swerve swerve) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_Swerve = swerve;
     addRequirements(m_Swerve);
   }

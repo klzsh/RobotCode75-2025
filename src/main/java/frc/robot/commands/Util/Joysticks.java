@@ -4,6 +4,10 @@ import edu.wpi.first.math.MathUtil;
 import frc.robot.Constants.OIConstants;
 import java.util.function.DoubleSupplier;
 
+/**
+ * Helper class to process joystick inputs. I wanted to use joystick expos to better control the
+ * robot, so this is to simplify driver code
+ */
 public class Joysticks {
   public static double[] processJoystick(
       DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {

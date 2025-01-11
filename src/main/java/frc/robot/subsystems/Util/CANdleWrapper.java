@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CANdleWrapper extends SubsystemBase {
   /** Creates a new CANdleWrapper. */
+  // TODO: rework for 2025 robot
   private final CANdle m_Candle;
 
   public enum Section {
@@ -22,8 +23,6 @@ public class CANdleWrapper extends SubsystemBase {
   public CANdleWrapper() {
     m_Candle = new CANdle(4);
     m_Candle.configBrightnessScalar(0.5);
-
-    // m_Candle.animate()
   }
 
   private void setLeftHalf(Color color) {

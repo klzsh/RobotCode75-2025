@@ -22,7 +22,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
 
 /*
@@ -63,7 +62,6 @@ public class Swerve extends SubsystemBase {
   private final PIDController xController;
   private final PIDController yController;
   private final PIDController rController;
-
 
   // fuse camera pose into odometry
   @Logged(name = "PDH", importance = Importance.DEBUG)
@@ -128,8 +126,10 @@ public class Swerve extends SubsystemBase {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, false);
     }
   }
+
   /**
    * intermediary function to convert between chassis speeds and swerve module states
+   *
    * @param speeds
    */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
@@ -139,17 +139,17 @@ public class Swerve extends SubsystemBase {
         DrivetrainConstants.swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
     setModuleStates(swerveModuleStates, false);
   }
+
   /**
    * getter for chassis speeds
+   *
    * @return robot relative speeds
    */
   public ChassisSpeeds getChassisSpeeds() {
     return DrivetrainConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
   }
 
-  /**
-   * follows an autonomous path provided by choreo
-   */
+  /** follows an autonomous path provided by choreo */
   public void followSwerveSample(SwerveSample sample) {
     // TODO: some fancy optimization stuff
     ChassisSpeeds speeds =
@@ -181,8 +181,10 @@ public class Swerve extends SubsystemBase {
       mod.setDesiredState(new SwerveModuleState(0, mod.getSetpoint().angle), true, false);
     }
   }
+
   /**
    * Used to find the kS value of the swerve module drive motors. Essentially a feedforward
+   *
    * @param current
    */
   public void characterizeDrive(Current current) {

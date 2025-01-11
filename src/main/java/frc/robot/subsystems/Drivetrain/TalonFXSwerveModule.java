@@ -55,12 +55,10 @@ public class TalonFXSwerveModule {
 
   // sets the "forward" position of the wheel
   private CANcoder angleEncoder;
-  // used for closed loop control
-
+  // used for logging
   private SwerveModuleState setpoint;
 
   /* drive motor control requests */
-  // TODO: timesync control requests, in CTREConfigs + oneshot in here
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   // closed loop control
   private final VelocityTorqueCurrentFOC torqueDrivevelocity =
@@ -91,7 +89,8 @@ public class TalonFXSwerveModule {
     lastAngle = getState().angle;
     setpoint = new SwerveModuleState();
 
-    // set control requests to be one shot
+    // set control requests to be one shot + enable timesync:
+    // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/status-signals.html#canivore-timesync
     driveDutyCycle.UpdateFreqHz = 0;
     driveDutyCycle.UseTimesync = true;
 
@@ -109,7 +108,7 @@ public class TalonFXSwerveModule {
    * sets the module state for an individual module
    *
    * @param desiredState the velocity and angle of the module
-   * @param isOpenLoop wether or not to use PIDF and motor feedback
+   * @param isOpenLoop Use duty cycle or closed loop control
    */
   public void setDesiredState(
       SwerveModuleState desiredState, boolean isOpenLoop, boolean steerWhenStationary) {
@@ -146,6 +145,12 @@ public class TalonFXSwerveModule {
     }
   }
 
+  /**
+   * Used to determine the amount of current to overcome the static friction between the ground and
+   * the module wheels.
+   *
+   * @param current the current to apply to the drive motor
+   */
   public void characterizeDrive(Current current) {
     mDriveMotor.setControl(torqueCharacterization.withOutput(current));
   }
@@ -154,6 +159,7 @@ public class TalonFXSwerveModule {
    * Sets the angle of the module via position control
    *
    * @param desiredState the velocity and angle of the module (only uses angle)
+   * @param steerWhenStationary used for XStance
    */
   private void setAngle(SwerveModuleState desiredState, boolean steerWhenStationary) {
     Rotation2d angle = new Rotation2d();
