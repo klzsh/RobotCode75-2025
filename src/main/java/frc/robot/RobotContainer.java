@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,11 +35,6 @@ public class RobotContainer {
   private final Swerve m_Swerve = new Swerve();
 
   private final CANdleWrapper m_Wrapper = new CANdleWrapper();
-
-  // define auto factory for autos
-  private final AutoFactory factory =
-      new AutoFactory(
-          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
