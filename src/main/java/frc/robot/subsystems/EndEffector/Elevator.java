@@ -28,6 +28,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
@@ -236,6 +237,10 @@ public class Elevator extends SubsystemBase {
     return m_Routine.dynamic(SysIdRoutine.Direction.kReverse);
   }
 
+  public Command positionCommand(ElevatorPositions position, boolean algae) {
+    return Commands.runOnce(() -> setPosition(position, algae), this).until(() -> isAtPosition(position, algae));
+  }
+ 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
