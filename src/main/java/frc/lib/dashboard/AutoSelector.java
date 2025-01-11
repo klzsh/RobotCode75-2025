@@ -158,10 +158,12 @@ public class AutoSelector {
     }
 
     SequentialCommandGroup finalPath = new SequentialCommandGroup();
+    StringBuilder s = new StringBuilder();
     m_trajectories.clear();
 
     for (Command startCommand : m_startCommands) {
       finalPath.addCommands(startCommand);
+      s.append(startCommand.getName() + " ");
     }
 
     if (autoString.length() == 0) {
@@ -188,6 +190,7 @@ public class AutoSelector {
               m_trajectories.add(
                   new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + current).get()));
               group.addCommands(factory.trajectoryCmd("" + lastPose + "-" + current));
+              s.append("" + lastPose + "-" + current + " ");
 
             } catch (Exception e) {
               setFeedback("Path File Not Found");
@@ -196,11 +199,12 @@ public class AutoSelector {
           }
         } else if (Character.isDigit(current) && m_actionMap.containsKey(current)) {
           group.addCommands(m_actionMap.get(current));
+          s.append(m_actionMap.get(current).getName() + " ");
         }
       }
       finalPath.addCommands(group);
     }
-    setFeedback("Successfully Created Auto Sequence!");
+    setFeedback("Successfully Created Auto Sequence! " + s.toString());
     m_autoCommand = finalPath;
   }
 
