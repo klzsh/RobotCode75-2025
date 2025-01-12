@@ -16,7 +16,7 @@ public class ElevatorConstants {
 
   public static final Distance pulleyCircumference =
       Inches.of(1.751 * Math.PI); // circumference of 22 teeth #25 WCP sprocket
-  public static final double mechanismToMotorRatio = 3.0; // 3 motor rotations = 1 shaft rotation
+  public static final double mechanismToMotorRatio = 5.0 + (1.0/3.0); // 5 1/3 motor rotations = 1 shaft rotation
   // TODO: sanity check this value
   public static final Distance inchesPerRotation =
       Inches.of(
