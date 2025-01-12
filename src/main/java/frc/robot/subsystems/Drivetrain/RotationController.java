@@ -51,15 +51,7 @@ public class RotationController {
         new TrapezoidProfile.Constraints(
             DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
             DrivetrainConstants.maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
-    double rotation = swerve.getRotation2D().getRadians();
-    if (Math.abs(rotation + 2 * Math.PI - setpoint.getRadians())
-        < Math.abs(rotation - setpoint.getRadians())) {
-      rotation += 2 * Math.PI;
-    }
-    if (Math.abs(rotation - 2 * Math.PI - setpoint.getRadians())
-        < Math.abs(rotation - setpoint.getRadians())) {
-      rotation -= 2 * Math.PI;
-    }
+
     this.output = -controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
   }
 
@@ -69,7 +61,7 @@ public class RotationController {
     update(setpoint);
   }
 
-  public boolean atSetpoint() {
+  public boolean atGoal() {
     return controller.atGoal();
   }
 }

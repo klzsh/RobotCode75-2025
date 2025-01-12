@@ -9,10 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.*;
 import frc.lib.util.SwerveModuleConstants;
 
 /** Add your docs here. */
@@ -42,6 +39,22 @@ public final class DrivetrainConstants {
     public static final double maxAccelerationMultiplier = 0.8;
     public static final double loopPeriodSeconds = 0.02;
     public static final double toleranceRadians = .15;
+    public static final double toleranceTranslation = .05;
+
+    public static final LinearVelocity maxVelocity = MetersPerSecond.of(3);
+    public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
+
+    /** Radians per Second */
+    public static final AngularVelocity maxAngularVelocity =
+        RadiansPerSecond.of(
+            maxSpeed.in(MetersPerSecond)
+                / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
+
+    /** Radians per Second per Second */
+    public static final AngularAcceleration maxAngularAcceleration =
+        RadiansPerSecondPerSecond.of(
+            maxSpeed.in(MetersPerSecond)
+                / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
   }
 
   /*
@@ -71,6 +84,8 @@ public final class DrivetrainConstants {
 
   /** Meters per Second */
   public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.49);
+
+  public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
 
   /** Radians per Second */
   public static final AngularVelocity maxAngularVelocity =
