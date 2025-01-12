@@ -198,11 +198,11 @@ public class AutoSelector {
     String[] words = autoString.split(" ");
     // boolean ignoreSafety = safetyEntry.getBoolean(false);
 
-    if (!m_startPositions.containsKey(autoString.split(" ")[0].toLowerCase())) {
+    if (!m_startPositions.containsKey(words[0].toLowerCase())) {
       setFeedback("Invalid start position");
       return;
     }
-    m_startPose = m_startPositions.get(autoString.split(" ")[0].toLowerCase());
+    m_startPose = m_startPositions.get(words[0].toLowerCase());
 
     SequentialCommandGroup finalPath = new SequentialCommandGroup();
     StringBuilder s = new StringBuilder();
