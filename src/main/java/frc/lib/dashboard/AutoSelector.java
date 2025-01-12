@@ -29,19 +29,35 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * Takes in a string to parse into an auto
+ * Enter Command - place to type/paste in the string
+ * Feedback - displays errors, shows completed path
+ * Generate - checks paths for errors, displays trajectories on field, sets auto command
+ * Reset - reset trajectories, string, and auto command
+ * 
+ * FORMAT FOR AUTO STRING
+ * Separated into words by spaces - commands in the same word are executed simultaneously
+ * Each word can contain one point and one action max
+ *  - All points are strings of letters (case insensitive)
+ *  - All actions are numbers
+ * !!! The first word MUST be only one starting point (ST/SM/SB) without an action
+ * Points are labeled according to position in Choreo/relative to processor
+ */
+
 /* ACTIONS
- * 1 for score L1
- * 2 for dealgify (decide level by last point or apriltag)
- * 3, 4 for left/right L4
- * 5 for align + elevator up + processor + elevator down
- * 6, 7, 8 for align to left/middle/right coral station + elevator up + check for beam break + elevator down
+ * 1 for align + score L1 + move back to R point
+ * 2 for align + elevator movement & dealgify (decide level by last point or apriltag) + move back to R point
+ * 3, 4 for align + elevator movement & score left/right L4 + move back to R point
+ * 5 for align + elevator movement & processor + move back to P point
+ * 6, 7, 8 for align to left/middle/right coral station + check for beam break + move back to H point
  */
 
 /* POINTS
  * ST, SM, SB - top/middle/bottom starting positions
  * L - arbitrary leave point
  * P - processor
- * RTL, RTR, RBL, RBR, RR,  RL - reef points
+ * RTL, RTR, RBL, RBR, RR, RL - reef points
  * HT, HB - human player stations
  */
 
@@ -57,6 +73,7 @@ public class AutoSelector {
 
   private List<ChoreoTrajectory> m_trajectories = new ArrayList<>();
   private Command m_autoCommand = Commands.runOnce(() -> {});
+  private Pose2d m_startPose;
   private Field2d m_field;
   private Map<Integer, Command> m_actionMap;
   private Swerve m_drivetrain;
@@ -69,8 +86,6 @@ public class AutoSelector {
   // private GenericEntry safetyEntry;
 
   private final AutoFactory factory;
-
-  private Pose2d m_startPose;
 
   public AutoSelector(
       Map<Integer, Command> actionMap,
@@ -128,6 +143,8 @@ public class AutoSelector {
     clearAll();
     autoStringEntry.setString("");
     feedbackEntry.setString("Enter a command!");
+    m_autoCommand = Commands.runOnce(() -> {});
+    m_startPose = null;
   }
 
   public void setFeedback(String feedback) {
@@ -204,27 +221,27 @@ public class AutoSelector {
     }
     m_startPose = m_startPositions.get(words[0].toLowerCase());
 
-    SequentialCommandGroup finalPath = new SequentialCommandGroup();
+    SequentialCommandGroup sequential = new SequentialCommandGroup();
     StringBuilder s = new StringBuilder();
     m_trajectories.clear();
 
     for (Command startCommand : m_startCommands) {
-      finalPath.addCommands(startCommand);
+      sequential.addCommands(startCommand);
       s.append(startCommand.getName() + " ");
     }
 
     if (autoString.length() == 0) {
       for (Command endCommand : m_endCommands) {
-        finalPath.addCommands(endCommand);
+        sequential.addCommands(endCommand);
       }
-      m_autoCommand = finalPath;
+      m_autoCommand = sequential;
       setFeedback("Empty path. Is this intentional?");
       return;
     }
 
     String lastPose = "";
     for (int i = 0; i < words.length; i++) {
-      ParallelCommandGroup group = new ParallelCommandGroup();
+      ParallelCommandGroup parallelGroup = new ParallelCommandGroup();
       StringBuilder pointString = new StringBuilder();
       StringBuilder actionString = new StringBuilder();
       for (int j = 0; j < words[i].length(); j++) {
@@ -245,30 +262,35 @@ public class AutoSelector {
       }
       if (point != "" && lastPose != "") {
         try {
-          // m_trajectories.add(
-          //     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
-          // group.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
-          // if (DriverStation.getAlliance().get() == Alliance.Red) {
-          //   m_trajectories.set(
-          //       m_trajectories.size() - 1,
-          //       new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() - 1).traj.flipped()));
-          // }
+          m_trajectories.add(
+              new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+          parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
+          if (DriverStation.getAlliance().get() == Alliance.Red) {
+            m_trajectories.set(
+                m_trajectories.size() - 1,
+                new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() - 1).traj.flipped()));
+          }
           s.append("" + lastPose + "-" + point + " ");
           lastPose = point;
         } catch (Exception e) {
-          setFeedback("Path File Not Found");
+          setFeedback("Path File Not Found: " + lastPose + "-" + point);
           m_autoCommand = Commands.runOnce(() -> {});
+          return;
         }
       }
       if (m_actionMap.containsKey(action)) {
-        group.addCommands(m_actionMap.get(action));
+        parallelGroup.addCommands(m_actionMap.get(action));
         s.append(m_actionMap.get(action).getName() + " ");
+      } else {
+        setFeedback("Action Not Found: " + action);
+        m_autoCommand = Commands.runOnce(() -> {});
+        return;
       }
-      finalPath.addCommands(group);
+      sequential.addCommands(parallelGroup);
     }
     setFeedback("Auto Sequence: " + s.toString());
     drawPaths();
-    m_autoCommand = finalPath;
+    m_autoCommand = sequential;
   }
 
   public Command getAutoCommand() {
