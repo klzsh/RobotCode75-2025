@@ -4,14 +4,12 @@
 
 package frc.robot.Constants;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -26,6 +24,26 @@ public final class DrivetrainConstants {
 
   public static final boolean USE_ANGLE_TORQUE = true;
   public static final boolean USE_DRIVE_TORQUE = true;
+
+  /* Drivetrain Constants */
+  // TODO: Find these
+  public static final Distance trackWidth = Inches.of(22.5);
+  public static final Distance wheelBase = Inches.of(22.5);
+  // distance between the center of the wheel to the center of the robot
+  public static final Distance kCenterToWheel =
+      Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
+  public static final Distance wheelDiameter = Inches.of(2);
+  public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
+
+  public static final class ControllerConstants {
+    public static final double kp = 0.08;
+    public static final double kd = 0.03;
+    public static final double maxVelocityMultiplier = 0.8;
+    public static final double maxAccelerationMultiplier = 0.8;
+    public static final double loopPeriodSeconds = 0.02;
+    public static final double toleranceRadians = .15;
+  }
+
   /*
    * Swerve Kinematics
    * No need to ever change this unless you are not doing a traditional
@@ -46,16 +64,6 @@ public final class DrivetrainConstants {
               -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
               -DrivetrainConstants.trackWidth.in(Meters) / 2.0));
 
-  /* Drivetrain Constants */
-  // TODO: Find these
-  public static final Distance trackWidth = Inches.of(22.5);
-  public static final Distance wheelBase = Inches.of(22.5);
-  // distance between the center of the wheel to the center of the robot
-  public static final Distance kCenterToWheel =
-      Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
-  public static final Distance wheelDiameter = Inches.of(2);
-  public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
-
   /* Module Gear Ratios */
   // ratio of motor turns to mechanism turns
   public static final double driveGearRatio = 6.75;
@@ -67,6 +75,12 @@ public final class DrivetrainConstants {
   /** Radians per Second */
   public static final AngularVelocity maxAngularVelocity =
       RadiansPerSecond.of(
+          maxSpeed.in(MetersPerSecond)
+              / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
+
+  /** Radians per Second per Second */
+  public static final AngularAcceleration maxAngularAcceleration =
+      RadiansPerSecondPerSecond.of(
           maxSpeed.in(MetersPerSecond)
               / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
 

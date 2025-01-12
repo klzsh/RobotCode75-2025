@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -18,6 +19,8 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import frc.lib.math.Conversions;
@@ -52,16 +55,10 @@ public class TalonFXSwerveModule {
 
   // sets the "forward" position of the wheel
   private CANcoder angleEncoder;
-  // used for closed loop control
-
+  // used for logging
   private SwerveModuleState setpoint;
 
   /* drive motor control requests */
-  // TODO: timesync control requests, in CTREConfigs + oneshot in here
-  // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/status-signals.html
-  // TODO: latency compensation
-  // TODO: tune closed loop RampRate
-  // see following link
   private final DutyCycleOut driveDutyCycle = new DutyCycleOut(0);
   // closed loop control
   private final VelocityTorqueCurrentFOC torqueDrivevelocity =
@@ -75,31 +72,46 @@ public class TalonFXSwerveModule {
 
   public TalonFXSwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
     this.moduleNumber = moduleNumber;
-    this.angleOffset = moduleConstants.angleOffset;
+    this.angleOffset = moduleConstants.angleOffset();
 
     /* Angle Encoder Config */
-    angleEncoder = new CANcoder(moduleConstants.cancoderID, DrivetrainConstants.driveBusName);
+    angleEncoder = new CANcoder(moduleConstants.cancoderID(), DrivetrainConstants.driveBusName);
     configAngleEncoder();
 
     /* Angle Motor Config */
-    mAngleMotor = new TalonFX(moduleConstants.angleMotorID, DrivetrainConstants.driveBusName);
+    mAngleMotor = new TalonFX(moduleConstants.angleMotorID(), DrivetrainConstants.driveBusName);
     configAngleMotor();
 
     /* Drive Motor Config */
-    mDriveMotor = new TalonFX(moduleConstants.driveMotorID, DrivetrainConstants.driveBusName);
+    mDriveMotor = new TalonFX(moduleConstants.driveMotorID(), DrivetrainConstants.driveBusName);
     configDriveMotor();
 
     lastAngle = getState().angle;
     setpoint = new SwerveModuleState();
+
+    // set control requests to be one shot + enable timesync:
+    // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/status-signals.html#canivore-timesync
+    driveDutyCycle.UpdateFreqHz = 0;
+    driveDutyCycle.UseTimesync = true;
+
+    torqueDrivevelocity.UpdateFreqHz = 0;
+    torqueDrivevelocity.UseTimesync = true;
+
+    torqueAngleCurrent.UpdateFreqHz = 0;
+    torqueAngleCurrent.UseTimesync = true;
+
+    torqueCharacterization.UpdateFreqHz = 0;
+    torqueCharacterization.UseTimesync = true;
   }
 
   /**
    * sets the module state for an individual module
    *
    * @param desiredState the velocity and angle of the module
-   * @param isOpenLoop wether or not to use PIDF and motor feedback
+   * @param isOpenLoop Use duty cycle or closed loop control
    */
-  public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+  public void setDesiredState(
+      SwerveModuleState desiredState, boolean isOpenLoop, boolean steerWhenStationary) {
     /*
      * This is a custom optimize function, since default WPILib optimize assumes
      * continuous controller which CTRE and Rev onboard is not
@@ -107,9 +119,7 @@ public class TalonFXSwerveModule {
 
     desiredState = CTREModuleState.optimize(desiredState, getState().angle);
     setpoint = desiredState;
-    // cosine compensation
-    desiredState.cosineScale(getAngle());
-    setAngle(desiredState);
+    setAngle(desiredState, steerWhenStationary);
     // will either be percent output or velocity based on open loop
     setSpeed(desiredState, isOpenLoop);
   }
@@ -135,6 +145,12 @@ public class TalonFXSwerveModule {
     }
   }
 
+  /**
+   * Used to determine the amount of current to overcome the static friction between the ground and
+   * the module wheels.
+   *
+   * @param current the current to apply to the drive motor
+   */
   public void characterizeDrive(Current current) {
     mDriveMotor.setControl(torqueCharacterization.withOutput(current));
   }
@@ -143,14 +159,20 @@ public class TalonFXSwerveModule {
    * Sets the angle of the module via position control
    *
    * @param desiredState the velocity and angle of the module (only uses angle)
+   * @param steerWhenStationary used for XStance
    */
-  private void setAngle(SwerveModuleState desiredState) {
-    Rotation2d angle =
-        (Math.abs(desiredState.speedMetersPerSecond)
-                <= (DrivetrainConstants.maxSpeed.in(MetersPerSecond) * 0.01))
-            ? lastAngle
-            : desiredState
-                .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+  private void setAngle(SwerveModuleState desiredState, boolean steerWhenStationary) {
+    Rotation2d angle = new Rotation2d();
+    if (!steerWhenStationary) {
+      angle =
+          (Math.abs(desiredState.speedMetersPerSecond)
+                  <= (DrivetrainConstants.maxSpeed.in(MetersPerSecond) * 0.01))
+              ? lastAngle
+              : desiredState
+                  .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+    } else {
+      angle = desiredState.angle;
+    }
 
     mAngleMotor.setControl(
         torqueAngleCurrent.withPosition(
@@ -163,11 +185,16 @@ public class TalonFXSwerveModule {
   /**
    * @return the current angle of the angle motor
    */
-  @Logged(name = "Module Angle", importance = Importance.INFO)
+  @Logged(name = "Module Angle", importance = Importance.DEBUG)
   public Rotation2d getAngle() {
+    Measure<AngleUnit> LatencyCompensatedPosition =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            mAngleMotor.getPosition().refresh(), mAngleMotor.getVelocity().refresh());
+
     return Rotation2d.fromDegrees(
         Conversions.talonToDegrees(
-                mAngleMotor.getPosition().getValue(), DrivetrainConstants.angleGearRatio)
+                Rotations.of(LatencyCompensatedPosition.in(Rotations)),
+                DrivetrainConstants.angleGearRatio)
             .in(Degrees));
   }
 
@@ -217,7 +244,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the velocity and angle of the module
    */
-  @Logged(name = "Module State", importance = Importance.CRITICAL)
+  @Logged(name = "Module State", importance = Importance.DEBUG)
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         Conversions.talonToMPS(
@@ -230,7 +257,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the setpoint the module is commanded to go to
    */
-  @Logged(name = "Module Setpoint", importance = Importance.CRITICAL)
+  @Logged(name = "Module Setpoint", importance = Importance.DEBUG)
   public SwerveModuleState getSetpoint() {
     return setpoint;
   }
@@ -240,11 +267,13 @@ public class TalonFXSwerveModule {
    */
   @Logged(name = "Module Position", importance = Importance.DEBUG)
   public SwerveModulePosition getPosition() {
-    // BaseStatusSignal.getLatencyCompensatedValue(mDriveMotor.getPosition(),
-    // mDriveMotor.getVelocity());
+    Measure<AngleUnit> LatencyCompensatedPosition =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            mDriveMotor.getPosition().refresh(), mDriveMotor.getVelocity().refresh());
+
     return new SwerveModulePosition(
         Conversions.talonToMeters(
-            mDriveMotor.getPosition().getValue(),
+            Rotations.of(LatencyCompensatedPosition.in(Rotations)),
             DrivetrainConstants.wheelCircumference,
             DrivetrainConstants.driveGearRatio),
         getAngle());

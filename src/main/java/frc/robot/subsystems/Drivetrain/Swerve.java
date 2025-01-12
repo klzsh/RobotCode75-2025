@@ -3,14 +3,9 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 
-// import choreo.trajectory.SwerveSample;
+import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.config.ModuleConfig;
-// import com.pathplanner.lib.config.PIDConstants;
-// import com.pathplanner.lib.config.RobotConfig;
-// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -24,12 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 
@@ -46,42 +37,31 @@ public class Swerve extends SubsystemBase {
 
   public TalonFXSwerveModule[] m_SwerveModules;
 
-  @Logged(name = "Driver X", importance = Importance.DEBUG)
-  public double translationX = 0;
-
-  @Logged(name = "Driver Y", importance = Importance.DEBUG)
-  public double translationY = 0;
-
   @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
 
-  @Logged(name = "mod/Front Left")
+  @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
-  @Logged(name = "mod/Front Right")
+  @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontRight;
 
-  @Logged(name = "mod/Back Left")
+  @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackLeft;
 
-  @Logged(name = "mod/Back Right")
+  @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
-  private final Compressor m_Compressor;
-
-  @Logged private double CharacterizeCurrent = 0;
+  @Logged(name = "Drive Characterization Current", importance = Importance.DEBUG)
+  private double CharacterizeCurrent = 0;
 
   // controllers for autos
   private final PIDController xController;
   private final PIDController yController;
   private final PIDController rController;
-
-  private final Field2d m_Field;
-
-  // private final RobotConfig config;
 
   // fuse camera pose into odometry
   @Logged(name = "PDH", importance = Importance.DEBUG)
@@ -90,14 +70,9 @@ public class Swerve extends SubsystemBase {
   // gryo
   private Pigeon2 m_gyro;
 
-  /** define swerve modules, AHRS, odometry */
+  /** define swerve modules, Gyro, odometry */
   public Swerve() {
-    // m_Intake = intake;
 
-    m_Field = new Field2d();
-    m_Compressor = new Compressor(PneumaticsModuleType.REVPH);
-    // m_Compressor.enableAnalog(110, 120);
-    m_Compressor.disable();
     m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     // initalize objects in constructor so that they dont get initialized when the
@@ -121,47 +96,13 @@ public class Swerve extends SubsystemBase {
     xController = new PIDController(2.65, 0, 0);
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
+
     swerveOdometry =
         new SwerveDrivePoseEstimator(
             DrivetrainConstants.swerveKinematics,
             getRotation2D(),
             getModulePositions(),
             initialPose);
-    // ! Uncomment if we decide to use pathplanner
-    // config =
-    //     new RobotConfig(
-    //         Pounds.of(135),
-    //         KilogramSquareMeters.of(6),
-    //         new ModuleConfig(
-    //             Inches.of(2),
-    //             MetersPerSecond.of(3.779),
-    //             1.0,
-    //             DCMotor.getKrakenX60Foc(1),
-    //             Amps.of(80),
-    //             1),
-    //         Inches.of(22.5),
-    //         Inches.of(22.5));
-
-    // AutoBuilder.configure(
-    //     this::getPose,
-    //     this::setPose,
-    //     this::getChassisSpeeds,
-    //     (speeds) -> setChassisSpeeds(speeds),
-    //     new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(5, 0, 0)),
-    //     config,
-    //     () -> {
-    //       // Boolean supplier that controls when the path will be mirrored for the red
-    //       // alliance
-    //       // This will flip the path being followed to the red side of the field.
-    //       // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-    //       var alliance = DriverStation.getAlliance();
-    //       if (alliance.isPresent()) {
-    //         return alliance.get() == DriverStation.Alliance.Red;
-    //       }
-    //       return false;
-    //     },
-    //     this);
   }
 
   /**
@@ -172,10 +113,6 @@ public class Swerve extends SubsystemBase {
    */
   public void drive(
       Translation2d translation, double rotation, boolean isOpenLoop, boolean fieldRelative) {
-    // here the translational speed is correct
-    translationX = translation.getX();
-    translationY = translation.getY();
-
     SwerveModuleState[] swerveModuleStates =
         DrivetrainConstants.swerveKinematics.toSwerveModuleStates(
             fieldRelative
@@ -186,54 +123,70 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DrivetrainConstants.maxSpeed);
 
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, false);
     }
   }
 
+  /**
+   * intermediary function to convert between chassis speeds and swerve module states
+   *
+   * @param speeds
+   */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
-    speeds.omegaRadiansPerSecond = -speeds.omegaRadiansPerSecond;
+    speeds.omegaRadiansPerSecond = speeds.omegaRadiansPerSecond;
     speeds = setpointSpeeds;
     var swerveModuleStates =
         DrivetrainConstants.swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
-    setModuleStates(swerveModuleStates);
+    setModuleStates(swerveModuleStates, false);
   }
 
+  /**
+   * getter for chassis speeds
+   *
+   * @return robot relative speeds
+   */
   public ChassisSpeeds getChassisSpeeds() {
     return DrivetrainConstants.swerveKinematics.toChassisSpeeds(getModuleStates());
   }
 
-  // public void followSwerveSample(Pose2d currentPose, SwerveSample sample) {
-  //   // TODO: some fancy optimization stuff
-  //   ChassisSpeeds speeds =
-  //       ChassisSpeeds.fromFieldRelativeSpeeds(
-  //           new ChassisSpeeds(
-  //               xController.calculate(currentPose.getX(), sample.x) + sample.vx,
-  //               yController.calculate(currentPose.getY(), sample.y) + sample.vy,
-  //               rController.calculate(currentPose.getRotation().getRadians(), sample.heading)
-  //                   + sample.omega),
-  //           currentPose.getRotation());
-  //   this.setChassisSpeeds(speeds);
-  // }
+  /** follows an autonomous path provided by choreo */
+  public void followSwerveSample(SwerveSample sample) {
+    // TODO: some fancy optimization stuff
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(
+                xController.calculate(getPose().getX(), sample.x) + sample.vx,
+                yController.calculate(getPose().getY(), sample.y) + sample.vy,
+                rController.calculate(getPose().getRotation().getRadians(), sample.heading)
+                    + sample.omega),
+            getPose().getRotation());
+    this.setChassisSpeeds(speeds);
+  }
 
   /**
    * Set the module states (used in autos)
    *
    * @param desiredStates The desired module state to set the wheels
    */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
+  public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxSpeed);
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(desiredStates[mod.moduleNumber], false); // ! idk why this is open loop
+      mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
   }
 
   /** stops the swerve modules for autonomous */
   public void stopModules() {
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(new SwerveModuleState(0, mod.getSetpoint().angle), true);
+      mod.setDesiredState(new SwerveModuleState(0, mod.getSetpoint().angle), true, false);
     }
   }
 
+  /**
+   * Used to find the kS value of the swerve module drive motors. Essentially a feedforward
+   *
+   * @param current
+   */
   public void characterizeDrive(Current current) {
     CharacterizeCurrent = current.in(Amps);
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -244,7 +197,7 @@ public class Swerve extends SubsystemBase {
   /**
    * @return the estimated position of the robot
    */
-  @Logged
+  @Logged(name = "Robot Pose", importance = Importance.CRITICAL)
   public Pose2d getPose() {
     return swerveOdometry.getEstimatedPosition();
   }
@@ -263,7 +216,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the state of all swerve modules
    */
-  @Logged
+  @Logged(name = "Module States", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -278,7 +231,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the setpoint a module has been set to
    */
-  @Logged
+  @Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleSetpoints() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -292,7 +245,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return position of all swerve modules
    */
-  @Logged
+  @Logged(name = "Module Positions", importance = Importance.INFO)
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -311,30 +264,13 @@ public class Swerve extends SubsystemBase {
    *
    * @return rotation2d returned by the gyro
    */
-  @Logged
+  @Logged(name = "Gyro Angle", importance = Importance.INFO)
   public Rotation2d getRotation2D() {
     return Rotation2d.fromDegrees(m_gyro.getYaw().getValue().in(Degrees));
   }
 
-  /** resets the swerve module state to the angle offset in constants */
   @Override
   public void periodic() {
     swerveOdometry.update(getRotation2D(), getModulePositions());
-
-    // logging
-    for (TalonFXSwerveModule mod : m_SwerveModules) {
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " CANcoder", mod.getCANCoder().getDegrees());
-    }
-
-    m_Field.setRobotPose(swerveOdometry.getEstimatedPosition());
-    SmartDashboard.putData(m_Field);
-
-    SmartDashboard.putNumber(
-        "Heading", swerveOdometry.getEstimatedPosition().getRotation().getDegrees());
-    SmartDashboard.putNumber("Robot x", swerveOdometry.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Robot y", swerveOdometry.getEstimatedPosition().getY());
-
-    SmartDashboard.putNumber("Pressure", m_Compressor.getPressure());
   }
 }
