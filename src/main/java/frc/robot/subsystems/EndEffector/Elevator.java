@@ -238,9 +238,10 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command positionCommand(ElevatorPositions position, boolean algae) {
-    return Commands.runOnce(() -> setPosition(position, algae), this).until(() -> isAtPosition(position, algae));
+    return Commands.runOnce(() -> setPosition(position, algae), this)
+        .until(() -> isAtPosition(position, algae));
   }
- 
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

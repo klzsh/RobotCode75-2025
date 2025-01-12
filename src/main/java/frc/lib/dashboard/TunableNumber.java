@@ -15,7 +15,7 @@ public class TunableNumber {
   private DoubleEntry entry;
 
   public TunableNumber(String path, double number) {
-    entry = table.getDoubleTopic(path).getEntry(0.0);    
+    entry = table.getDoubleTopic(path).getEntry(0.0);
     entry.set(number);
   }
 

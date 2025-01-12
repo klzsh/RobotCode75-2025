@@ -4,16 +4,35 @@
 
 package frc.robot.commands.EndEffector;
 
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.EndEffector.AlgaeIntake;
+import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class DeAlgaefy extends SequentialCommandGroup {
   /** Creates a new DeAlgaefy. */
-  public DeAlgaefy() {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands();
+  public DeAlgaefy(Elevator elevator, AlgaeIntake algaeIntake, boolean isL2) {
+    if (isL2) { // temporary fix until we get april tags
+      addCommands(
+          /* L2 Algae Intake */
+          elevator.positionCommand(ElevatorPositions.L2, true),
+          new ParallelCommandGroup(
+              Commands.runOnce(() -> algaeIntake.runAlgaeIntake(1000)),
+              elevator.positionCommand(ElevatorPositions.L2, false)),
+          elevator.positionCommand(ElevatorPositions.HOME, isScheduled()));
+    } else {
+      /* L3 Algae Intake */
+      addCommands(
+          elevator.positionCommand(ElevatorPositions.L3, true),
+          new ParallelCommandGroup(
+              Commands.runOnce(() -> algaeIntake.runAlgaeIntake(1000)),
+              elevator.positionCommand(ElevatorPositions.L3, false)),
+          elevator.positionCommand(ElevatorPositions.HOME, isScheduled()));
+    }
   }
 }

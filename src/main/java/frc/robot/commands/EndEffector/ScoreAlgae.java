@@ -4,16 +4,26 @@
 
 package frc.robot.commands.EndEffector;
 
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.EndEffector.AlgaeIntake;
+import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ScoreAlgae extends SequentialCommandGroup {
   /** Creates a new ScoreAlgae. */
-  public ScoreAlgae() {
+  public ScoreAlgae(Elevator elevator, AlgaeIntake algaeIntake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands();
+    addCommands(
+        elevator.positionCommand(ElevatorPositions.PROCESSOR, false),
+        new ParallelCommandGroup(
+            Commands.runOnce(() -> algaeIntake.runAlgaeOutake(200)),
+            elevator.positionCommand(ElevatorPositions.L4, false)),
+        elevator.positionCommand(ElevatorPositions.PROCESSOR, isScheduled()));
   }
 }
