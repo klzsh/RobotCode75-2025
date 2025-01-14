@@ -4,7 +4,9 @@
 
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -13,7 +15,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
+import edu.wpi.first.units.measure.Time;
 
 /** This class is meant to house the configs for specific motors */
 public final class HardwareConstants {
@@ -22,57 +26,71 @@ public final class HardwareConstants {
   public static final class EndEffector {
     public static final TalonFXConfiguration m_CoralMotorConfig = new TalonFXConfiguration();
     public static final TalonFXConfiguration m_AlgaeMotorConfig = new TalonFXConfiguration();
-
+    public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
     /* CANIDS */
+    // TODO: find these
     public static final int coralMotorCanID = 0;
     public static final int algaeMotorCanID = 0;
-    public static final int coralBeamBreakCanDIO = 0;
+    public static final int pivotCanID = 0;
+    public static final int coralBeamBreakDIO = 0;
 
     /* Neutral modes / inverts */
-    public static final InvertedValue coralMotorInvert = InvertedValue.Clockwise_Positive;
-    public static final InvertedValue algaeMotorInvert = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue coralMotorInvert = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue algaeMotorInvert = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue pivotInvert = InvertedValue.CounterClockwise_Positive;
+
     public static final NeutralModeValue coralMotorNuetralMode = NeutralModeValue.Brake;
     public static final NeutralModeValue algaeMotorNuetralMode = NeutralModeValue.Brake;
+    public static final NeutralModeValue pivotNeutralMode = NeutralModeValue.Brake;
 
     public static final Frequency TimeSyncFreq = Hertz.of(250);
 
-    /* End Effector Current Limiting (Amps) */
-    public static final int coralCurrentLimit = 80;
-    public static final int coralCurrentLowerThreshold = 40;
+    // coral current limiting
+    public static final Current coralCurrentLimit = Amps.of(30);
+    public static final Current coralCurrentLowerThreshold = Amps.of(20);
 
-    public static final boolean coralStatorCurrnetLimitEnable = true;
-    public static final int coralStatorCurrentLimit = 20;
-    public static final int coralStatorCurrentLimitForward = 20;
-    public static final int coralStatorCurrentLimitReverse = -20;
+    public static final Current coralStatorCurrentLimit = Amps.of(40);
+    public static final Current coralStatorCurrentLimitForward = Amps.of(40);
+    public static final Current coralStatorCurrentLimitReverse = Amps.of(-40);
 
-    // Seconds
-    public static final double coralCurrentThresholdTime = 0.50;
-    public static final boolean coralEnableCurrentLimit = true;
+    public static final Time coralCurrentThresholdTime = Seconds.of(0.50);
 
-    // amps
-    public static final int algaeCurrentLimit = 80;
-    public static final int algaeLowerCurrentThreshold = 40;
+    // algae current limiting
+    public static final Current algaeCurrentLimit = Amps.of(30);
+    public static final Current algaeLowerCurrentThreshold = Amps.of(15);
 
-    public static final boolean algaeStatorCurrnetLimitEnable = true;
-    public static final int algaeStatorCurrentLimit = 20;
-    public static final int algaeStatorCurrentLimitForward = 20;
-    public static final int algaeStatorCurrentLimitReverse = -20;
+    public static final Current algaeStatorCurrentLimit = Amps.of(20);
+    public static final Current algaeStatorCurrentLimitForward = Amps.of(20);
+    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-20);
 
-    // seconds
-    public static final double algaeCurrentThresholdTime = 0.50;
-    public static final boolean algaeEnableCurrentLimit = true;
+    public static final Time algaeCurrentThresholdTime = Seconds.of(1);
+
+    // pivot current limits
+    public static final Current pivotCurrentLimit = Amps.of(40);
+    public static final Current pivotCurrentLowerThreshold = Amps.of(30);
+
+    public static final Current pivotStatorCurrentLimit = Amps.of(60);
+    public static final Current pivotStatorCurrentLimitForward = Amps.of(60);
+    public static final Current pivotStatorCurrentLimitReverse = Amps.of(-60);
+
+    public static final Time pivotCurrentThresholdTime = Seconds.of(0.50);
 
     /* Torque PID */
     public static final double openLoopRamp = 0.1;
     public static final double closedLoopRamp = 0.1;
 
-    public static final double coralTorqueKP = 2.0;
-    public static final double coralTorqueKI = 0.0;
-    public static final double coralTorqueKD = 0.0;
+    public static final double coralKP = 0.5;
+    public static final double coralKI = 0.0;
+    public static final double coralKD = 0.0;
+    public static final double coralkS = 0.0;
 
-    public static final double algaeTorqueKP = 2.0;
-    public static final double algaeTorqueKI = 0.0;
-    public static final double algaeTorqueKD = 0.0;
+    public static final double algaeKP = 0.5;
+    public static final double algaeKI = 0.0;
+    public static final double algaeKD = 0.0;
+
+    public static final double pivotKP = 0.5;
+    public static final double pivotKI = 0.0;
+    public static final double pivotKD = 0.0;
 
     public static TalonFXConfiguration getCoralMotorConfiguration() {
 
@@ -80,20 +98,25 @@ public final class HardwareConstants {
       m_CoralMotorConfig.MotorOutput.NeutralMode = coralMotorNuetralMode;
 
       /* Current Limiting */
-      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = coralEnableCurrentLimit;
-      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLimit = coralCurrentLimit;
-      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLowerTime = coralCurrentThresholdTime;
-      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = coralCurrentLowerThreshold;
+      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLimit = coralCurrentLimit.in(Amps);
+      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
+          coralCurrentThresholdTime.in(Seconds);
+      m_CoralMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
+          coralCurrentLowerThreshold.in(Amps);
 
-      m_CoralMotorConfig.CurrentLimits.StatorCurrentLimitEnable = coralStatorCurrnetLimitEnable;
-      m_CoralMotorConfig.CurrentLimits.StatorCurrentLimit = coralStatorCurrentLimit;
-      m_CoralMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent = coralStatorCurrentLimitForward;
-      m_CoralMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent = coralStatorCurrentLimitReverse;
+      m_CoralMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      m_CoralMotorConfig.CurrentLimits.StatorCurrentLimit = coralStatorCurrentLimit.in(Amps);
+      m_CoralMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          coralStatorCurrentLimitForward.in(Amps);
+      m_CoralMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          coralStatorCurrentLimitReverse.in(Amps);
 
       /* PID Config */
-      m_CoralMotorConfig.Slot0.kP = coralTorqueKP;
-      m_CoralMotorConfig.Slot0.kI = coralTorqueKI;
-      m_CoralMotorConfig.Slot0.kD = coralTorqueKD;
+      m_CoralMotorConfig.Slot0.kP = coralKP;
+      m_CoralMotorConfig.Slot0.kI = coralKI;
+      m_CoralMotorConfig.Slot0.kD = coralKD;
+      m_CoralMotorConfig.Slot0.kS = coralkS;
 
       /* Open and Closed Loop Ramping */
       m_CoralMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;
@@ -101,7 +124,7 @@ public final class HardwareConstants {
 
       m_CoralMotorConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp;
       m_CoralMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp;
-      // TODO: see if nessesary
+
       m_CoralMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
       m_CoralMotorConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
@@ -113,24 +136,56 @@ public final class HardwareConstants {
       m_AlgaeMotorConfig.MotorOutput.NeutralMode = algaeMotorNuetralMode;
 
       /* Current Limiting */
-      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = algaeEnableCurrentLimit;
-      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLimit = algaeCurrentLimit;
-      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLowerTime = algaeCurrentThresholdTime;
-      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = algaeLowerCurrentThreshold;
+      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLimit = algaeCurrentLimit.in(Amps);
+      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
+          algaeCurrentThresholdTime.in(Seconds);
+      m_AlgaeMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
+          algaeLowerCurrentThreshold.in(Amps);
 
-      m_AlgaeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = algaeStatorCurrnetLimitEnable;
-      m_AlgaeMotorConfig.CurrentLimits.StatorCurrentLimit = algaeStatorCurrentLimit;
-      m_AlgaeMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent = algaeStatorCurrentLimitForward;
-      m_AlgaeMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent = algaeStatorCurrentLimitReverse;
+      m_AlgaeMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      m_AlgaeMotorConfig.CurrentLimits.StatorCurrentLimit = algaeStatorCurrentLimit.in(Amps);
+      m_AlgaeMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          algaeStatorCurrentLimitForward.in(Amps);
+      m_AlgaeMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          algaeStatorCurrentLimitReverse.in(Amps);
 
       /* PID Config */
-      m_AlgaeMotorConfig.Slot0.kP = algaeTorqueKP;
-      m_AlgaeMotorConfig.Slot0.kI = algaeTorqueKI;
-      m_AlgaeMotorConfig.Slot0.kD = algaeTorqueKD;
+      m_AlgaeMotorConfig.Slot0.kP = algaeKP;
+      m_AlgaeMotorConfig.Slot0.kI = algaeKI;
+      m_AlgaeMotorConfig.Slot0.kD = algaeKD;
 
       m_AlgaeMotorConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
       return m_AlgaeMotorConfig;
+    }
+
+    public static TalonFXConfiguration getpivotConfiguration() {
+
+      m_PivotConfig.MotorOutput.Inverted = algaeMotorInvert;
+      m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+      /* Current Limiting */
+      m_PivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+      m_PivotConfig.CurrentLimits.SupplyCurrentLimit = pivotCurrentLimit.in(Amps);
+      m_PivotConfig.CurrentLimits.SupplyCurrentLowerTime = pivotCurrentThresholdTime.in(Seconds);
+      m_PivotConfig.CurrentLimits.SupplyCurrentLowerLimit = pivotCurrentLowerThreshold.in(Amps);
+
+      m_PivotConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      m_PivotConfig.CurrentLimits.StatorCurrentLimit = pivotStatorCurrentLimit.in(Amps);
+      m_PivotConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          pivotStatorCurrentLimitForward.in(Amps);
+      m_PivotConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          pivotStatorCurrentLimitReverse.in(Amps);
+
+      /* PID Config */
+      m_PivotConfig.Slot0.kP = pivotKP;
+      m_PivotConfig.Slot0.kI = pivotKI;
+      m_PivotConfig.Slot0.kD = pivotKD;
+
+      m_PivotConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
+
+      return m_PivotConfig;
     }
   }
 

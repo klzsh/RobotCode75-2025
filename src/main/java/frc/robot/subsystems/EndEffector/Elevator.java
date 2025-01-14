@@ -12,7 +12,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.HardwareConstants.*;
+import static frc.robot.Constants.HardwareConstants.Elevator.*;
+import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -34,8 +35,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.lib.dashboard.TunableNumber;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.HardwareConstants;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -47,14 +46,13 @@ import frc.robot.Constants.HardwareConstants;
 public class Elevator extends SubsystemBase {
 
   // we only have a certain number of states the elevator will be in at any given time
-  public enum ElevatorPositions {
+  public static enum ElevatorPositions {
     L1(l1Position),
     L2(l2Position),
     L3(l3Position),
     L4(l4Position),
     HOME(homePosition),
-    PROCESSOR(processorPosition),
-    HPStation(HPStationPosition);
+    PROCESSOR(processorPosition);
 
     public final Distance inches;
 
@@ -94,29 +92,25 @@ public class Elevator extends SubsystemBase {
     m_PositionRequest = new DynamicMotionMagicTorqueCurrentFOC(0, 0, 0, 0);
     m_CharacterizationRequest = new TorqueCurrentFOC(Amps.of(0));
     // configure motors with correct inverts
-    m_ElevatorMotor1
-        .getConfigurator()
-        .apply(HardwareConstants.Elevator.getElevatorMotorConfig(false));
-    m_ElevatorMotor2
-        .getConfigurator()
-        .apply(HardwareConstants.Elevator.getElevatorMotorConfig(true));
+    m_ElevatorMotor1.getConfigurator().apply(getElevatorMotorConfig(false));
+    m_ElevatorMotor2.getConfigurator().apply(getElevatorMotorConfig(true));
     // set the position of the elevator
-    // TODO: determine where the "zero" point of the elevator is (floor or fully retracted elevator)
     m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
     m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
 
     // set up sysid
     m_Routine =
         new SysIdRoutine(
+            // 12 amps per second                   7 amps per step        timeout
             new Config(Volts.of(12).per(Seconds), Volts.of(7), Seconds.of(5)),
             new Mechanism(this::characterizeElevator, this::logMotors, this));
-
-    upVelocity = new TunableNumber("/Elevator/UV", ElevatorConstants.profileUp[0]);
-    upAcceleration = new TunableNumber("/Elevator/UA", ElevatorConstants.profileUp[1]);
-    upJerk = new TunableNumber("/Elevator/UJ", ElevatorConstants.profileUp[2]);
-    downVelocity = new TunableNumber("/Elevator/DV", ElevatorConstants.profileDown[0]);
-    downAcceleration = new TunableNumber("/Elevator/DA", ElevatorConstants.profileDown[1]);
-    downJerk = new TunableNumber("/Elevator/DJ", ElevatorConstants.profileDown[2]);
+    //TODO: get these numbers from periodic
+    upVelocity = new TunableNumber("/Elevator/UV", MotionMagicProfileUp[0]);
+    upAcceleration = new TunableNumber("/Elevator/UA", MotionMagicProfileUp[1]);
+    upJerk = new TunableNumber("/Elevator/UJ", MotionMagicProfileUp[2]);
+    downVelocity = new TunableNumber("/Elevator/DV", MotionMagicProfileDown[0]);
+    downAcceleration = new TunableNumber("/Elevator/DA", MotionMagicProfileDown[1]);
+    downJerk = new TunableNumber("/Elevator/DJ", MotionMagicProfileDown[2]);
   }
 
   /**
@@ -130,6 +124,7 @@ public class Elevator extends SubsystemBase {
    * @param current
    */
   public void characterizeElevator(Voltage current) {
+    // absolutely cursed
     m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(current.in(Volts)));
     m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(current.in(Volts)));
   }
@@ -144,7 +139,8 @@ public class Elevator extends SubsystemBase {
                 rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches), Inches))
         .linearVelocity(
             m_velocity.mut_replace(
-                rotationsToInches(m_ElevatorMotor1.getVelocity().getValue()).in(InchesPerSecond),
+                rotationsPerSecondToInchesPerSecond(m_ElevatorMotor1.getVelocity().getValue())
+                    .in(InchesPerSecond),
                 InchesPerSecond));
     log.motor("elevator2")
         .voltage(
@@ -155,7 +151,8 @@ public class Elevator extends SubsystemBase {
                 rotationsToInches(m_ElevatorMotor2.getPosition().getValue()).in(Inches), Inches))
         .linearVelocity(
             m_velocity.mut_replace(
-                rotationsToInches(m_ElevatorMotor2.getVelocity().getValue()).in(InchesPerSecond),
+                rotationsPerSecondToInchesPerSecond(m_ElevatorMotor2.getVelocity().getValue())
+                    .in(InchesPerSecond),
                 InchesPerSecond));
   }
 
@@ -192,7 +189,7 @@ public class Elevator extends SubsystemBase {
         m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
   }
 
-  public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) {
+  public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) { 
     double currentPosition =
         rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches);
     double algaeOffset =
@@ -200,8 +197,7 @@ public class Elevator extends SubsystemBase {
             ? algaeRemovalOffset.in(Inches)
             : 0;
     return MathUtil.applyDeadband(
-            currentPosition - position.inches.in(Inches) - algaeOffset,
-            ElevatorConstants.deadband.in(Inches))
+            currentPosition - position.inches.in(Inches) - algaeOffset, deadband.in(Inches))
         == 0.0;
   }
 
@@ -213,11 +209,11 @@ public class Elevator extends SubsystemBase {
     return Rotations.of(inches.in(Inches) / inchesPerRotation.in(Inches));
   }
 
-  private LinearVelocity rotationsToInches(AngularVelocity rotations) {
+  private LinearVelocity rotationsPerSecondToInchesPerSecond(AngularVelocity rotations) {
     return InchesPerSecond.of(rotations.in(RotationsPerSecond) * inchesPerRotation.in(Inches));
   }
 
-  private AngularVelocity inchesToRotations(LinearVelocity inches) {
+  private AngularVelocity inchesPerSecondToRotationsPerSecond(LinearVelocity inches) {
     return RotationsPerSecond.of(inches.in(InchesPerSecond) / inchesPerRotation.in(Inches));
   }
 

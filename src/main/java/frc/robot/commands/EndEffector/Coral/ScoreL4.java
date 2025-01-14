@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.EndEffector.CoralIntake;
+import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
@@ -22,7 +23,7 @@ public class ScoreL4 extends SequentialCommandGroup {
     addCommands(
         elevator.positionCommand(ElevatorPositions.L4, false),
         new ParallelCommandGroup(
-            Commands.runOnce(() -> coralIntake.runCoral(1800)),
+            Commands.runOnce(() -> coralIntake.setState(CoralStates.SCORING)),
             elevator.positionCommand(ElevatorPositions.L4, false)),
         elevator.positionCommand(ElevatorPositions.HOME, isScheduled()));
   }

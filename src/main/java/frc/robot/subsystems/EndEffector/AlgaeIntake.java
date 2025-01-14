@@ -5,65 +5,125 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.Constants.EndEffectorConstants.*;
+import static frc.robot.Constants.HardwareConstants.EndEffector.*;
 
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.HardwareConstants;
-
-enum IntakeState {
-  NONE,
-  INTAKING,
-  HASGAMEPIECE,
-  OUTAKING
-}
 
 public class AlgaeIntake extends SubsystemBase {
+  public static enum AlgaeStates {
+    NONE,
+    INTAKING,
+    HASGAMEPIECE,
+    OUTAKING
+  }
 
-  private static IntakeState m_AlgaeIntakeState;
+  public static enum PivotState {
+    RETRACTED,
+    GROUNDINTAKE,
+    DEAGLAEFY,
+    NONE
+  }
+
+  // TODO: add tunable numbers for PIDS, velocity, Position, CURRENT LIMITS
+  private AlgaeStates m_AlgaeIntakeState;
+  private PivotState m_PivotState;
   private TalonFX m_AlgaeMotor;
+  private TalonFX m_AlgaePivot;
 
-  private final VelocityTorqueCurrentFOC torqueVelocity =
+  private final VelocityTorqueCurrentFOC algaeRequest =
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
+  private final PositionTorqueCurrentFOC pivotRequest =
+      new PositionTorqueCurrentFOC(Rotations.of(0));
 
   /** Creates a new AlgaeIntake. */
   public AlgaeIntake() {
-    m_AlgaeMotor = new TalonFX(HardwareConstants.EndEffector.algaeMotorCanID);
-    m_AlgaeMotor
-        .getConfigurator()
-        .apply(HardwareConstants.EndEffector.getAlgaeMotorConfiguration());
-    m_AlgaeIntakeState = IntakeState.NONE;
+    m_AlgaeMotor = new TalonFX(algaeMotorCanID);
+    m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
+    m_AlgaeIntakeState = AlgaeStates.NONE;
 
-    torqueVelocity.UpdateFreqHz = 0;
-    torqueVelocity.UseTimesync = true;
+    m_AlgaeMotor = new TalonFX(pivotCanID);
+    m_AlgaeMotor.getConfigurator().apply(getpivotConfiguration());
+    m_PivotState = PivotState.NONE;
+
+    algaeRequest.UpdateFreqHz = 0;
+    algaeRequest.UseTimesync = true;
 
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;
+
+    pivotRequest.UpdateFreqHz = 0;
+    pivotRequest.UseTimesync = true;
   }
 
-  public void runAlgaeIntake(double RPM) {
-    /* Cannot intake if HASGAMEPIECE */
-    m_AlgaeIntakeState = IntakeState.INTAKING;
-    m_AlgaeMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(RPM * 60)));
+  public void setAlgaeState(AlgaeStates state) {
+    if (m_AlgaeIntakeState == AlgaeStates.HASGAMEPIECE && state != AlgaeStates.OUTAKING) {
+      m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
+    } else {
+      m_AlgaeIntakeState = state;
+    }
   }
 
-  public void runAlgaeOutake(double RPM) {
-    m_AlgaeIntakeState = IntakeState.OUTAKING;
-    m_AlgaeMotor.setControl(torqueVelocity.withVelocity(RotationsPerSecond.of(-RPM * 60)));
+  public void setPivotState(PivotState state) {
+    m_PivotState = state;
   }
 
-  public IntakeState getAlgaeState() {
+  public AlgaeStates getAlgaeState() {
     return m_AlgaeIntakeState;
+  }
+
+  public PivotState getPivotState() {
+    return m_PivotState;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     if (m_AlgaeMotor.getFault_StatorCurrLimit().getValue()) {
-      m_AlgaeIntakeState = IntakeState.HASGAMEPIECE;
+      m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
+    }
+
+    switch (m_AlgaeIntakeState) {
+      case INTAKING -> {
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeIntakeSpeed));
+      }
+      case HASGAMEPIECE -> {
+        // set the velocity control to a very low value (like 1-2 rps) to hold the algae in. The
+        // motor will stall trying to get to the desired speed, and that will help hold the ball in;
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeHoldSpeed));
+      }
+      case OUTAKING -> {
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeOutakeSpeed));
+      }
+      case NONE -> {
+        // set a NONE state for when there is no algae and we are not intaking anything
+        m_AlgaeMotor.setControl(currentOut.withOutput(Amps.of(0)));
+      }
+        // no default case because all states are accounted for
+    }
+    switch (m_PivotState) {
+      case RETRACTED -> {
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
+      }
+      case GROUNDINTAKE -> {
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotGroundIntakePosition));
+      }
+      case DEAGLAEFY -> {
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotDeAlgifyPosition));
+      }
+      case NONE -> {
+        // just keep the pivot retracted if there is no state
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
+      }
+        // no default case because all states are accounted for
+
     }
   }
 }

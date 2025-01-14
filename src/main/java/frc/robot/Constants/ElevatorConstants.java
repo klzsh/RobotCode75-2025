@@ -16,7 +16,9 @@ public class ElevatorConstants {
 
   public static final Distance pulleyCircumference =
       Inches.of(1.751 * Math.PI); // circumference of 22 teeth #25 WCP sprocket
-  public static final double mechanismToMotorRatio = 5.0 + (1.0/3.0); // 5 1/3 motor rotations = 1 shaft rotation
+  public static final double mechanismToMotorRatio =
+      5.0 + (1.0 / 3.0); // 5 1/3 motor rotations = 1 shaft rotation
+
   // TODO: sanity check this value
   public static final Distance inchesPerRotation =
       Inches.of(
@@ -27,7 +29,7 @@ public class ElevatorConstants {
   public static final Distance distanceBetweenElevatorZeroAndGround = Inches.of(0);
 
   // TODO: figure out (placeholder values)
-  // Distance from
+  // Distance from GROUND.
   public static final Distance algaeRemovalOffset = Inches.of(0);
   public static final Distance l1Position = Inches.of(8);
   public static final Distance l2Position = Inches.of(24);
@@ -35,10 +37,10 @@ public class ElevatorConstants {
   public static final Distance l4Position = Inches.of(72);
   public static final Distance homePosition = Inches.of(0);
   public static final Distance processorPosition = Inches.of(7);
-  public static final Distance HPStationPosition = Inches.of(1);
 
-  public static double[] profileUp = {50, 200, 1200};
-  public static double[] profileDown = {25, 100, 1200};
+  // velocity, acceleration, jerk
+  public static double[] MotionMagicProfileUp = {50, 200, 1200};
+  public static double[] MotionMagicProfileDown = {25, 100, 1200};
 
-  public static final Distance deadband = Inches.of(.5);
+  public static final Distance deadband = Inches.of(0.5);
 }

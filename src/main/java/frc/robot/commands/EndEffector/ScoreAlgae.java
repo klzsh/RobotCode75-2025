@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
+import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
@@ -22,7 +23,7 @@ public class ScoreAlgae extends SequentialCommandGroup {
     addCommands(
         elevator.positionCommand(ElevatorPositions.PROCESSOR, false),
         new ParallelCommandGroup(
-            Commands.runOnce(() -> algaeIntake.runAlgaeOutake(200)),
+            Commands.runOnce(() -> algaeIntake.setAlgaeState(AlgaeStates.OUTAKING)),
             elevator.positionCommand(ElevatorPositions.L4, false)),
         elevator.positionCommand(ElevatorPositions.PROCESSOR, isScheduled()));
   }
