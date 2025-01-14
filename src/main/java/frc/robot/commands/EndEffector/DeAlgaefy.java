@@ -30,7 +30,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                     algaeIntake.setAlgaeState(AlgaeStates.INTAKING);
                     algaeIntake.setPivotState(PivotState.DEAGLAEFY);
                   }),
-              elevator.positionCommand(ElevatorPositions.L2, false)),
+              elevator.positionCommand(ElevatorPositions.L2, true)),
           elevator.positionCommand(ElevatorPositions.HOME, false));
     } else {
       /* L3 Algae Intake */
@@ -42,7 +42,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                     algaeIntake.setAlgaeState(AlgaeStates.INTAKING);
                     algaeIntake.setPivotState(PivotState.DEAGLAEFY);
                   }),
-              elevator.positionCommand(ElevatorPositions.L3, false)),
+              elevator.positionCommand(ElevatorPositions.L3, true)),
           elevator.positionCommand(ElevatorPositions.HOME, false));
     }
   }

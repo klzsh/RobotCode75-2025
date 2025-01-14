@@ -24,7 +24,7 @@ public class ScoreAlgae extends SequentialCommandGroup {
         elevator.positionCommand(ElevatorPositions.PROCESSOR, false),
         new ParallelCommandGroup(
             Commands.runOnce(() -> algaeIntake.setAlgaeState(AlgaeStates.OUTAKING)),
-            elevator.positionCommand(ElevatorPositions.L4, false)),
-        elevator.positionCommand(ElevatorPositions.PROCESSOR, isScheduled()));
+            elevator.positionCommand(ElevatorPositions.PROCESSOR, false)),
+        elevator.positionCommand(ElevatorPositions.HOME, false));
   }
 }

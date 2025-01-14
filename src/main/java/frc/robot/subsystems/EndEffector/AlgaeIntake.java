@@ -49,8 +49,8 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = AlgaeStates.NONE;
 
-    m_AlgaeMotor = new TalonFX(pivotCanID);
-    m_AlgaeMotor.getConfigurator().apply(getpivotConfiguration());
+    m_AlgaePivot = new TalonFX(pivotCanID);
+    m_AlgaePivot.getConfigurator().apply(getpivotConfiguration());
     m_PivotState = PivotState.NONE;
 
     algaeRequest.UpdateFreqHz = 0;
