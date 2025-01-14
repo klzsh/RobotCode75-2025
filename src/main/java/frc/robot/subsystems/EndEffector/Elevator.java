@@ -61,6 +61,10 @@ public class Elevator extends SubsystemBase {
     }
   }
 
+
+  private ElevatorPositions m_CurrentPosition = ElevatorPositions.HOME;
+  private boolean m_IsAlgae = false;
+
   // define motors
   private final TalonFX m_ElevatorMotor1;
   private final TalonFX m_ElevatorMotor2;
@@ -160,33 +164,11 @@ public class Elevator extends SubsystemBase {
    * this function should account for whether the elevator is going up or down and modify parameters
    * like velocity and acceleration
    *
-   * @param positions the position to set the elevator to
+   * @param position the position to set the elevator to
    */
   public void setPosition(ElevatorPositions position, boolean isAlgae) {
-    if (isAtPosition(position, isAlgae)) {
-      return;
-    }
-    Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
-    double algaeOffset =
-        (isAlgae && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
-            ? algaeRemovalOffset.in(Inches)
-            : 0;
-    double target = position.inches.in(Inches) + algaeOffset;
-
-    if (currentPosition.in(Inches) < target) {
-      m_PositionRequest.Velocity = upVelocity.getNumber();
-      m_PositionRequest.Acceleration = upAcceleration.getNumber();
-      m_PositionRequest.Jerk = upJerk.getNumber();
-    } else {
-      m_PositionRequest.Velocity = downVelocity.getNumber();
-      m_PositionRequest.Acceleration = downAcceleration.getNumber();
-      m_PositionRequest.Jerk = downJerk.getNumber();
-    }
-
-    m_ElevatorMotor1.setControl(
-        m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
-    m_ElevatorMotor2.setControl(
-        m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+    m_CurrentPosition = position;
+    m_IsAlgae = isAlgae;
   }
 
   public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) { 
@@ -240,6 +222,28 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
+      Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
+      double algaeOffset =
+              (m_IsAlgae && (m_CurrentPosition == ElevatorPositions.L2 || m_CurrentPosition == ElevatorPositions.L3))
+                      ? algaeRemovalOffset.in(Inches)
+                      : 0;
+      double target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
+
+      if (currentPosition.in(Inches) < target) {
+        m_PositionRequest.Velocity = upVelocity.getNumber();
+        m_PositionRequest.Acceleration = upAcceleration.getNumber();
+        m_PositionRequest.Jerk = upJerk.getNumber();
+      } else {
+        m_PositionRequest.Velocity = downVelocity.getNumber();
+        m_PositionRequest.Acceleration = downAcceleration.getNumber();
+        m_PositionRequest.Jerk = downJerk.getNumber();
+      }
+
+      m_ElevatorMotor1.setControl(
+              m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+      m_ElevatorMotor2.setControl(
+              m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+    }
   }
 }
