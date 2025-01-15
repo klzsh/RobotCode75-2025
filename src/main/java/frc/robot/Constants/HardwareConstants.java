@@ -351,7 +351,7 @@ public final class HardwareConstants {
     public static final double torqueForwardCurrentLimit = 20;
     public static final double torqueReverseCurrentLimit = 20;
 
-    public static TalonFXConfiguration getElevatorMotorConfig(boolean inverted) {
+    public static TalonFXConfiguration getElevatorMotorConfig() {
       TalonFXConfiguration m_ElevatorMotorConfig = new TalonFXConfiguration();
 
       m_ElevatorMotorConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp;
@@ -372,8 +372,7 @@ public final class HardwareConstants {
       m_ElevatorMotorConfig.MotionMagic.MotionMagicJerk = mmJerk;
 
       m_ElevatorMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq;
-      m_ElevatorMotorConfig.MotorOutput.Inverted =
-          inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+      m_ElevatorMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       m_ElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
       m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;

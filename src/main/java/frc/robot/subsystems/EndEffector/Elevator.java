@@ -96,8 +96,8 @@ public class Elevator extends SubsystemBase {
     m_PositionRequest = new DynamicMotionMagicTorqueCurrentFOC(0, 0, 0, 0);
     m_CharacterizationRequest = new TorqueCurrentFOC(Amps.of(0));
     // configure motors with correct inverts
-    m_ElevatorMotor1.getConfigurator().apply(getElevatorMotorConfig(false));
-    m_ElevatorMotor2.getConfigurator().apply(getElevatorMotorConfig(true));
+    m_ElevatorMotor1.getConfigurator().apply(getElevatorMotorConfig());
+    m_ElevatorMotor2.getConfigurator().apply(getElevatorMotorConfig());
     // set the position of the elevator
     m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
     m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
