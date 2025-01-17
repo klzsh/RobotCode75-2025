@@ -68,10 +68,10 @@ public class CoralIntake extends SubsystemBase {
     }
 
     switch (m_CoralIntakeState) {
-      case HASGAMEPIECE -> { 
+      case HASGAMEPIECE -> {
         // motors do not move, beam break is broken
         // state does not change the motor output, just states that there is a gamepeice
-        //  in the robot
+        // in the robot
         // this state should never be set by an external command
         m_CoralMotor.setControl(currentOut.withOutput(0));
       }

@@ -20,7 +20,7 @@ public class ScoreL1 extends SequentialCommandGroup {
   public ScoreL1(Elevator elevator, CoralIntake coralIntake) {
     addCommands(
         elevator.positionCommand(ElevatorPositions.L1, false),
-        new ParallelCommandGroup( 
+        new ParallelCommandGroup(
             Commands.runOnce(() -> coralIntake.setState(CoralStates.SCORING)),
             elevator.positionCommand(ElevatorPositions.L1, false)),
         elevator.positionCommand(ElevatorPositions.HOME, false));

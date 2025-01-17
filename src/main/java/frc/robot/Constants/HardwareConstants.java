@@ -6,6 +6,7 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Hertz;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -15,6 +16,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
@@ -329,6 +331,10 @@ public final class HardwareConstants {
     public static final double supplyCurrentLowerLimit = 30;
     public static final double supplyCurrentLowerTime = 0.5;
 
+    // TODO: Find
+    public static final Angle forwardLimit = Rotations.of(0);
+    public static final Angle reverseLimit = Rotations.of(0);
+
     // TODO: find these
     public static final double mmAcceleration = 0;
     public static final double mmCruiseVelocity = 0;
@@ -388,6 +394,13 @@ public final class HardwareConstants {
 
       m_ElevatorMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent = torqueForwardCurrentLimit;
       m_ElevatorMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent = torqueReverseCurrentLimit;
+
+      m_ElevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+          forwardLimit.in(Rotations);
+      m_ElevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+      m_ElevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+          reverseLimit.in(Rotations);
+      m_ElevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
       return m_ElevatorMotorConfig;
     }

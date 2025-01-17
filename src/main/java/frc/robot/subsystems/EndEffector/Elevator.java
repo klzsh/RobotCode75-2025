@@ -61,7 +61,6 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-
   private ElevatorPositions m_CurrentPosition = ElevatorPositions.HOME;
   private boolean m_IsAlgae = false;
 
@@ -72,7 +71,7 @@ public class Elevator extends SubsystemBase {
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
-
+  
   // motor characterization stuff
   private final SysIdRoutine m_Routine;
 
@@ -108,7 +107,7 @@ public class Elevator extends SubsystemBase {
             // 12 amps per second                   7 amps per step        timeout
             new Config(Volts.of(12).per(Seconds), Volts.of(7), Seconds.of(5)),
             new Mechanism(this::characterizeElevator, this::logMotors, this));
-    //TODO: get these numbers from periodic
+    // TODO: get these numbers from periodic
     upVelocity = new TunableNumber("/Elevator/UV", MotionMagicProfileUp[0]);
     upAcceleration = new TunableNumber("/Elevator/UA", MotionMagicProfileUp[1]);
     upJerk = new TunableNumber("/Elevator/UJ", MotionMagicProfileUp[2]);
@@ -171,7 +170,7 @@ public class Elevator extends SubsystemBase {
     m_IsAlgae = isAlgae;
   }
 
-  public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) { 
+  public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) {
     double currentPosition =
         rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches);
     double algaeOffset =
@@ -225,9 +224,11 @@ public class Elevator extends SubsystemBase {
     if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
       Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
       double algaeOffset =
-              (m_IsAlgae && (m_CurrentPosition == ElevatorPositions.L2 || m_CurrentPosition == ElevatorPositions.L3))
-                      ? algaeRemovalOffset.in(Inches)
-                      : 0;
+          (m_IsAlgae
+                  && (m_CurrentPosition == ElevatorPositions.L2
+                      || m_CurrentPosition == ElevatorPositions.L3))
+              ? algaeRemovalOffset.in(Inches)
+              : 0;
       double target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
 
       if (currentPosition.in(Inches) < target) {
@@ -241,9 +242,9 @@ public class Elevator extends SubsystemBase {
       }
 
       m_ElevatorMotor1.setControl(
-              m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+          m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
       m_ElevatorMotor2.setControl(
-              m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+          m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
     }
   }
 }
