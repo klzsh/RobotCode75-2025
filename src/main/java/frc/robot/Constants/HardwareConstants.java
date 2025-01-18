@@ -61,7 +61,7 @@ public final class HardwareConstants {
      */
     public static final double openLoopRamp = 0.25;
     public static final double closedLoopRamp = 0.25;
-
+    //TODO: tune
     public static final double angleTorqueKP = 50.0;
     public static final double angleTorqueKI = 0.0;
     public static final double angleTorqueKD = 1.0;
@@ -69,6 +69,7 @@ public final class HardwareConstants {
     /* Drive Motor PID Values */
 
     // TORQUE PID Values
+    //TODO: tune
     public static final double driveTorqueKP = 2;
     public static final double driveTorqueKI = 0.0;
     public static final double driveTorqueKD = 0.0;
