@@ -96,7 +96,6 @@ public class Swerve extends SubsystemBase {
     xController = new PIDController(2.65, 0, 0);
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
-
     swerveOdometry =
         new SwerveDrivePoseEstimator(
             DrivetrainConstants.swerveKinematics,
