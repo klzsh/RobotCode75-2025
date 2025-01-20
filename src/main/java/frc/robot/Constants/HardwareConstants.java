@@ -61,7 +61,7 @@ public final class HardwareConstants {
     public static final Current driveStatorCurrentLimitReverse = Amps.of(-80);
 
     /*
-     * These values are used by the drive falcon to ramp in open loop and closed
+     * These values are used by the drive motor to ramp in open loop and closed
      * loop driving.
      * We found a small open loop ramp (0.25 sec) helps with tread wear, tipping,
      * etc
@@ -74,13 +74,11 @@ public final class HardwareConstants {
     public static final double angleTorqueKD = 1.0;
 
     /* Drive Motor PID Values */
-
-    // TORQUE PID Values
     //TODO: tune
     public static final double driveTorqueKP = 2;
     public static final double driveTorqueKI = 0.0;
     public static final double driveTorqueKD = 0.0;
-    public static final double driveTorqueKS = 10;
+    public static final double driveTorqueKS = 10; // static feedforward
 
     /* Neutral Modes */
     public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
@@ -142,9 +140,6 @@ public final class HardwareConstants {
       m_AngleConfig.Slot0.kP = angleTorqueKP;
       m_AngleConfig.Slot0.kI = angleTorqueKI;
       m_AngleConfig.Slot0.kD = angleTorqueKD;
-
-      // TODO: try this out
-      // m_AngleConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
       m_AngleConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 

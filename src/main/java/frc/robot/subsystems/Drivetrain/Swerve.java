@@ -63,7 +63,6 @@ public class Swerve extends SubsystemBase {
   private final PIDController yController;
   private final PIDController rController;
 
-  // fuse camera pose into odometry
   @Logged(name = "PDH", importance = Importance.DEBUG)
   private final PowerDistribution m_PDH;
 
