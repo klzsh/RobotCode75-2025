@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 public class EndEffectorConstants {
   public static final double coralMotorGearRatio = 5.0;
   public static final double algaeMotorGearRatio = 25.0;
-  public static final double pivotMotorGearRatio = 9.0 * (50.0/26.0);
+  public static final double pivotMotorGearRatio = 9.0 * (50.0 / 26.0);
 
   public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(300);
 

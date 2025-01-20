@@ -31,7 +31,7 @@ public final class DrivetrainConstants {
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
-    //TODO: tune
+    // TODO: tune
     public static final double kp = 0.08;
     public static final double kd = 0.03;
     public static final double maxVelocityMultiplier = 0.8;
@@ -63,7 +63,7 @@ public final class DrivetrainConstants {
   /* Module Gear Ratios */
   // ratio of motor turns to mechanism turns
   public static final double driveGearRatio = 6.75; // L2
-  public static final double angleGearRatio = 150.0/7.0; // ~21:1 ratio
+  public static final double angleGearRatio = 150.0 / 7.0; // ~21:1 ratio
 
   /** Meters per Second */
   public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.49);
@@ -82,6 +82,7 @@ public final class DrivetrainConstants {
 
   /** Drivetrain CANBus name */
   public static final String driveBusName = "Drivetrain";
+
   /* Module Specific Constants */
   // ! Only change if a serious deviation is seen, as well as in each comp
   /* Front Left Module - Module 0 */

@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -18,11 +19,11 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 
 /** This class is meant to house the configs for specific motors */
 public final class HardwareConstants {
@@ -68,13 +69,13 @@ public final class HardwareConstants {
      */
     public static final Time openLoopRamp = Seconds.of(0.25);
     public static final Time closedLoopRamp = Seconds.of(0.25);
-    //TODO: tune
+    // TODO: tune
     public static final double angleTorqueKP = 50.0;
     public static final double angleTorqueKI = 0.0;
     public static final double angleTorqueKD = 1.0;
 
     /* Drive Motor PID Values */
-    //TODO: tune
+    // TODO: tune
     public static final double driveTorqueKP = 2;
     public static final double driveTorqueKI = 0.0;
     public static final double driveTorqueKD = 0.0;
@@ -99,8 +100,10 @@ public final class HardwareConstants {
 
       m_DriveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_DriveConfig.CurrentLimits.StatorCurrentLimit = driveStatorCurrentLimit.in(Amps);
-      m_DriveConfig.TorqueCurrent.PeakForwardTorqueCurrent = driveStatorCurrentLimitForward.in(Amps);
-      m_DriveConfig.TorqueCurrent.PeakReverseTorqueCurrent = driveStatorCurrentLimitReverse.in(Amps);
+      m_DriveConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          driveStatorCurrentLimitForward.in(Amps);
+      m_DriveConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          driveStatorCurrentLimitReverse.in(Amps);
 
       /* PID Config */
       m_DriveConfig.Slot0.kP = driveTorqueKP;
@@ -133,8 +136,10 @@ public final class HardwareConstants {
 
       m_AngleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_AngleConfig.CurrentLimits.StatorCurrentLimit = angleStatorCurrentLimit.in(Amps);
-      m_AngleConfig.TorqueCurrent.PeakForwardTorqueCurrent = angleStatorCurrentLimitForward.in(Amps);
-      m_AngleConfig.TorqueCurrent.PeakReverseTorqueCurrent = angleStatorCurrentLimitReverse.in(Amps);
+      m_AngleConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          angleStatorCurrentLimitForward.in(Amps);
+      m_AngleConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          angleStatorCurrentLimitReverse.in(Amps);
 
       /* PID Config */
       m_AngleConfig.Slot0.kP = angleTorqueKP;
@@ -333,7 +338,6 @@ public final class HardwareConstants {
     // TODO: Find
     public static final Angle forwardLimit = Rotations.of(0);
     public static final Angle reverseLimit = Rotations.of(0);
-    
 
     // TODO: find these
     public static final AngularAcceleration mmAcceleration = RotationsPerSecondPerSecond.of(0);
@@ -367,12 +371,16 @@ public final class HardwareConstants {
 
       m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit.in(Amps);
       m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = supplyCurrentLowerLimit.in(Amps);
-      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerTime = supplyCurrentLowerTime.in(Seconds);
+      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerLimit =
+          supplyCurrentLowerLimit.in(Amps);
+      m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
+          supplyCurrentLowerTime.in(Seconds);
 
       // TODO: decide on which motion magic config to use
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicAcceleration = mmAcceleration.in(RotationsPerSecondPerSecond);
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity = mmCruiseVelocity.in(RotationsPerSecond);
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
+          mmAcceleration.in(RotationsPerSecondPerSecond);
+      m_ElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+          mmCruiseVelocity.in(RotationsPerSecond);
       m_ElevatorMotorConfig.MotionMagic.MotionMagicExpo_kA = mmExpoKa;
       m_ElevatorMotorConfig.MotionMagic.MotionMagicExpo_kV = mmExpoKv;
       m_ElevatorMotorConfig.MotionMagic.MotionMagicJerk = mmJerk;
@@ -384,16 +392,18 @@ public final class HardwareConstants {
       m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
       m_ElevatorMotorConfig.Slot0.StaticFeedforwardSign =
           StaticFeedforwardSignValue.UseVelocitySign;
-      m_ElevatorMotorConfig.Slot0.kA = kA;
-      m_ElevatorMotorConfig.Slot0.kG = kG;
-      m_ElevatorMotorConfig.Slot0.kS = kS;
-      m_ElevatorMotorConfig.Slot0.kV = kV;
-      m_ElevatorMotorConfig.Slot0.kP = kP;
-      m_ElevatorMotorConfig.Slot0.kI = kI;
-      m_ElevatorMotorConfig.Slot0.kD = kD;
+      m_ElevatorMotorConfig.Slot0.kA = kA; // tune third
+      m_ElevatorMotorConfig.Slot0.kG = kG; // tune first
+      m_ElevatorMotorConfig.Slot0.kS = kS; // tune second
+      m_ElevatorMotorConfig.Slot0.kV = kV; // tune third
+      m_ElevatorMotorConfig.Slot0.kP = kP; // tune fourth
+      m_ElevatorMotorConfig.Slot0.kI = kI; // tune only if needed
+      m_ElevatorMotorConfig.Slot0.kD = kD; // tune fifth
 
-      m_ElevatorMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent = torqueForwardCurrentLimit.in(Amps);
-      m_ElevatorMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent = torqueReverseCurrentLimit.in(Amps);
+      m_ElevatorMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          torqueForwardCurrentLimit.in(Amps);
+      m_ElevatorMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          torqueReverseCurrentLimit.in(Amps);
 
       m_ElevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardLimit.in(Rotations);

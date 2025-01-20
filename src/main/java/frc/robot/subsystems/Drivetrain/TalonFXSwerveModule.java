@@ -56,6 +56,7 @@ public class TalonFXSwerveModule {
   // sets the "forward" position of the wheel
   @Logged(name = "CanCoder", importance = Importance.DEBUG)
   private CANcoder angleEncoder;
+
   // used for logging
   private SwerveModuleState setpoint;
 

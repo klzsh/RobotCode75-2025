@@ -8,6 +8,7 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +22,7 @@ import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Util.LEDsDefaultCommand;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.Util.CANdleWrapper;
 
 /**
@@ -34,6 +36,8 @@ public class RobotContainer {
   // define subsystems first
   @Logged(name = "swerve")
   private final Swerve m_Swerve = new Swerve();
+
+  private final Elevator m_Elevator = new Elevator();
 
   private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -63,6 +67,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    DriverStation.silenceJoystickConnectionWarning(true);
     configureDefaultCommands();
     configureBindings();
     configureChooser();
