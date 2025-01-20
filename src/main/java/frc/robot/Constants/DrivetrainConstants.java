@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.lib.util.SwerveModuleConstants;
 
-/** Add your docs here. */
+/** Swerve drive constants */
 public final class DrivetrainConstants {
   // TODO: make sure this is correct
   public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
@@ -26,13 +26,12 @@ public final class DrivetrainConstants {
   // TODO: Find these
   public static final Distance trackLength = Inches.of(22.75);
   public static final Distance trackWidth = Inches.of(22.75);
-  // distance between the center of the wheel to the center of the robot
-  public static final Distance kCenterToWheel =
-      Meters.of(Math.hypot(trackLength.in(Meters), trackWidth.in(Meters)) / 2);
-  public static final Distance wheelDiameter = Inches.of(2);
+
+  public static final Distance wheelDiameter = Inches.of(4);
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
+    //TODO: tune
     public static final double kp = 0.08;
     public static final double kd = 0.03;
     public static final double maxVelocityMultiplier = 0.8;
@@ -83,13 +82,8 @@ public final class DrivetrainConstants {
 
   /** Drivetrain CANBus name */
   public static final String driveBusName = "Drivetrain";
-
-  /** Radius of robot from center to wheel */
-
   /* Module Specific Constants */
-  // ! module offsets are configured. Only change if a serious deviation is seen,
-  // as well as in
-  // ! each comp
+  // ! Only change if a serious deviation is seen, as well as in each comp
   /* Front Left Module - Module 0 */
   public static final class FrontLeft {
     public static final int driveMotorID = 14;
