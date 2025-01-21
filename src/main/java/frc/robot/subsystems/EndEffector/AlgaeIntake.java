@@ -8,13 +8,18 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static frc.robot.Constants.EndEffectorConstants.*;
+import static frc.robot.Constants.HardwareConstants.Elevator.*;
+import static frc.robot.Constants.HardwareConstants.Elevator.kS;
 import static frc.robot.Constants.HardwareConstants.EndEffector.*;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 public class AlgaeIntake extends SubsystemBase {
   public static enum AlgaeStates {
@@ -36,6 +41,18 @@ public class AlgaeIntake extends SubsystemBase {
   private PivotState m_PivotState;
   private TalonFX m_AlgaeMotor;
   private TalonFX m_AlgaePivot;
+
+  private Slot0Configs IntakePIDConfig = new Slot0Configs();
+  private final TunableNumber algaeIntakeKp;
+  private final TunableNumber algaeIntakeKd;
+  private final TunableNumber algaeIntakeKg;
+  private final TunableNumber algaeIntakeKs;
+
+  private Slot0Configs PivotPIDConfig = new Slot0Configs();
+  private final TunableNumber algaePivotKp;
+  private final TunableNumber algaePivotKd;
+  private final TunableNumber algaePivotKs;
+  private final TunableNumber algaePivotKg;
 
   private final VelocityTorqueCurrentFOC algaeRequest =
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
@@ -61,6 +78,32 @@ public class AlgaeIntake extends SubsystemBase {
 
     pivotRequest.UpdateFreqHz = 0;
     pivotRequest.UseTimesync = true;
+
+    IntakePIDConfig.withKA(kA)
+        .withKS(kS)
+        .withKV(kV)
+        .withKG(kG)
+        .withKP(kP)
+        .withKD(kD)
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+
+    algaeIntakeKp = new TunableNumber("/Algae Intake/kP", kP);
+    algaeIntakeKd = new TunableNumber("/Algae Intake/kD", kD);
+    algaeIntakeKg = new TunableNumber("/Algae Intake/kG", kG);
+    algaeIntakeKs = new TunableNumber("/Algae Intake/kS", kS);
+
+    PivotPIDConfig.withKA(kA)
+        .withKS(kS)
+        .withKV(kV)
+        .withKG(kG)
+        .withKP(kP)
+        .withKD(kD)
+        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+
+    algaePivotKp = new TunableNumber("/Algae Pivot/kP", kP);
+    algaePivotKd = new TunableNumber("/Algae Pivot/kD", kD);
+    algaePivotKg = new TunableNumber("/Algae Pivot/kG", kG);
+    algaePivotKs = new TunableNumber("/Algae Pivot/kS", kS);
   }
 
   public void setAlgaeState(AlgaeStates state) {
@@ -85,6 +128,30 @@ public class AlgaeIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
+        || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
+        || algaeIntakeKs.getNumber() != IntakePIDConfig.kS
+        || algaeIntakeKg.getNumber() != IntakePIDConfig.kG) {
+      IntakePIDConfig.kP = algaeIntakeKp.getNumber();
+      IntakePIDConfig.kD = algaeIntakeKd.getNumber();
+      IntakePIDConfig.kS = algaeIntakeKs.getNumber();
+      IntakePIDConfig.kG = algaeIntakeKg.getNumber();
+
+      m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
+    }
+
+    if (algaePivotKp.getNumber() != PivotPIDConfig.kP
+        || algaePivotKd.getNumber() != PivotPIDConfig.kD
+        || algaePivotKs.getNumber() != PivotPIDConfig.kS
+        || algaePivotKg.getNumber() != IntakePIDConfig.kG) {
+      PivotPIDConfig.kP = algaePivotKp.getNumber();
+      PivotPIDConfig.kD = algaePivotKd.getNumber();
+      PivotPIDConfig.kS = algaePivotKs.getNumber();
+      PivotPIDConfig.kG = algaePivotKg.getNumber();
+
+      m_AlgaePivot.getConfigurator().apply(PivotPIDConfig);
+    }
+
     // This method will be called once per scheduler run
     if (m_AlgaeMotor.getFault_StatorCurrLimit().getValue()) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;

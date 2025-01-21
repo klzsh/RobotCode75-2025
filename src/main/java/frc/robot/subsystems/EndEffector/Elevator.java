@@ -4,13 +4,7 @@
 
 package frc.robot.subsystems.EndEffector;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.HardwareConstants.Elevator.*;
 import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
@@ -30,6 +24,8 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -38,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.lib.dashboard.TunableNumber;
+import frc.robot.Constants.ElevatorConstants;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -71,6 +68,11 @@ public class Elevator extends SubsystemBase {
   private final TalonFX m_ElevatorMotor1;
   private final TalonFX m_ElevatorMotor2;
 
+  // sensors
+  private final DigitalInput m_lowerLimitSwitch;
+  private final DigitalInput m_upperLimitSwitch;
+  private final Counter m_distanceSensor;
+
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
@@ -101,6 +103,10 @@ public class Elevator extends SubsystemBase {
     // initialize motors, using the non drivetrain CANivore bus
     m_ElevatorMotor1 = new TalonFX(elevatorMotor1CANID, superstructureCANBusName);
     m_ElevatorMotor2 = new TalonFX(elevatorMotor2CANID, superstructureCANBusName);
+    // initialize sensors
+    m_lowerLimitSwitch = new DigitalInput(lowerLimitPort);
+    m_upperLimitSwitch = new DigitalInput(upperLimitPort);
+    m_distanceSensor = new Counter(distanceSensorPort);
     // initialize control requests
     m_PositionRequest = new DynamicMotionMagicTorqueCurrentFOC(0, 0, 0, 0);
     m_CharacterizationRequest = new TorqueCurrentFOC(Amps.of(0));
@@ -146,7 +152,6 @@ public class Elevator extends SubsystemBase {
 
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
-
   }
 
   /**
@@ -204,6 +209,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) {
+    if (position == ElevatorPositions.HOME) return m_lowerLimitSwitch.get();
+    if (position == ElevatorPositions.L4) return m_upperLimitSwitch.get();
     double currentPosition =
         rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches);
     double algaeOffset =
@@ -270,6 +277,28 @@ public class Elevator extends SubsystemBase {
       m_ElevatorMotor2.getConfigurator().apply(PIDConfig);
     }
 
+    if (m_lowerLimitSwitch.get()) {
+      m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
+      m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
+    }
+    if (m_upperLimitSwitch.get()) {
+      m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.L4.inches));
+      m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.L4.inches));
+    }
+
+    double distance =
+        Millimeter.of(m_distanceSensor.getDistance()).in(Inches)
+            + motorCounterOffset.in(Inches); // inches
+    double deviation =
+        Math.abs(
+            distance
+                - rotationsToInches(m_ElevatorMotor1.getPosition().getValue())
+                    .in(Inches)); // inches
+    if (deviation > ElevatorConstants.maxDeviation.in(Inches)) {
+      m_ElevatorMotor1.setPosition(inchesToRotations(Inches.of(distance)));
+      m_ElevatorMotor2.setPosition(inchesToRotations(Inches.of(distance)));
+    }
+
     if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
       Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
       double algaeOffset =
@@ -281,10 +310,12 @@ public class Elevator extends SubsystemBase {
       double target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
 
       if (currentPosition.in(Inches) < target) {
+        if (m_upperLimitSwitch.get()) return;
         m_PositionRequest.Velocity = upVelocity.getNumber();
         m_PositionRequest.Acceleration = upAcceleration.getNumber();
         m_PositionRequest.Jerk = upJerk.getNumber();
       } else {
+        if (m_lowerLimitSwitch.get()) return;
         m_PositionRequest.Velocity = downVelocity.getNumber();
         m_PositionRequest.Acceleration = downAcceleration.getNumber();
         m_PositionRequest.Jerk = downJerk.getNumber();

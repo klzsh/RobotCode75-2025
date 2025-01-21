@@ -42,7 +42,7 @@ public class Swerve extends SubsystemBase {
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
-  //TODO: tunable numebr for PIDs + current limits
+  // TODO: tunable numebr for PIDs + current limits
   @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
