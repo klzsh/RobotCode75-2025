@@ -15,6 +15,9 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -43,6 +46,7 @@ import frc.robot.Constants.ElevatorConstants;
  *  Motion magic is used to prevent the elevator from destroying itself by moving too fast
  *
  */
+@Logged(strategy = Strategy.OPT_IN, name = "Elevator")
 public class Elevator extends SubsystemBase {
 
   // we only have a certain number of states the elevator will be in at any given time
@@ -61,11 +65,16 @@ public class Elevator extends SubsystemBase {
     }
   }
 
+  @Logged(name = "Current Position", importance = Importance.INFO)
   private ElevatorPositions m_CurrentPosition = ElevatorPositions.HOME;
+
   private boolean m_IsAlgae = false;
 
   // define motors
+  @Logged(name = "Left Elevator Motor", importance = Importance.INFO)
   private final TalonFX m_ElevatorMotor1;
+
+  @Logged(name = "Right Elevator Motor", importance = Importance.INFO)
   private final TalonFX m_ElevatorMotor2;
 
   // sensors
