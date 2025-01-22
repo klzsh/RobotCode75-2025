@@ -11,8 +11,9 @@ import edu.wpi.first.units.measure.Distance;
 /** Add your docs here. */
 public class ElevatorConstants {
   // TODO: figure out
-  public static final int elevatorMotor1CANID = 0;
-  public static final int elevatorMotor2CANID = 0;
+  // from the perspective of looking from the back of the robot forwards
+  public static final int elevatorMotor1CANID = 41; //left
+  public static final int elevatorMotor2CANID = 42; //right
   public static final int lowerLimitPort = 0;
   public static final int upperLimitPort = 0;
   public static final int distanceSensorPort = 0;
