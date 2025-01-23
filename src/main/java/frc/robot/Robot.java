@@ -4,13 +4,7 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.epilogue.Epilogue;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -20,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-@Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN)
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  @Logged(strategy = Strategy.OPT_IN)
+  // @Logged(strategy = Strategy.OPT_IN)
   private final RobotContainer m_robotContainer;
 
   /**
@@ -34,41 +28,43 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    DataLogManager.start();
     m_robotContainer = new RobotContainer();
-    Epilogue.configure(
-        config -> {
 
-          // log every 100 ms
-          config.loggingPeriod = Seconds.of(0.1);
-          // period offset is 50 ms
-          config.loggingPeriodOffset = Seconds.of(0.05);
+    // Epilogue.configure(
+    //     config -> {
 
-          if (isSimulation()) {
-            // If running in simulation, then we'd want to re-throw any errors that
-            // occur so we can debug and fix them!
-            config.errorHandler = ErrorHandler.crashOnError();
-          } else {
-            config.errorHandler = ErrorHandler.printErrorMessages();
-          }
-          // Change the root data path
-          config.root = "Telemetry";
-          // ! reference
+    //       // log every 100 ms
+    //       config.loggingPeriod = Seconds.of(0.1);
+    //       // period offset is 50 ms
+    //       config.loggingPeriodOffset = Seconds.of(0.05);
 
-          // ! NO FMS
-          //   // log INFO and CRITICAL data to NT, NOT DISK
-          //   config.minimumImportance = Logged.Importance.INFO;
-          //   config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
-          //   DataLogManager.stop();
-          // ! FMS ATTACHED
-          //   // only disk log during comp
-          //   // do not log joysticks
-          //   config.minimumImportance = Logged.Importance.CRITICAL;
-          //   DriverStation.startDataLog(DataLogManager.getLog(), false);
-          //   config.backend = new FileBackend(DataLogManager.getLog());
-          // }
-          config.minimumImportance = Importance.DEBUG;
-        });
-    Epilogue.bind(this);
+    //       if (isSimulation()) {
+    //         // If running in simulation, then we'd want to re-throw any errors that
+    //         // occur so we can debug and fix them!
+    //         config.errorHandler = ErrorHandler.crashOnError();
+    //       } else {
+    //         config.errorHandler = ErrorHandler.printErrorMessages();
+    //       }
+    //       // Change the root data path
+    //       config.root = "Telemetry";
+    //       // ! reference
+
+    //       // ! NO FMS
+    //       //   // log INFO and CRITICAL data to NT, NOT DISK
+    //       //   config.minimumImportance = Logged.Importance.INFO;
+    //       //   config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+    //       //   DataLogManager.stop();
+    //       // ! FMS ATTACHED
+    //       //   // only disk log during comp
+    //       //   // do not log joysticks
+    //       //   config.minimumImportance = Logged.Importance.CRITICAL;
+    //       //   DriverStation.startDataLog(DataLogManager.getLog(), false);
+    //       //   config.backend = new FileBackend(DataLogManager.getLog());
+    //       // }
+    //       config.minimumImportance = Importance.DEBUG;
+    //     });
+    // Epilogue.bind(this);
   }
 
   /**

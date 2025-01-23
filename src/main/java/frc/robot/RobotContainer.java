@@ -4,26 +4,19 @@
 
 package frc.robot;
 
-import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.Drivetrain.ResetHeading;
-import frc.robot.commands.Drivetrain.SnapHoldRotation;
-import frc.robot.commands.Drivetrain.TeleopSwerve;
-import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.Util.LEDsDefaultCommand;
-import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.Util.CANdleWrapper;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,16 +28,16 @@ import frc.robot.subsystems.Util.CANdleWrapper;
 public class RobotContainer {
   // define subsystems first
   @Logged(name = "swerve")
-  private final Swerve m_Swerve = new Swerve();
+  // private final Swerve m_Swerve = new Swerve();
 
   private final Elevator m_Elevator = new Elevator();
 
-  private final CANdleWrapper m_Wrapper = new CANdleWrapper();
+  // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
   // define auto factory for autos
-  private final AutoFactory factory =
-      new AutoFactory(
-          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+  // private final AutoFactory factory =
+  //     new AutoFactory(
+  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
@@ -70,22 +63,24 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDefaultCommands();
     configureBindings();
-    configureChooser();
+    // configureChooser();
   }
 
   private void configureDefaultCommands() {
-    m_Swerve.setDefaultCommand(
-        new TeleopSwerve(
-            m_Swerve,
-            // for some reason, the makers of WPILIB decided that joystick coordinates and robot
-            // coordinates should be flipped. I don't know what drove them to do that, but due to
-            // this decision, we have to negate the stick values.
-            () -> -m_LeftStick.getY(),
-            () -> -m_LeftStick.getX(),
-            () -> m_RightStick.getX(),
-            false,
-            !robotRelative.getAsBoolean()));
-    m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
+    // m_Swerve.setDefaultCommand(
+    //     new TeleopSwerve(
+    //         m_Swerve,
+    //         // for some reason, the makers of WPILIB decided that joystick coordinates and robot
+    //         // coordinates should be flipped. I don't know what drove them to do that, but due to
+    //         // this decision, we have to negate the stick values.
+    //         () -> -m_LeftStick.getY(),
+    //         () -> -m_LeftStick.getX(),
+    //         () -> m_RightStick.getX(),
+    //         false,
+    //         !robotRelative.getAsBoolean()));
+    // m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
+    m_Elevator.setDefaultCommand(
+        new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
   }
 
   /**
@@ -98,16 +93,28 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    resetHeading.onTrue(new ResetHeading(m_Swerve));
-    Xstance.whileTrue(new XStance(m_Swerve));
-    holdButton.whileTrue(
-        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
-    alignButton.onTrue(
-        new SnapHoldRotation(
-            m_Swerve,
-            Rotation2d.fromDegrees(90),
-            () -> -m_LeftStick.getY(),
-            () -> -m_LeftStick.getX()));
+    // resetHeading.onTrue(new ResetHeading(m_Swerve));
+    // Xstance.whileTrue(new XStance(m_Swerve));
+    // holdButton.whileTrue(
+    //     new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+    // alignButton.onTrue(
+    //     new SnapHoldRotation(
+    //         m_Swerve,
+    //         Rotation2d.fromDegrees(90),
+    //         () -> -m_LeftStick.getY(),
+    //         () -> -m_LeftStick.getX()));
+
+    m_Controller.a().whileTrue(m_Elevator.quasistaticForward());
+    m_Controller.b().whileTrue(m_Elevator.quasistaticReverse());
+    m_Controller.x().whileTrue(m_Elevator.dynamicForward());
+    m_Controller.y().whileTrue(m_Elevator.dynamicReverse());
+
+    m_Controller
+        .povUp()
+        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runUp(), m_Elevator)));
+    m_Controller
+        .povDown()
+        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runDown(), m_Elevator)));
   }
 
   private void configureChooser() {}
@@ -118,6 +125,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_AutoChooser.getSelected();
+    // return m_AutoChooser.getSelected();
+    return null;
   }
 }

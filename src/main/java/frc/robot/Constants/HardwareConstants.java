@@ -27,7 +27,7 @@ import edu.wpi.first.units.measure.Time;
 
 /** This class is meant to house the configs for specific motors */
 public final class HardwareConstants {
-  public static final String superstructureCANBusName = " Superstructure";
+  public static final String superstructureCANBusName = "Superstructure";
 
   public static final class Swerve {
     public static final TalonFXConfiguration m_DriveConfig = new TalonFXConfiguration();
@@ -386,7 +386,7 @@ public final class HardwareConstants {
       m_ElevatorMotorConfig.MotionMagic.MotionMagicJerk = mmJerk;
 
       m_ElevatorMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
-      m_ElevatorMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      m_ElevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
       m_ElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
       m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;

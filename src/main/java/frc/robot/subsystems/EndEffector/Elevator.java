@@ -27,8 +27,8 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.lib.dashboard.TunableNumber;
-import frc.robot.Constants.ElevatorConstants;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -80,7 +79,7 @@ public class Elevator extends SubsystemBase {
   // sensors
   private final DigitalInput m_lowerLimitSwitch;
   private final DigitalInput m_upperLimitSwitch;
-  private final Counter m_distanceSensor;
+  // private final Counter m_distanceSensor;
 
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
@@ -115,7 +114,7 @@ public class Elevator extends SubsystemBase {
     // initialize sensors
     m_lowerLimitSwitch = new DigitalInput(lowerLimitPort);
     m_upperLimitSwitch = new DigitalInput(upperLimitPort);
-    m_distanceSensor = new Counter(distanceSensorPort);
+    // m_distanceSensor = new Counter(distanceSensorPort);
     // initialize control requests
     m_PositionRequest = new DynamicMotionMagicTorqueCurrentFOC(0, 0, 0, 0);
     m_CharacterizationRequest = new TorqueCurrentFOC(Amps.of(0));
@@ -123,6 +122,7 @@ public class Elevator extends SubsystemBase {
     m_ElevatorMotor1.getConfigurator().apply(getElevatorMotorConfig());
     m_ElevatorMotor2.getConfigurator().apply(getElevatorMotorConfig());
     // set the position of the elevator
+    // TODO: change to elevator position sensor
     m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
     m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
 
@@ -218,8 +218,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) {
-    if (position == ElevatorPositions.HOME) return m_lowerLimitSwitch.get();
-    if (position == ElevatorPositions.L4) return m_upperLimitSwitch.get();
+    if (position == ElevatorPositions.HOME) return getLowerLimit();
+    if (position == ElevatorPositions.L4) return getUpperLimit();
     double currentPosition =
         rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches);
     double algaeOffset =
@@ -268,8 +268,34 @@ public class Elevator extends SubsystemBase {
         .until(() -> isAtPosition(position, algae));
   }
 
+  // temp methods
+  public void runUp() {
+    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(12));
+    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(12));
+  }
+
+  public void runDown() {
+    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(5));
+    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(5));
+  }
+
+  public void stopMotors() {
+    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(0));
+    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(0));
+  }
+
+  public boolean getUpperLimit() {
+    return !m_upperLimitSwitch.get();
+  }
+
+  public boolean getLowerLimit() {
+    return !m_lowerLimitSwitch.get();
+  }
+
   @Override
   public void periodic() {
+    SmartDashboard.putBoolean("Upper Limit", getUpperLimit());
+    SmartDashboard.putBoolean("Lower Limit", getLowerLimit());
 
     // only apply if one of the numbers are not equal to the others because setting the config is a
     // blocking operation
@@ -284,29 +310,30 @@ public class Elevator extends SubsystemBase {
 
       m_ElevatorMotor1.getConfigurator().apply(PIDConfig);
       m_ElevatorMotor2.getConfigurator().apply(PIDConfig);
+      System.out.println("fff");
     }
 
-    if (m_lowerLimitSwitch.get()) {
+    if (getLowerLimit()) {
       m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
       m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
     }
-    if (m_upperLimitSwitch.get()) {
+    if (getUpperLimit()) {
       m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.L4.inches));
       m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.L4.inches));
     }
 
-    double distance =
-        Millimeter.of(m_distanceSensor.getDistance()).in(Inches)
-            + motorCounterOffset.in(Inches); // inches
-    double deviation =
-        Math.abs(
-            distance
-                - rotationsToInches(m_ElevatorMotor1.getPosition().getValue())
-                    .in(Inches)); // inches
-    if (deviation > ElevatorConstants.maxDeviation.in(Inches)) {
-      m_ElevatorMotor1.setPosition(inchesToRotations(Inches.of(distance)));
-      m_ElevatorMotor2.setPosition(inchesToRotations(Inches.of(distance)));
-    }
+    // double distance =
+    //     Millimeter.of(m_distanceSensor.getDistance()).in(Inches)
+    //         + motorCounterOffset.in(Inches); // inches
+    // double deviation =
+    //     Math.abs(
+    //         distance
+    //             - rotationsToInches(m_ElevatorMotor1.getPosition().getValue())
+    //                 .in(Inches)); // inches
+    // if (deviation > ElevatorConstants.maxDeviation.in(Inches)) {
+    //   m_ElevatorMotor1.setPosition(inchesToRotations(Inches.of(distance)));
+    //   m_ElevatorMotor2.setPosition(inchesToRotations(Inches.of(distance)));
+    // }
 
     if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
       Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
@@ -319,21 +346,27 @@ public class Elevator extends SubsystemBase {
       double target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
 
       if (currentPosition.in(Inches) < target) {
-        if (m_upperLimitSwitch.get()) return;
+        if (getUpperLimit()) return;
         m_PositionRequest.Velocity = upVelocity.getNumber();
         m_PositionRequest.Acceleration = upAcceleration.getNumber();
         m_PositionRequest.Jerk = upJerk.getNumber();
       } else {
-        if (m_lowerLimitSwitch.get()) return;
+        if (getLowerLimit()) return;
         m_PositionRequest.Velocity = downVelocity.getNumber();
         m_PositionRequest.Acceleration = downAcceleration.getNumber();
         m_PositionRequest.Jerk = downJerk.getNumber();
       }
 
       m_ElevatorMotor1.setControl(
-          m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+          m_PositionRequest
+              .withPosition(inchesToRotations(Inches.of(target)))
+              .withLimitForwardMotion(getUpperLimit())
+              .withLimitReverseMotion(getLowerLimit()));
       m_ElevatorMotor2.setControl(
-          m_PositionRequest.withPosition(inchesToRotations(Inches.of(target))));
+          m_PositionRequest
+              .withPosition(inchesToRotations(Inches.of(target)))
+              .withLimitForwardMotion(getUpperLimit())
+              .withLimitReverseMotion(getLowerLimit()));
     }
   }
 }
