@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -241,6 +242,12 @@ public class TalonFXSwerveModule {
   private void configDriveMotor() {
     mDriveMotor.getConfigurator().apply(HardwareConstants.Swerve.getDriveConfiguration());
     mDriveMotor.getConfigurator().setPosition(0);
+  }
+  public void setDrivePIDS(Slot0Configs config){
+    mDriveMotor.getConfigurator().apply(config);
+  }
+  public void setAnglePIDS(Slot0Configs config){
+    mAngleMotor.getConfigurator().apply(config);
   }
 
   /**
