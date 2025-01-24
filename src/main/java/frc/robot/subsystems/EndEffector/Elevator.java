@@ -70,15 +70,16 @@ public class Elevator extends SubsystemBase {
   private boolean m_IsAlgae = false;
 
   // define motors
-  @Logged(name = "Left Elevator Motor", importance = Importance.INFO)
+  @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
   private final TalonFX m_ElevatorMotor1;
 
-  @Logged(name = "Right Elevator Motor", importance = Importance.INFO)
+  @Logged(name = "Right Elevator Motor", importance = Importance.DEBUG)
   private final TalonFX m_ElevatorMotor2;
 
   // sensors
   private final DigitalInput m_lowerLimitSwitch;
   private final DigitalInput m_upperLimitSwitch;
+  // this is probably not going to be used for homing the elevator
   // private final Counter m_distanceSensor;
 
   // define control requests
@@ -106,6 +107,8 @@ public class Elevator extends SubsystemBase {
   private final TunableNumber elevatorKd;
   private final TunableNumber elevatorKg;
   private final TunableNumber elevatorKs;
+  private final TunableNumber elevatorKa;
+  private final TunableNumber elevatorKv;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -130,7 +133,7 @@ public class Elevator extends SubsystemBase {
     m_Routine =
         new SysIdRoutine(
             // 12 amps per second                   7 amps per step        timeout
-            new Config(Volts.of(12).per(Seconds), Volts.of(7), Seconds.of(5)),
+            new Config(Volts.of(5).per(Seconds), Volts.of(10), Seconds.of(5)),
             new Mechanism(this::characterizeElevator, this::logMotors, this));
 
     // sets the default values for the tunable numbers
@@ -155,6 +158,8 @@ public class Elevator extends SubsystemBase {
     elevatorKd = new TunableNumber("/Elevator/kD", kD);
     elevatorKg = new TunableNumber("/Elevator/kG", kG);
     elevatorKs = new TunableNumber("/Elevator/kS", kS);
+    elevatorKa = new TunableNumber("/Elevator/kA", kA);
+    elevatorKv = new TunableNumber("/Elevator/kV", kV);
 
     m_CharacterizationRequest.UpdateFreqHz = 0;
     m_CharacterizationRequest.UseTimesync = true;
@@ -270,13 +275,24 @@ public class Elevator extends SubsystemBase {
 
   // temp methods
   public void runUp() {
-    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(12));
-    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(12));
+    m_PositionRequest.Velocity = upVelocity.getNumber();
+    m_PositionRequest.Acceleration = upAcceleration.getNumber();
+    m_PositionRequest.Jerk = upJerk.getNumber();
+    m_ElevatorMotor1.setControl(
+        m_PositionRequest
+            .withPosition(17)
+            .withLimitForwardMotion(getUpperLimit())
+            .withLimitReverseMotion(getLowerLimit()));
+    m_ElevatorMotor2.setControl(
+        m_PositionRequest
+            .withPosition(17)
+            .withLimitForwardMotion(getUpperLimit())
+            .withLimitReverseMotion(getLowerLimit()));
   }
 
   public void runDown() {
-    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(5));
-    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(5));
+    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(15));
+    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(15));
   }
 
   public void stopMotors() {
@@ -302,11 +318,15 @@ public class Elevator extends SubsystemBase {
     if (elevatorKp.getNumber() != PIDConfig.kP
         || elevatorKd.getNumber() != PIDConfig.kD
         || elevatorKs.getNumber() != PIDConfig.kS
-        || elevatorKg.getNumber() != PIDConfig.kG) {
+        || elevatorKg.getNumber() != PIDConfig.kG
+        || elevatorKa.getNumber() != PIDConfig.kA
+        || elevatorKv.getNumber() != PIDConfig.kV) {
       PIDConfig.kP = elevatorKp.getNumber();
       PIDConfig.kD = elevatorKd.getNumber();
       PIDConfig.kS = elevatorKs.getNumber();
       PIDConfig.kG = elevatorKg.getNumber();
+      PIDConfig.kA = elevatorKa.getNumber();
+      PIDConfig.kV = elevatorKv.getNumber();
 
       m_ElevatorMotor1.getConfigurator().apply(PIDConfig);
       m_ElevatorMotor2.getConfigurator().apply(PIDConfig);
@@ -314,26 +334,13 @@ public class Elevator extends SubsystemBase {
     }
 
     if (getLowerLimit()) {
-      m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
-      m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
+      m_ElevatorMotor1.setPosition(Rotations.of(0));
+      m_ElevatorMotor2.setPosition(Rotations.of(0));
     }
     if (getUpperLimit()) {
-      m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.L4.inches));
-      m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.L4.inches));
+      m_ElevatorMotor1.setPosition(Rotations.of(25));
+      m_ElevatorMotor2.setPosition(Rotations.of(25));
     }
-
-    // double distance =
-    //     Millimeter.of(m_distanceSensor.getDistance()).in(Inches)
-    //         + motorCounterOffset.in(Inches); // inches
-    // double deviation =
-    //     Math.abs(
-    //         distance
-    //             - rotationsToInches(m_ElevatorMotor1.getPosition().getValue())
-    //                 .in(Inches)); // inches
-    // if (deviation > ElevatorConstants.maxDeviation.in(Inches)) {
-    //   m_ElevatorMotor1.setPosition(inchesToRotations(Inches.of(distance)));
-    //   m_ElevatorMotor2.setPosition(inchesToRotations(Inches.of(distance)));
-    // }
 
     if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
       Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());

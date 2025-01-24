@@ -7,8 +7,6 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Hertz;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -19,8 +17,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
@@ -335,31 +331,23 @@ public final class HardwareConstants {
     public static final Current supplyCurrentLowerLimit = Amps.of(30);
     public static final Time supplyCurrentLowerTime = Seconds.of(0.5);
 
-    // TODO: Find
-    public static final Angle forwardLimit = Rotations.of(0);
-    public static final Angle reverseLimit = Rotations.of(0);
-
-    // TODO: find these
-    public static final AngularAcceleration mmAcceleration = RotationsPerSecondPerSecond.of(0);
-    public static final AngularVelocity mmCruiseVelocity = RotationsPerSecond.of(0);
-    public static final double mmExpoKa = 0;
-    public static final double mmExpoKv = 0;
-    public static final double mmJerk = 0;
+    public static final Angle forwardLimit = Rotations.of(24);
+    public static final Angle reverseLimit = Rotations.of(5);
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
     // TODO: find these
-    public static final double kA = 0;
-    public static final double kG = 0;
-    public static final double kS = 0;
-    public static final double kV = 0;
-    public static final double kP = 0;
+    public static final double kA = 0.3;
+    public static final double kG = 15;
+    public static final double kS = 14;
+    public static final double kV = 0.12;
+    public static final double kP = 30;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 2;
 
     // TODO: slowly ramp these up
-    public static final Current torqueForwardCurrentLimit = Amps.of(20);
-    public static final Current torqueReverseCurrentLimit = Amps.of(20);
+    public static final Current torqueForwardCurrentLimit = Amps.of(100);
+    public static final Current torqueReverseCurrentLimit = Amps.of(100);
 
     public static TalonFXConfiguration getElevatorMotorConfig() {
       TalonFXConfiguration m_ElevatorMotorConfig = new TalonFXConfiguration();
@@ -375,15 +363,6 @@ public final class HardwareConstants {
           supplyCurrentLowerLimit.in(Amps);
       m_ElevatorMotorConfig.CurrentLimits.SupplyCurrentLowerTime =
           supplyCurrentLowerTime.in(Seconds);
-
-      // TODO: decide on which motion magic config to use
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicAcceleration =
-          mmAcceleration.in(RotationsPerSecondPerSecond);
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-          mmCruiseVelocity.in(RotationsPerSecond);
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicExpo_kA = mmExpoKa;
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicExpo_kV = mmExpoKv;
-      m_ElevatorMotorConfig.MotionMagic.MotionMagicJerk = mmJerk;
 
       m_ElevatorMotorConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
       m_ElevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -405,12 +384,12 @@ public final class HardwareConstants {
       m_ElevatorMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
           torqueReverseCurrentLimit.in(Amps);
 
+      m_ElevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
       m_ElevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardLimit.in(Rotations);
-      m_ElevatorMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+      m_ElevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
       m_ElevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
           reverseLimit.in(Rotations);
-      m_ElevatorMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
       return m_ElevatorMotorConfig;
     }
