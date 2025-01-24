@@ -87,10 +87,10 @@ public class AlgaeIntake extends SubsystemBase {
         .withKD(kD)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    algaeIntakeKp = new TunableNumber("/Algae Intake/kP", kP);
-    algaeIntakeKd = new TunableNumber("/Algae Intake/kD", kD);
-    algaeIntakeKg = new TunableNumber("/Algae Intake/kG", kG);
-    algaeIntakeKs = new TunableNumber("/Algae Intake/kS", kS);
+    algaeIntakeKp = new TunableNumber("Algae Intake/kP", kP);
+    algaeIntakeKd = new TunableNumber("Algae Intake/kD", kD);
+    algaeIntakeKg = new TunableNumber("Algae Intake/kG", kG);
+    algaeIntakeKs = new TunableNumber("Algae Intake/kS", kS);
 
     PivotPIDConfig.withKA(kA)
         .withKS(kS)
@@ -100,10 +100,10 @@ public class AlgaeIntake extends SubsystemBase {
         .withKD(kD)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    algaePivotKp = new TunableNumber("/Algae Pivot/kP", kP);
-    algaePivotKd = new TunableNumber("/Algae Pivot/kD", kD);
-    algaePivotKg = new TunableNumber("/Algae Pivot/kG", kG);
-    algaePivotKs = new TunableNumber("/Algae Pivot/kS", kS);
+    algaePivotKp = new TunableNumber("Algae Pivot/kP", kP);
+    algaePivotKd = new TunableNumber("Algae Pivot/kD", kD);
+    algaePivotKg = new TunableNumber("Algae Pivot/kG", kG);
+    algaePivotKs = new TunableNumber("Algae Pivot/kS", kS);
   }
 
   public void setAlgaeState(AlgaeStates state) {

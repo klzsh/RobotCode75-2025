@@ -21,9 +21,15 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 
-/** This class is meant to house the configs for specific motors */
+/**
+ * This class is meant to house the configs for specific motors All configs from CTRE motors are
+ * unit-aware, especially configs for closed loop gains timeSync can only be used on a CANivore any
+ * TorqueCurrentFOC gains/control modes can only be used with Phoenix pro (HIGHLY RECCOMENDED TO
+ * USE)
+ */
 public final class HardwareConstants {
   public static final String superstructureCANBusName = "Superstructure";
+  public static final boolean TUNING_MODE = true;
 
   public static final class Swerve {
     public static final TalonFXConfiguration m_DriveConfig = new TalonFXConfiguration();
@@ -337,10 +343,10 @@ public final class HardwareConstants {
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
     // TODO: find these
-    public static final double kA = 0.3;
-    public static final double kG = 15;
-    public static final double kS = 14;
-    public static final double kV = 0.12;
+    public static final double kA = 0.3; // current per unit of acceleration
+    public static final double kG = 15; // current to overcome gravity
+    public static final double kS = 14; // current to overcome static friction
+    public static final double kV = 0.12; // current per unit of requested velocity
     public static final double kP = 30;
     public static final double kI = 0;
     public static final double kD = 2;

@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    DataLogManager.start();
+    // DataLogManager.start(); // do not start this when not in comp
     m_robotContainer = new RobotContainer();
 
     Epilogue.configure(

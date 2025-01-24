@@ -34,12 +34,12 @@ public class ElevatorConstants {
   // Distance from GROUND.
   public static final Distance motorCounterOffset = Inches.of(0);
   public static final Distance algaeRemovalOffset = Inches.of(0);
-  public static final Distance coralOffset = Inches.of(18.795);
-  public static final Distance l1Position = Inches.of(8);
+  public static final Distance coralOffset = Inches.of(18.795); // 27.495 inches from the ground
+  public static final Distance l1Position = Inches.of(10);
   public static final Distance l2Position = Inches.of(24);
   public static final Distance l3Position = Inches.of(48);
   public static final Distance l4Position = Inches.of(72);
-  public static final Distance homePosition = Inches.of(0);
+  public static final Distance homePosition = Inches.of(8.7);
   public static final Distance processorPosition = Inches.of(7);
 
   // velocity, acceleration, jerk

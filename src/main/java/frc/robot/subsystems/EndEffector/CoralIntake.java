@@ -64,10 +64,10 @@ public class CoralIntake extends SubsystemBase {
         .withKD(kD)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    coralIntakeKp = new TunableNumber("/Coral Intake/kP", kP);
-    coralIntakeKd = new TunableNumber("/Coral Intake/kD", kD);
-    coralIntakeKg = new TunableNumber("/Coral Intake/kG", kG);
-    coralIntakeKs = new TunableNumber("/Coral Intake/kS", kS);
+    coralIntakeKp = new TunableNumber("Coral Intake/kP", kP);
+    coralIntakeKd = new TunableNumber("Coral Intake/kD", kD);
+    coralIntakeKg = new TunableNumber("Coral Intake/kG", kG);
+    coralIntakeKs = new TunableNumber("Coral Intake/kS", kS);
   }
 
   public void setState(CoralStates state) {

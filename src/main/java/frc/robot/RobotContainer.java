@@ -104,11 +104,6 @@ public class RobotContainer {
     //         () -> -m_LeftStick.getY(),
     //         () -> -m_LeftStick.getX()));
 
-    m_Controller.a().whileTrue(m_Elevator.quasistaticForward());
-    m_Controller.b().whileTrue(m_Elevator.quasistaticReverse());
-    m_Controller.x().whileTrue(m_Elevator.dynamicForward());
-    m_Controller.y().whileTrue(m_Elevator.dynamicReverse());
-
     m_Controller
         .povUp()
         .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runUp(), m_Elevator)));
