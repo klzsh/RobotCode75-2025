@@ -106,10 +106,11 @@ public class RobotContainer {
 
     m_Controller
         .povUp()
-        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runUp(), m_Elevator)));
+        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint1(), m_Elevator)));
     m_Controller
         .povDown()
-        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runDown(), m_Elevator)));
+        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
+    m_Controller.povLeft().whileTrue(new RepeatCommand(new InstantCommand(()-> m_Elevator.stopMotors(), m_Elevator)));
   }
 
   private void configureChooser() {}

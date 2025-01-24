@@ -20,22 +20,12 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.units.measure.MutLinearVelocity;
-import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.lib.dashboard.TunableNumber;
 
 /*
@@ -86,13 +76,6 @@ public class Elevator extends SubsystemBase {
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
 
-  // motor characterization stuff
-  private final SysIdRoutine m_Routine;
-
-  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
-  private final MutDistance m_distance = Inches.mutable(0);
-  private final MutLinearVelocity m_velocity = InchesPerSecond.mutable(0);
-
   // tunable numbers
   private final TunableNumber upVelocity;
   private final TunableNumber upAcceleration;
@@ -125,25 +108,17 @@ public class Elevator extends SubsystemBase {
     m_ElevatorMotor1.getConfigurator().apply(getElevatorMotorConfig());
     m_ElevatorMotor2.getConfigurator().apply(getElevatorMotorConfig());
     // set the position of the elevator
-    // TODO: change to elevator position sensor
     m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
     m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
 
-    // set up sysid
-    m_Routine =
-        new SysIdRoutine(
-            // 12 amps per second                   7 amps per step        timeout
-            new Config(Volts.of(5).per(Seconds), Volts.of(10), Seconds.of(5)),
-            new Mechanism(this::characterizeElevator, this::logMotors, this));
-
     // sets the default values for the tunable numbers
-    upVelocity = new TunableNumber("/Elevator/UpVelocity", MotionMagicProfileUp[0]);
-    upAcceleration = new TunableNumber("/Elevator/UpAcceleration", MotionMagicProfileUp[1]);
-    upJerk = new TunableNumber("/Elevator/UpJerk", MotionMagicProfileUp[2]);
+    upVelocity = new TunableNumber("Elevator/UpVelocity", MotionMagicProfileUp[0]);
+    upAcceleration = new TunableNumber("Elevator/UpAcceleration", MotionMagicProfileUp[1]);
+    upJerk = new TunableNumber("Elevator/UpJerk", MotionMagicProfileUp[2]);
 
-    downVelocity = new TunableNumber("/Elevator/DowbVelocity", MotionMagicProfileDown[0]);
-    downAcceleration = new TunableNumber("/Elevator/DownAcceleration", MotionMagicProfileDown[1]);
-    downJerk = new TunableNumber("/Elevator/DownJerk", MotionMagicProfileDown[2]);
+    downVelocity = new TunableNumber("Elevator/DownVelocity", MotionMagicProfileDown[0]);
+    downAcceleration = new TunableNumber("Elevator/DownAcceleration", MotionMagicProfileDown[1]);
+    downJerk = new TunableNumber("Elevator/DownJerk", MotionMagicProfileDown[2]);
 
     PIDConfig.withKA(kA)
         .withKS(kS)
@@ -154,12 +129,12 @@ public class Elevator extends SubsystemBase {
         .withGravityType(GravityTypeValue.Elevator_Static)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    elevatorKp = new TunableNumber("/Elevator/kP", kP);
-    elevatorKd = new TunableNumber("/Elevator/kD", kD);
-    elevatorKg = new TunableNumber("/Elevator/kG", kG);
-    elevatorKs = new TunableNumber("/Elevator/kS", kS);
-    elevatorKa = new TunableNumber("/Elevator/kA", kA);
-    elevatorKv = new TunableNumber("/Elevator/kV", kV);
+    elevatorKp = new TunableNumber("Elevator/kP", kP);
+    elevatorKd = new TunableNumber("Elevator/kD", kD);
+    elevatorKg = new TunableNumber("Elevator/kG", kG);
+    elevatorKs = new TunableNumber("Elevator/kS", kS);
+    elevatorKa = new TunableNumber("Elevator/kA", kA);
+    elevatorKv = new TunableNumber("Elevator/kV", kV);
 
     m_CharacterizationRequest.UpdateFreqHz = 0;
     m_CharacterizationRequest.UseTimesync = true;
@@ -169,51 +144,7 @@ public class Elevator extends SubsystemBase {
   }
 
   /**
-   * This function is a bit confusing due to how SysID works. SysID works with volts, but the
-   * concept of characterizing the kS, kV, and kA are all the same between current and voltage
-   * control. So what needs to happen is this function takes in a "voltage" value, but we set up the
-   * {@link edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config} rate parameters to be more
-   * representitive of current values. It is a jank workaround to WPILib not supporting an extremely
-   * small subset of FRC teams
-   *
-   * @param current
-   */
-  public void characterizeElevator(Voltage current) {
-    // absolutely cursed
-    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(current.in(Volts)));
-    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(current.in(Volts)));
-  }
-
-  public void logMotors(SysIdRoutineLog log) {
-    log.motor("elevator1")
-        .voltage(
-            m_appliedVoltage.mut_replace(
-                m_ElevatorMotor1.getMotorVoltage().getValue().in(Volts), Volts))
-        .linearPosition(
-            m_distance.mut_replace(
-                rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches), Inches))
-        .linearVelocity(
-            m_velocity.mut_replace(
-                rotationsPerSecondToInchesPerSecond(m_ElevatorMotor1.getVelocity().getValue())
-                    .in(InchesPerSecond),
-                InchesPerSecond));
-    log.motor("elevator2")
-        .voltage(
-            m_appliedVoltage.mut_replace(
-                m_ElevatorMotor2.getMotorVoltage().getValue().in(Volts), Volts))
-        .linearPosition(
-            m_distance.mut_replace(
-                rotationsToInches(m_ElevatorMotor2.getPosition().getValue()).in(Inches), Inches))
-        .linearVelocity(
-            m_velocity.mut_replace(
-                rotationsPerSecondToInchesPerSecond(m_ElevatorMotor2.getVelocity().getValue())
-                    .in(InchesPerSecond),
-                InchesPerSecond));
-  }
-
-  /**
-   * this function should account for whether the elevator is going up or down and modify parameters
-   * like velocity and acceleration
+   * sets the elevator state
    *
    * @param position the position to set the elevator to
    */
@@ -236,6 +167,12 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
+  /**
+   * Raw rotations to inches. Does not take into account offsets
+   *
+   * @param rotations the rotations to convert to
+   * @return inches the elevator has moved
+   */
   private Distance rotationsToInches(Angle rotations) {
     return Inches.of(rotations.in(Rotations) * inchesPerRotation.in(Inches));
   }
@@ -244,37 +181,13 @@ public class Elevator extends SubsystemBase {
     return Rotations.of(inches.in(Inches) / inchesPerRotation.in(Inches));
   }
 
-  private LinearVelocity rotationsPerSecondToInchesPerSecond(AngularVelocity rotations) {
-    return InchesPerSecond.of(rotations.in(RotationsPerSecond) * inchesPerRotation.in(Inches));
-  }
-
-  private AngularVelocity inchesPerSecondToRotationsPerSecond(LinearVelocity inches) {
-    return RotationsPerSecond.of(inches.in(InchesPerSecond) / inchesPerRotation.in(Inches));
-  }
-
-  public Command quasistaticForward() {
-    return m_Routine.quasistatic(SysIdRoutine.Direction.kForward);
-  }
-
-  public Command quasistaticReverse() {
-    return m_Routine.quasistatic(SysIdRoutine.Direction.kReverse);
-  }
-
-  public Command dynamicForward() {
-    return m_Routine.dynamic(SysIdRoutine.Direction.kForward);
-  }
-
-  public Command dynamicReverse() {
-    return m_Routine.dynamic(SysIdRoutine.Direction.kReverse);
-  }
-
   public Command positionCommand(ElevatorPositions position, boolean algae) {
     return Commands.runOnce(() -> setPosition(position, algae), this)
         .until(() -> isAtPosition(position, algae));
   }
 
   // temp methods
-  public void runUp() {
+  public void runSetpoint1() {
     m_PositionRequest.Velocity = upVelocity.getNumber();
     m_PositionRequest.Acceleration = upAcceleration.getNumber();
     m_PositionRequest.Jerk = upJerk.getNumber();
@@ -290,7 +203,7 @@ public class Elevator extends SubsystemBase {
             .withLimitReverseMotion(getLowerLimit()));
   }
 
-  public void runDown() {
+  public void runSetpoint2() {
     m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(15));
     m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(15));
   }
@@ -300,6 +213,7 @@ public class Elevator extends SubsystemBase {
     m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(0));
   }
 
+  // end temp methods
   public boolean getUpperLimit() {
     return !m_upperLimitSwitch.get();
   }
@@ -313,7 +227,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putBoolean("Upper Limit", getUpperLimit());
     SmartDashboard.putBoolean("Lower Limit", getLowerLimit());
 
-    // only apply if one of the numbers are not equal to the others because setting the config is a
+    // only apply if one of the numbers have changed because setting the config is a
     // blocking operation
     if (elevatorKp.getNumber() != PIDConfig.kP
         || elevatorKd.getNumber() != PIDConfig.kD
@@ -341,7 +255,7 @@ public class Elevator extends SubsystemBase {
       m_ElevatorMotor1.setPosition(Rotations.of(25));
       m_ElevatorMotor2.setPosition(Rotations.of(25));
     }
-
+    double target = 0;
     if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
       Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
       double algaeOffset =
@@ -350,30 +264,28 @@ public class Elevator extends SubsystemBase {
                       || m_CurrentPosition == ElevatorPositions.L3))
               ? algaeRemovalOffset.in(Inches)
               : 0;
-      double target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
+      target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
 
       if (currentPosition.in(Inches) < target) {
-        if (getUpperLimit()) return;
         m_PositionRequest.Velocity = upVelocity.getNumber();
         m_PositionRequest.Acceleration = upAcceleration.getNumber();
         m_PositionRequest.Jerk = upJerk.getNumber();
       } else {
-        if (getLowerLimit()) return;
         m_PositionRequest.Velocity = downVelocity.getNumber();
         m_PositionRequest.Acceleration = downAcceleration.getNumber();
         m_PositionRequest.Jerk = downJerk.getNumber();
       }
-
-      m_ElevatorMotor1.setControl(
-          m_PositionRequest
-              .withPosition(inchesToRotations(Inches.of(target)))
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_PositionRequest
-              .withPosition(inchesToRotations(Inches.of(target)))
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
     }
+    // uncomment when done profiling elevator
+      // m_ElevatorMotor1.setControl(
+      //     m_PositionRequest
+      //         .withPosition(inchesToRotations(Inches.of(target)))
+      //         .withLimitForwardMotion(getUpperLimit())
+      //         .withLimitReverseMotion(getLowerLimit()));
+      // m_ElevatorMotor2.setControl(
+      //     m_PositionRequest
+      //         .withPosition(inchesToRotations(Inches.of(target)))
+      //         .withLimitForwardMotion(getUpperLimit())
+      //         .withLimitReverseMotion(getLowerLimit()));
   }
 }
