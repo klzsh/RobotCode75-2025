@@ -26,7 +26,7 @@ public class ElevatorConstants {
   public static final Distance inchesPerRotation =
       Inches.of(
           pulleyCircumference.in(Inches)
-              * mechanismToMotorRatio); // 1 motor rotation = 3 inches of elevator movement
+              / mechanismToMotorRatio); // 1 motor rotation = 2.068 inches of elevator movement
   // 8.7 inches from ground
   public static final Distance distanceBetweenElevatorZeroAndGround = Inches.of(8.7);
 
@@ -43,8 +43,8 @@ public class ElevatorConstants {
   public static final Distance processorPosition = Inches.of(7);
 
   // velocity, acceleration, jerk
-  public static double[] MotionMagicProfileUp = {50, 200, 1200};
-  public static double[] MotionMagicProfileDown = {25, 100, 1200};
+  public static double[] MotionMagicProfileUp = {70, 100, 1000};
+  public static double[] MotionMagicProfileDown = {5, 50, 400};
 
   public static final Distance deadband = Inches.of(0.5);
 
