@@ -27,9 +27,9 @@ import frc.robot.subsystems.EndEffector.Elevator;
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "swerve")
+  // @Logged(name = "swerve")
   // private final Swerve m_Swerve = new Swerve();
-
+  @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
