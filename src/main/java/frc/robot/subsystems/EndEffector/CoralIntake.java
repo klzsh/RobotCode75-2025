@@ -5,16 +5,22 @@
 package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.EndEffectorConstants.*;
 import static frc.robot.Constants.HardwareConstants.Elevator.*;
-import static frc.robot.Constants.HardwareConstants.Elevator.kS;
 import static frc.robot.Constants.HardwareConstants.EndEffector.*;
+import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,7 +35,8 @@ public class CoralIntake extends SubsystemBase {
   }
 
   private static CoralStates m_CoralIntakeState;
-  private TalonFX m_CoralMotor;
+  // private TalonFXS m_CoralMotor;
+  private final TalonSRX m_tempCoralMotor;
   private DigitalInput m_CoralBeamBreak;
   // TODO: add tunable numbers for PID configs, velocity speed
   private Slot0Configs PIDConfig = new Slot0Configs();
@@ -38,23 +45,29 @@ public class CoralIntake extends SubsystemBase {
   private final TunableNumber coralIntakeKg;
   private final TunableNumber coralIntakeKs;
 
-  private final VelocityTorqueCurrentFOC velocityRequest =
-      new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
-  private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
+  private final VoltageOut m_CharacterizationRequest;
+  private final VelocityVoltage m_VelocityRequest;
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
-    m_CoralMotor = new TalonFX(coralMotorCanID);
+    m_tempCoralMotor = new TalonSRX(4);
+    // m_CoralMotor = new TalonFXS(coralMotorCanID, superstructureCANBusName);
     m_CoralIntakeState = CoralStates.DEFAULT;
     m_CoralBeamBreak = new DigitalInput(coralBeamBreakDIO);
 
-    velocityRequest.UpdateFreqHz = 0;
-    velocityRequest.UseTimesync = true;
 
-    currentOut.UpdateFreqHz = 0;
-    currentOut.UseTimesync = true;
+    m_CharacterizationRequest = new VoltageOut(Volts.of(0));
+    m_VelocityRequest = new VelocityVoltage(RotationsPerSecond.of(0));
 
-    m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
+    m_CharacterizationRequest.EnableFOC = true;
+    m_CharacterizationRequest.UpdateFreqHz = 0;
+    m_CharacterizationRequest.UseTimesync = true;
+
+    m_VelocityRequest.EnableFOC = true;
+    m_VelocityRequest.UpdateFreqHz = 0;
+    m_VelocityRequest.UseTimesync = true;
+
+    // m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
 
     PIDConfig.withKA(kA)
         .withKS(kS)
@@ -95,7 +108,7 @@ public class CoralIntake extends SubsystemBase {
       PIDConfig.kS = coralIntakeKs.getNumber();
       PIDConfig.kG = coralIntakeKg.getNumber();
 
-      m_CoralMotor.getConfigurator().apply(PIDConfig);
+      // m_CoralMotor.getConfigurator().apply(PIDConfig);
     }
 
     if (m_CoralBeamBreak.get()) {
@@ -108,13 +121,18 @@ public class CoralIntake extends SubsystemBase {
         // state does not change the motor output, just states that there is a gamepeice
         // in the robot
         // this state should never be set by an external command
-        m_CoralMotor.setControl(currentOut.withOutput(0));
+        // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(0));
+        m_tempCoralMotor.set(ControlMode.PercentOutput, 0);
       }
       case SCORING -> {
-        m_CoralMotor.setControl(velocityRequest.withVelocity(coralScoreSpeed));
+        // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed));
+        m_tempCoralMotor.set(ControlMode.PercentOutput, 0.5);
+
       }
       case DEFAULT -> {
-        m_CoralMotor.setControl(currentOut.withOutput(0));
+        // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(0));
+        m_tempCoralMotor.set(ControlMode.PercentOutput, 0);
+
       }
     }
   }

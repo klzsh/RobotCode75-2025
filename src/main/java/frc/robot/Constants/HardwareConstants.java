@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -160,7 +161,7 @@ public final class HardwareConstants {
   }
 
   public static final class EndEffector {
-    public static final TalonFXConfiguration m_CoralMotorConfig = new TalonFXConfiguration();
+    public static final TalonFXSConfiguration m_CoralMotorConfig = new TalonFXSConfiguration();
     public static final TalonFXConfiguration m_AlgaeMotorConfig = new TalonFXConfiguration();
     public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
     /* CANIDS */
@@ -228,7 +229,7 @@ public final class HardwareConstants {
     public static final double pivotKI = 0.0;
     public static final double pivotKD = 0.0;
 
-    public static TalonFXConfiguration getCoralMotorConfiguration() {
+    public static TalonFXSConfiguration getCoralMotorConfiguration() {
 
       m_CoralMotorConfig.MotorOutput.Inverted = coralMotorInvert;
       m_CoralMotorConfig.MotorOutput.NeutralMode = coralMotorNuetralMode;
@@ -243,10 +244,6 @@ public final class HardwareConstants {
 
       m_CoralMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_CoralMotorConfig.CurrentLimits.StatorCurrentLimit = coralStatorCurrentLimit.in(Amps);
-      m_CoralMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
-          coralStatorCurrentLimitForward.in(Amps);
-      m_CoralMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
-          coralStatorCurrentLimitReverse.in(Amps);
 
       /* PID Config */
       m_CoralMotorConfig.Slot0.kP = coralKP;
