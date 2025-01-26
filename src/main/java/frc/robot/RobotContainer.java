@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Elevator;
 
 /**
@@ -80,7 +84,7 @@ public class RobotContainer {
     //         !robotRelative.getAsBoolean()));
     // m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
     m_Elevator.setDefaultCommand(
-        new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
+        new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint(), m_Elevator)));
   }
 
   /**
