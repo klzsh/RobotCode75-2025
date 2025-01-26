@@ -47,10 +47,10 @@ public class Elevator extends SubsystemBase {
     HOME(homePosition),
     PROCESSOR(processorPosition);
 
-    public final Distance inches;
+    public final Angle Rotations;
 
-    private ElevatorPositions(Distance inches) {
-      this.inches = inches;
+    private ElevatorPositions(Angle rotations) {
+      this.Rotations = rotations;
     }
   }
 
@@ -93,6 +93,11 @@ public class Elevator extends SubsystemBase {
   private final TunableNumber elevatorKa;
   private final TunableNumber elevatorKv;
 
+  private final TunableNumber setpoint;
+  private final TunableNumber setpoint1;
+  private final TunableNumber setpoint2;
+
+
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
     m_ElevatorMotor1 = new TalonFX(elevatorMotor1CANID, superstructureCANBusName);
@@ -108,8 +113,8 @@ public class Elevator extends SubsystemBase {
     m_ElevatorMotor1.getConfigurator().apply(getElevatorMotorConfig());
     m_ElevatorMotor2.getConfigurator().apply(getElevatorMotorConfig());
     // set the position of the elevator
-    m_ElevatorMotor1.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
-    m_ElevatorMotor2.setPosition(inchesToRotations(ElevatorPositions.HOME.inches));
+    m_ElevatorMotor1.setPosition(ElevatorPositions.HOME.Rotations);
+    m_ElevatorMotor2.setPosition(ElevatorPositions.HOME.Rotations);
 
     // sets the default values for the tunable numbers
     upVelocity = new TunableNumber("Elevator/UpVelocity", MotionMagicProfileUp[0]);
@@ -119,6 +124,10 @@ public class Elevator extends SubsystemBase {
     downVelocity = new TunableNumber("Elevator/DownVelocity", MotionMagicProfileDown[0]);
     downAcceleration = new TunableNumber("Elevator/DownAcceleration", MotionMagicProfileDown[1]);
     downJerk = new TunableNumber("Elevator/DownJerk", MotionMagicProfileDown[2]);
+
+    setpoint = new TunableNumber("Elevator/Setpoint", 0);
+    setpoint1 = new TunableNumber("Elevator/Setpoint1", 10);
+    setpoint2 = new TunableNumber("Elevator/Setpoint2", 5);
 
     PIDConfig.withKA(kA)
         .withKS(kS)
@@ -152,29 +161,20 @@ public class Elevator extends SubsystemBase {
     m_CurrentPosition = position;
     m_IsAlgae = isAlgae;
   }
-
+  public Angle getPosition(){
+    return Rotations.of((m_ElevatorMotor1.getPosition().getValue().in(Rotations) + m_ElevatorMotor2.getPosition().getValue().in(Rotations)) /2);
+  }
   public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) {
     if (position == ElevatorPositions.HOME) return getLowerLimit();
     if (position == ElevatorPositions.L4) return getUpperLimit();
-    double currentPosition =
-        rotationsToInches(m_ElevatorMotor1.getPosition().getValue()).in(Inches);
+    double currentPosition = m_ElevatorMotor1.getPosition().getValue().in(Rotations);
     double algaeOffset =
         (isAlgae && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
-            ? algaeRemovalOffset.in(Inches)
+            ? algaeRemovalOffset.in(Rotations)
             : 0;
     return MathUtil.applyDeadband(
-            currentPosition - position.inches.in(Inches) - algaeOffset, deadband.in(Inches))
+            currentPosition - position.Rotations.in(Rotations) - algaeOffset, deadband.in(Rotations))
         == 0.0;
-  }
-
-  /**
-   * Raw rotations to inches. Does not take into account offsets
-   *
-   * @param rotations the rotations to convert to
-   * @return inches the elevator has moved
-   */
-  private Distance rotationsToInches(Angle rotations) {
-    return Inches.of(rotations.in(Rotations) * inchesPerRotation.in(Inches));
   }
 
   private Angle inchesToRotations(Distance inches) {
@@ -186,26 +186,62 @@ public class Elevator extends SubsystemBase {
         .until(() -> isAtPosition(position, algae));
   }
 
-  // temp methods
-  public void runSetpoint1() {
-    m_PositionRequest.Velocity = upVelocity.getNumber();
-    m_PositionRequest.Acceleration = upAcceleration.getNumber();
-    m_PositionRequest.Jerk = upJerk.getNumber();
+  public void runSetpoint() {
+    Angle rotations = Rotations.of(0);
+    if(setpoint.getNumber() >= 0 && setpoint.getNumber() <= 26){
+      rotations = Rotations.of(setpoint.getNumber());
+    } else {
+      rotations = Rotations.of(10);
+    }
     m_ElevatorMotor1.setControl(
         m_PositionRequest
-            .withPosition(17)
+            .withPosition(rotations)
             .withLimitForwardMotion(getUpperLimit())
             .withLimitReverseMotion(getLowerLimit()));
     m_ElevatorMotor2.setControl(
         m_PositionRequest
-            .withPosition(17)
+            .withPosition(rotations)
+            .withLimitForwardMotion(getUpperLimit())
+            .withLimitReverseMotion(getLowerLimit()));
+  }
+
+  // temp methods
+  public void runSetpoint1() {
+    Angle rotations = Rotations.of(0);
+    if(setpoint1.getNumber() >= 0 && setpoint1.getNumber() <= 26){
+      rotations = Rotations.of(setpoint1.getNumber());
+    } else {
+      rotations = Rotations.of(10);
+    }
+    m_ElevatorMotor1.setControl(
+        m_PositionRequest
+            .withPosition(rotations)
+            .withLimitForwardMotion(getUpperLimit())
+            .withLimitReverseMotion(getLowerLimit()));
+    m_ElevatorMotor2.setControl(
+        m_PositionRequest
+            .withPosition((rotations))
             .withLimitForwardMotion(getUpperLimit())
             .withLimitReverseMotion(getLowerLimit()));
   }
 
   public void runSetpoint2() {
-    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(15));
-    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(15));
+    Angle rotations = Rotations.of(0);
+    if(setpoint2.getNumber() >= 0 && setpoint2.getNumber() <= 26){
+      rotations = Rotations.of(setpoint2.getNumber());
+    } else {
+      rotations = Rotations.of(10);
+    }
+    m_ElevatorMotor1.setControl(
+      m_PositionRequest
+          .withPosition(rotations)
+          .withLimitForwardMotion(getUpperLimit())
+          .withLimitReverseMotion(getLowerLimit()));
+  m_ElevatorMotor2.setControl(
+      m_PositionRequest
+          .withPosition(rotations)
+          .withLimitForwardMotion(getUpperLimit())
+          .withLimitReverseMotion(getLowerLimit()));
   }
 
   public void stopMotors() {
@@ -257,24 +293,24 @@ public class Elevator extends SubsystemBase {
     }
     double target = 0;
     if (!isAtPosition(m_CurrentPosition, m_IsAlgae)) {
-      Distance currentPosition = rotationsToInches(m_ElevatorMotor1.getPosition().getValue());
+      Angle currentPosition = m_ElevatorMotor1.getPosition().getValue();
       double algaeOffset =
           (m_IsAlgae
                   && (m_CurrentPosition == ElevatorPositions.L2
                       || m_CurrentPosition == ElevatorPositions.L3))
-              ? algaeRemovalOffset.in(Inches)
+              ? algaeRemovalOffset.in(Rotations)
               : 0;
-      target = m_CurrentPosition.inches.in(Inches) + algaeOffset;
+      target = m_CurrentPosition.Rotations.in(Rotations) + algaeOffset;
 
-      if (currentPosition.in(Inches) < target) {
-        m_PositionRequest.Velocity = upVelocity.getNumber();
-        m_PositionRequest.Acceleration = upAcceleration.getNumber();
-        m_PositionRequest.Jerk = upJerk.getNumber();
-      } else {
-        m_PositionRequest.Velocity = downVelocity.getNumber();
-        m_PositionRequest.Acceleration = downAcceleration.getNumber();
-        m_PositionRequest.Jerk = downJerk.getNumber();
-      }
+    }
+    if (getPosition().in(Rotations) < target) {
+      m_PositionRequest.Velocity = upVelocity.getNumber();
+      m_PositionRequest.Acceleration = upAcceleration.getNumber();
+      m_PositionRequest.Jerk = upJerk.getNumber();
+    } else {
+      m_PositionRequest.Velocity = downVelocity.getNumber();
+      m_PositionRequest.Acceleration = downAcceleration.getNumber();
+      m_PositionRequest.Jerk = downJerk.getNumber();
     }
     // uncomment when done profiling elevator
       // m_ElevatorMotor1.setControl(

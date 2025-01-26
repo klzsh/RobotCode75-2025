@@ -5,7 +5,9 @@
 package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Rotations;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 
 /** Add your docs here. */
@@ -32,21 +34,19 @@ public class ElevatorConstants {
 
   // TODO: figure out (placeholder values)
   // Distance from GROUND.
-  public static final Distance motorCounterOffset = Inches.of(0);
-  public static final Distance algaeRemovalOffset = Inches.of(0);
-  public static final Distance coralOffset = Inches.of(18.795); // 27.495 inches from the ground
-  public static final Distance l1Position = Inches.of(10);
-  public static final Distance l2Position = Inches.of(24);
-  public static final Distance l3Position = Inches.of(48);
-  public static final Distance l4Position = Inches.of(72);
-  public static final Distance homePosition = Inches.of(8.7);
-  public static final Distance processorPosition = Inches.of(7);
+  public static final Angle algaeRemovalOffset = Rotations.of(0);
+  public static final Angle l1Position = Rotations.of(2);
+  public static final Angle l2Position = Rotations.of(10);
+  public static final Angle l3Position = Rotations.of(17);
+  public static final Angle l4Position = Rotations.of(26);
+  public static final Angle homePosition = Rotations.of(0);
+  public static final Angle processorPosition = Rotations.of(2);
 
   // velocity, acceleration, jerk
   public static double[] MotionMagicProfileUp = {70, 100, 1000};
   public static double[] MotionMagicProfileDown = {5, 50, 400};
 
-  public static final Distance deadband = Inches.of(0.5);
+  public static final Angle deadband = Rotations.of(0.25);
 
-  public static final Distance maxDeviation = Inches.of(2);
+  public static final Angle maxDeviation = Rotations.of(0.5);
 }
