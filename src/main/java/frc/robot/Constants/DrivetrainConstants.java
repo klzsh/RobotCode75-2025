@@ -44,13 +44,13 @@ public final class DrivetrainConstants {
     public static final AngularVelocity maxAngularVelocity =
         RadiansPerSecond.of(
             maxSpeed.in(MetersPerSecond)
-                / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
+                / Math.hypot(trackWidth.in(Meters) / 2.0, trackLength.in(Meters) / 2.0));
 
     /** Radians per Second per Second */
     public static final AngularAcceleration maxAngularAcceleration =
         RadiansPerSecondPerSecond.of(
             maxSpeed.in(MetersPerSecond)
-                / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
+                / Math.hypot(trackWidth.in(Meters) / 2.0, trackLength.in(Meters) / 2.0));
   }
 
   /*
