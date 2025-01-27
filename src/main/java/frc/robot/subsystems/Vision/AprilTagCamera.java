@@ -21,7 +21,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class ApriltagCamera extends SubsystemBase {
+public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
   private AprilTagFieldLayout m_tagLayout =
@@ -29,7 +29,7 @@ public class ApriltagCamera extends SubsystemBase {
   private PhotonPoseEstimator m_poseEstimator;
   private EstimatedRobotPose m_pose;
 
-  public ApriltagCamera(String name, Transform3d cameraPose) {
+  public AprilTagCamera(String name, Transform3d cameraPose) {
     m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
     m_poseEstimator =
@@ -77,7 +77,7 @@ public class ApriltagCamera extends SubsystemBase {
   }
 
   // public Optional<Pose2d> getMultiTagResult() {  // This doesn't work in 2025 ig
-  //   MultiTargetPNPResult target = m_result.getMultiTagResult();
+  //   Optional<MultiTargetPNPResult> target = m_result.getMultiTagResult();
   //   if (target.estimatedPose.isPresent) {
   //     return Optional.of(
   //         new Pose2d(
