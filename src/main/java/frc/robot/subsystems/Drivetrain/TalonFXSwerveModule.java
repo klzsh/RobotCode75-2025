@@ -243,10 +243,12 @@ public class TalonFXSwerveModule {
     mDriveMotor.getConfigurator().apply(HardwareConstants.Swerve.getDriveConfiguration());
     mDriveMotor.getConfigurator().setPosition(0);
   }
-  public void setDrivePIDS(Slot0Configs config){
+
+  public void setDrivePIDS(Slot0Configs config) {
     mDriveMotor.getConfigurator().apply(config);
   }
-  public void setAnglePIDS(Slot0Configs config){
+
+  public void setAnglePIDS(Slot0Configs config) {
     mAngleMotor.getConfigurator().apply(config);
   }
 

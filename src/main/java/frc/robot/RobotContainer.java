@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Rotations;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,8 +16,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.Drivetrain.TeleopSwerve;
-import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.Elevator;
 
 /**
@@ -110,11 +106,16 @@ public class RobotContainer {
 
     m_Controller
         .povUp()
-        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint1(), m_Elevator)));
+        .whileTrue(
+            new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint1(), m_Elevator)));
     m_Controller
         .povDown()
-        .whileTrue(new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
-    m_Controller.povLeft().whileTrue(new RepeatCommand(new InstantCommand(()-> m_Elevator.stopMotors(), m_Elevator)));
+        .whileTrue(
+            new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
+    m_Controller
+        .povLeft()
+        .whileTrue(
+            new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
   }
 
   private void configureChooser() {}

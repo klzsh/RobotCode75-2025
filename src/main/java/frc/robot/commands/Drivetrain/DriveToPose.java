@@ -8,11 +8,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain.AutoAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToPose extends Command {
@@ -20,7 +17,7 @@ public class DriveToPose extends Command {
   private AutoAlignController m_controller;
   private Pose2d targetPose;
   private boolean holdPose;
-  
+
   /** Creates a new DriveToPose. */
   public DriveToPose(Swerve swerve, Pose2d pose, boolean hold) {
     m_swerve = swerve;
@@ -39,7 +36,11 @@ public class DriveToPose extends Command {
   @Override
   public void execute() {
     ChassisSpeeds speeds = m_controller.update(m_swerve.getPose(), targetPose);
-    m_swerve.drive(new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond), speeds.omegaRadiansPerSecond, false, false);
+    m_swerve.drive(
+        new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
+        speeds.omegaRadiansPerSecond,
+        false,
+        false);
   }
 
   // Called once the command ends or is interrupted.

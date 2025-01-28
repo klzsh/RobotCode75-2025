@@ -4,23 +4,17 @@
 
 package frc.robot.subsystems.EndEffector;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.EndEffectorConstants.*;
 import static frc.robot.Constants.HardwareConstants.Elevator.*;
 import static frc.robot.Constants.HardwareConstants.EndEffector.*;
-import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -54,7 +48,6 @@ public class CoralIntake extends SubsystemBase {
     // m_CoralMotor = new TalonFXS(coralMotorCanID, superstructureCANBusName);
     m_CoralIntakeState = CoralStates.DEFAULT;
     m_CoralBeamBreak = new DigitalInput(coralBeamBreakDIO);
-
 
     m_CharacterizationRequest = new VoltageOut(Volts.of(0));
     m_VelocityRequest = new VelocityVoltage(RotationsPerSecond.of(0));
@@ -127,12 +120,10 @@ public class CoralIntake extends SubsystemBase {
       case SCORING -> {
         // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed));
         m_tempCoralMotor.set(ControlMode.PercentOutput, 0.5);
-
       }
       case DEFAULT -> {
         // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(0));
         m_tempCoralMotor.set(ControlMode.PercentOutput, 0);
-
       }
     }
   }

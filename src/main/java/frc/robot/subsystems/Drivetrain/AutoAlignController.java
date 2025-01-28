@@ -65,7 +65,7 @@ public class AutoAlignController {
         new TrapezoidProfile.Constraints(
             DrivetrainConstants.ControllerConstants.maxAngularVelocity.in(RadiansPerSecond),
             DrivetrainConstants.ControllerConstants.maxAngularAcceleration.in(
-                RadiansPerSecondPerSecond))); 
+                RadiansPerSecondPerSecond)));
 
     m_Swerve = swerve;
     reset();
