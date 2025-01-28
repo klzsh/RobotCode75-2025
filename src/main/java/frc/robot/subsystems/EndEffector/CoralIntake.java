@@ -44,7 +44,7 @@ public class CoralIntake extends SubsystemBase {
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
-    m_tempCoralMotor = new TalonSRX(4);
+    m_tempCoralMotor = new TalonSRX(6);
     // m_CoralMotor = new TalonFXS(coralMotorCanID, superstructureCANBusName);
     m_CoralIntakeState = CoralStates.DEFAULT;
     m_CoralBeamBreak = new DigitalInput(coralBeamBreakDIO);

@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,6 +33,8 @@ public class RobotContainer {
   // private final Swerve m_Swerve = new Swerve();
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
+
+  private final CoralIntake m_CoralIntake = new CoralIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -80,7 +84,9 @@ public class RobotContainer {
     //         !robotRelative.getAsBoolean()));
     // m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
     m_Elevator.setDefaultCommand(
-        new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint(), m_Elevator)));
+        new RepeatCommand(
+            new InstantCommand(
+                () -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)));
   }
 
   /**
@@ -104,18 +110,48 @@ public class RobotContainer {
     //         () -> -m_LeftStick.getY(),
     //         () -> -m_LeftStick.getX()));
 
+    // m_Controller
+    //     .povUp()
+    //     .whileTrue(
+    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint1(), m_Elevator)));
+    // m_Controller
+    //     .povDown()
+    //     .whileTrue(
+    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
+    // m_Controller
+    //     .povLeft()
+    //     .whileTrue(
+    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
+
+    // m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    // m_Controller.b().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    // m_Controller.x().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    // m_Controller.y().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+
     m_Controller
-        .povUp()
+        .a()
         .whileTrue(
-            new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint1(), m_Elevator)));
+            new RepeatCommand(
+                new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)));
     m_Controller
-        .povDown()
+        .b()
         .whileTrue(
-            new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
+            new RepeatCommand(
+                new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)));
     m_Controller
-        .povLeft()
+        .x()
         .whileTrue(
-            new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
+            new RepeatCommand(
+                new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)));
+    m_Controller
+        .y()
+        .whileTrue(
+            new RepeatCommand(
+                new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)));
   }
 
   private void configureChooser() {}

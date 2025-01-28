@@ -255,8 +255,11 @@ public class Swerve extends SubsystemBase {
   public void setPose(Pose2d pose) {
     swerveOdometry.resetPosition(getRotation2D(), getModulePositions(), pose);
   }
+
   /**
-   * sets the pose by the vision odometry if the deviation between vision and module odometry is too much
+   * sets the pose by the vision odometry if the deviation between vision and module odometry is too
+   * much
+   *
    * @param camera the camera to set the odoemtry with
    */
   public void setPoseByVision(AprilTagCamera camera) {

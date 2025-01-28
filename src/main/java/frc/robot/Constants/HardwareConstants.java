@@ -169,7 +169,7 @@ public final class HardwareConstants {
     public static final int coralMotorCanID = 0;
     public static final int algaeMotorCanID = 0;
     public static final int pivotCanID = 0;
-    public static final int coralBeamBreakDIO = 0;
+    public static final int coralBeamBreakDIO = 2;
 
     /* Neutral modes / inverts */
     public static final InvertedValue coralMotorInvert = InvertedValue.CounterClockwise_Positive;
@@ -344,7 +344,7 @@ public final class HardwareConstants {
     public static final double kG = 21; // current to overcome gravity
     public static final double kS = 15; // current to overcome static friction
     public static final double kV = 0.12; // current per unit of requested velocity
-    public static final double kP = 40;
+    public static final double kP = 20;
     public static final double kI = 0;
     public static final double kD = 15;
 
