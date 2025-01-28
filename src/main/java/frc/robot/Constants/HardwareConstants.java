@@ -334,19 +334,19 @@ public final class HardwareConstants {
     public static final Current supplyCurrentLowerLimit = Amps.of(30);
     public static final Time supplyCurrentLowerTime = Seconds.of(0.5);
 
-    public static final Angle forwardLimit = Rotations.of(24);
-    public static final Angle reverseLimit = Rotations.of(5);
+    public static final Angle forwardLimit = Rotations.of(26);
+    public static final Angle reverseLimit = Rotations.of(0);
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
     // TODO: find these
-    public static final double kA = 0.3; // current per unit of acceleration
-    public static final double kG = 15; // current to overcome gravity
-    public static final double kS = 14; // current to overcome static friction
+    public static final double kA = 0.5; // current per unit of acceleration
+    public static final double kG = 21; // current to overcome gravity
+    public static final double kS = 15; // current to overcome static friction
     public static final double kV = 0.12; // current per unit of requested velocity
-    public static final double kP = 30;
+    public static final double kP = 40;
     public static final double kI = 0;
-    public static final double kD = 2;
+    public static final double kD = 15;
 
     // TODO: slowly ramp these up
     public static final Current torqueForwardCurrentLimit = Amps.of(100);
