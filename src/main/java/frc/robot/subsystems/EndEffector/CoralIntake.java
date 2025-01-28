@@ -6,6 +6,10 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import static frc.robot.Constants.EndEffectorConstants.*;
 import static frc.robot.Constants.HardwareConstants.Elevator.*;
 import static frc.robot.Constants.HardwareConstants.EndEffector.*;
@@ -88,6 +92,14 @@ public class CoralIntake extends SubsystemBase {
     return m_CoralIntakeState;
   }
 
+  
+  public Command coralIntakeTimedCommand(CoralStates state, double delay) {
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> setState(state)),
+        new WaitCommand(delay),
+        new InstantCommand(() -> setState(CoralStates.DEFAULT)));
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -104,9 +116,9 @@ public class CoralIntake extends SubsystemBase {
       // m_CoralMotor.getConfigurator().apply(PIDConfig);
     }
 
-    if (m_CoralBeamBreak.get()) {
-      m_CoralIntakeState = CoralStates.HASGAMEPIECE;
-    }
+    // if (m_CoralBeamBreak.get()) {
+    //   m_CoralIntakeState = CoralStates.HASGAMEPIECE;
+    // }
 
     switch (m_CoralIntakeState) {
       case HASGAMEPIECE -> {
@@ -119,7 +131,7 @@ public class CoralIntake extends SubsystemBase {
       }
       case SCORING -> {
         // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed));
-        m_tempCoralMotor.set(ControlMode.PercentOutput, 0.5);
+        m_tempCoralMotor.set(ControlMode.PercentOutput, -1);
       }
       case DEFAULT -> {
         // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(0));

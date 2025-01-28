@@ -16,8 +16,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.EndEffector.Coral.ScoreL1;
+import frc.robot.commands.EndEffector.Coral.ScoreL2;
+import frc.robot.commands.EndEffector.Coral.ScoreL3;
+import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
 /**
@@ -87,6 +92,7 @@ public class RobotContainer {
         new RepeatCommand(
             new InstantCommand(
                 () -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)));
+    m_CoralIntake.setDefaultCommand(new RepeatCommand(new InstantCommand(()->m_CoralIntake.setState(CoralStates.DEFAULT),m_CoralIntake)));
   }
 
   /**
@@ -110,10 +116,10 @@ public class RobotContainer {
     //         () -> -m_LeftStick.getY(),
     //         () -> -m_LeftStick.getX()));
 
-    // m_Controller
-    //     .povUp()
-    //     .whileTrue(
-    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint1(), m_Elevator)));
+    m_Controller
+        .povDown()
+        .whileTrue(
+            new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint(), m_Elevator)));
     // m_Controller
     //     .povDown()
     //     .whileTrue(
@@ -123,35 +129,36 @@ public class RobotContainer {
     //     .whileTrue(
     //         new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
 
-    // m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    // m_Controller.b().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    // m_Controller.x().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    // m_Controller.y().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    m_Controller.b().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    m_Controller.x().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    m_Controller.y().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
-    m_Controller
-        .a()
-        .whileTrue(
-            new RepeatCommand(
-                new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)));
-    m_Controller
-        .b()
-        .whileTrue(
-            new RepeatCommand(
-                new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)));
-    m_Controller
-        .x()
-        .whileTrue(
-            new RepeatCommand(
-                new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)));
-    m_Controller
-        .y()
-        .whileTrue(
-            new RepeatCommand(
-                new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)));
+    m_Controller.povUp().whileTrue(new RepeatCommand(new InstantCommand(()->m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)));
+    // m_Controller
+    //     .a()
+    //     .whileTrue(
+    //         new RepeatCommand(
+    //             new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)));
+    // m_Controller
+    //     .b()
+    //     .whileTrue(
+    //         new RepeatCommand(
+    //             new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)));
+    // m_Controller
+    //     .x()
+    //     .whileTrue(
+    //         new RepeatCommand(
+    //             new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)));
+    // m_Controller
+    //     .y()
+    //     .whileTrue(
+    //         new RepeatCommand(
+    //             new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)));
   }
 
   private void configureChooser() {}
