@@ -20,7 +20,6 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -180,10 +179,6 @@ public class Elevator extends SubsystemBase {
             currentPosition - position.Rotations.in(Rotations) - algaeOffset,
             deadband.in(Rotations))
         == 0.0;
-  }
-
-  private Angle inchesToRotations(Distance inches) {
-    return Rotations.of(inches.in(Inches) / inchesPerRotation.in(Inches));
   }
 
   public Command positionCommand(ElevatorPositions position, boolean algae) {
@@ -373,7 +368,7 @@ public class Elevator extends SubsystemBase {
       m_PositionRequest.Acceleration = downAcceleration.getNumber();
       m_PositionRequest.Jerk = downJerk.getNumber();
     }
-    if (getLowerLimit() &&  m_SetpointPosition == ElevatorPositions.HOME) {
+    if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
       m_ElevatorMotor1.setControl(
           m_CharacterizationRequest
               .withOutput(0)

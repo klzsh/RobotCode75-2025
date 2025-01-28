@@ -120,7 +120,7 @@ public final class HardwareConstants {
 
       m_DriveConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
       m_DriveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
-      // TODO: see if nessesary
+
       m_DriveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
       m_DriveConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
 
@@ -327,7 +327,6 @@ public final class HardwareConstants {
     // takes 0.25 seconds to go from 0-100% current output
     public static final Time closedLoopRamp = Seconds.of(0.25);
 
-    // reasonable starting points TODO: make sure these are sane
     public static final Current statorCurrentLimit = Amps.of(60);
     public static final Current supplyCurrentLimit = Amps.of(40);
     // set current limit to 30 amps if supply current limit is exceeded for more than 0.5 seconds
@@ -339,7 +338,6 @@ public final class HardwareConstants {
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
-    // TODO: find these
     public static final double kA = 0.5; // current per unit of acceleration
     public static final double kG = 21; // current to overcome gravity
     public static final double kS = 15; // current to overcome static friction
@@ -348,7 +346,6 @@ public final class HardwareConstants {
     public static final double kI = 0;
     public static final double kD = 15;
 
-    // TODO: slowly ramp these up
     public static final Current torqueForwardCurrentLimit = Amps.of(100);
     public static final Current torqueReverseCurrentLimit = Amps.of(100);
 

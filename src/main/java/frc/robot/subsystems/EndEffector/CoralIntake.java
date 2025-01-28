@@ -6,11 +6,6 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import static frc.robot.Constants.EndEffectorConstants.*;
 import static frc.robot.Constants.HardwareConstants.Elevator.*;
 import static frc.robot.Constants.HardwareConstants.EndEffector.*;
 
@@ -21,7 +16,11 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.dashboard.TunableNumber;
 
 public class CoralIntake extends SubsystemBase {
@@ -92,7 +91,6 @@ public class CoralIntake extends SubsystemBase {
     return m_CoralIntakeState;
   }
 
-  
   public Command coralIntakeTimedCommand(CoralStates state, double delay) {
     return new SequentialCommandGroup(
         new InstantCommand(() -> setState(state)),

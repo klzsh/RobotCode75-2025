@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.Distance;
 
 /** Add your docs here. */
 public class ElevatorConstants {
-  // TODO: figure out
   // from the perspective of looking from the back of the robot forwards
   public static final int elevatorMotor1CANID = 41; // left
   public static final int elevatorMotor2CANID = 42; // right
@@ -32,7 +31,6 @@ public class ElevatorConstants {
   // 8.7 inches from ground
   public static final Distance distanceBetweenElevatorZeroAndGround = Inches.of(8.7);
 
-  // TODO: figure out (placeholder values)
   // Distance from GROUND.
   public static final Angle algaeRemovalOffset = Rotations.of(0);
   public static final Angle l1Position = Rotations.of(2);

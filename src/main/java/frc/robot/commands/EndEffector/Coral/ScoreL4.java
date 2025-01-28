@@ -24,9 +24,10 @@ public class ScoreL4 extends SequentialCommandGroup {
     addCommands(
         new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
         new ParallelCommandGroup(
-            new ParallelCommandGroup(new InstantCommand(()-> coralIntake.setState(CoralStates.SCORING), coralIntake), new WaitCommand(1)),
-            new SetElevatorPosition(elevator, ElevatorPositions.L1, false)
-        ),
+            new ParallelCommandGroup(
+                new InstantCommand(() -> coralIntake.setState(CoralStates.SCORING), coralIntake),
+                new WaitCommand(1)),
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
         new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
   }
 }

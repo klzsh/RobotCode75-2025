@@ -20,7 +20,6 @@ public final class DrivetrainConstants {
   public static final int kPigeonID = 18;
 
   /* Drivetrain Constants */
-  // TODO: Find these
   public static final Distance trackLength = Inches.of(22.75);
   public static final Distance trackWidth = Inches.of(22.75);
 
