@@ -3,6 +3,8 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.HardwareConstants.Swerve.*;
+import static frc.robot.Constants.VisionConstants.moduleMatrix;
+import static frc.robot.Constants.VisionConstants.visionMatrix;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -25,6 +27,11 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import frc.robot.Constants.DrivetrainConstants.BackLeft;
+import frc.robot.Constants.DrivetrainConstants.BackRight;
+import frc.robot.Constants.DrivetrainConstants.FrontLeft;
+import frc.robot.Constants.DrivetrainConstants.FrontRight;
+import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /*
  * OVERVIEW OF CHASSIS
@@ -73,6 +80,9 @@ public class Swerve extends SubsystemBase {
   private final PIDController yController;
   private final PIDController rController;
 
+  private final AprilTagCamera m_CenterCamera;
+  private final AprilTagCamera m_ModuleCamera;
+
   // do this later
   // private final TunableNumber translationKP;
   // private final TunableNumber translationKI;
@@ -89,8 +99,10 @@ public class Swerve extends SubsystemBase {
   private Pigeon2 m_gyro;
 
   /** define swerve modules, Gyro, odometry */
-  public Swerve() {
+  public Swerve(AprilTagCamera moduleCamera, AprilTagCamera centerCamera) {
 
+    m_ModuleCamera = moduleCamera;
+    m_CenterCamera = centerCamera;
     m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     // initalize objects in constructor so that they dont get initialized when the
@@ -116,7 +128,12 @@ public class Swerve extends SubsystemBase {
     rController = new PIDController(3.05, 0, 0);
     swerveOdometry =
         new SwerveDrivePoseEstimator(
-            swerveKinematics, getRotation2D(), getModulePositions(), initialPose);
+            swerveKinematics,
+            getRotation2D(),
+            getModulePositions(),
+            initialPose,
+            moduleMatrix,
+            visionMatrix);
     // init tunable numbers
     driveKP = new TunableNumber("Swerve/DriveMotor/kP", driveTorqueKP);
     driveKI = new TunableNumber("Swerve/DriveMotor/kI", driveTorqueKI);
@@ -238,6 +255,18 @@ public class Swerve extends SubsystemBase {
   public void setPose(Pose2d pose) {
     swerveOdometry.resetPosition(getRotation2D(), getModulePositions(), pose);
   }
+  /**
+   * sets the pose by the vision odometry if the deviation between vision and module odometry is too much
+   * @param camera the camera to set the odoemtry with
+   */
+  public void setPoseByVision(AprilTagCamera camera) {
+    if (camera.getEstimatedPose() != null) {
+      swerveOdometry.resetPosition(
+          getRotation2D(),
+          getModulePositions(),
+          camera.getEstimatedPose().estimatedPose.toPose2d());
+    }
+  }
 
   /**
    * returns the velocity and angle of all swerve modules
@@ -299,7 +328,42 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    if (m_CenterCamera.getEstimatedPose() != null) {
+      swerveOdometry.addVisionMeasurement(
+          m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
+          m_CenterCamera.getEstimatedPose().timestampSeconds);
+    }
+    if (m_ModuleCamera.getEstimatedPose() != null) {
+      swerveOdometry.addVisionMeasurement(
+          m_ModuleCamera.getEstimatedPose().estimatedPose.toPose2d(),
+          m_ModuleCamera.getEstimatedPose().timestampSeconds);
+    }
+
     swerveOdometry.update(getRotation2D(), getModulePositions());
+
+    if (m_CenterCamera.getEstimatedPose() != null) {
+      if (Math.abs(
+                  m_CenterCamera.getEstimatedPose().estimatedPose.getX()
+                      - swerveOdometry.getEstimatedPosition().getX())
+              > .5
+          || Math.abs(
+                  m_CenterCamera.getEstimatedPose().estimatedPose.getY()
+                      - swerveOdometry.getEstimatedPosition().getY())
+              > .5) {
+        setPoseByVision(m_CenterCamera);
+      }
+      if (Math.abs(
+                  m_ModuleCamera.getEstimatedPose().estimatedPose.getX()
+                      - swerveOdometry.getEstimatedPosition().getX())
+              > .5
+          || Math.abs(
+                  m_ModuleCamera.getEstimatedPose().estimatedPose.getY()
+                      - swerveOdometry.getEstimatedPosition().getY())
+              > .5) {
+        setPoseByVision(m_ModuleCamera);
+      }
+    }
 
     if (driveKP.getNumber() != drivePIDS.kP
         || driveKI.getNumber() != drivePIDS.kI
@@ -311,7 +375,7 @@ public class Swerve extends SubsystemBase {
       drivePIDS.kD = driveKI.getNumber();
       drivePIDS.kS = driveKD.getNumber();
 
-      for(TalonFXSwerveModule mod: m_SwerveModules){
+      for (TalonFXSwerveModule mod : m_SwerveModules) {
         mod.setDrivePIDS(drivePIDS);
       }
     }
@@ -320,7 +384,7 @@ public class Swerve extends SubsystemBase {
 
       anglePIDS.kP = angleKP.getNumber();
       anglePIDS.kS = angleKD.getNumber();
-      for(TalonFXSwerveModule mod: m_SwerveModules){
+      for (TalonFXSwerveModule mod : m_SwerveModules) {
         mod.setAnglePIDS(anglePIDS);
       }
     }
