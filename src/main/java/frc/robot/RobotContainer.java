@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -131,9 +132,7 @@ public class RobotContainer {
 
     m_Controller
         .povUp()
-        .whileTrue(
-            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
-                .repeatedly());
+        .whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
         .a()
         .whileTrue(

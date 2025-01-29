@@ -16,6 +16,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -114,10 +115,12 @@ public class CoralIntake extends SubsystemBase {
       // m_CoralMotor.getConfigurator().apply(PIDConfig);
     }
 
+    SmartDashboard.putBoolean("Coral Beam Break", m_CoralBeamBreak.get());
+
     if (m_CoralBeamBreak.get() && m_CoralIntakeState == CoralStates.DEFAULT) {
       m_CoralIntakeState = CoralStates.HASGAMEPIECE;
     }
-    
+
     if (!m_CoralBeamBreak.get()) {
       m_CoralIntakeState = CoralStates.DEFAULT;
     }

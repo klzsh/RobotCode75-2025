@@ -344,7 +344,7 @@ public final class HardwareConstants {
     public static final double kV = 0.12; // current per unit of requested velocity
     public static final double kP = 20;
     public static final double kI = 0;
-    public static final double kD = 15;
+    public static final double kD = 5;
 
     public static final Current torqueForwardCurrentLimit = Amps.of(100);
     public static final Current torqueReverseCurrentLimit = Amps.of(100);
