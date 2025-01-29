@@ -68,6 +68,7 @@ public class Elevator extends SubsystemBase {
   // sensors
   private final DigitalInput m_lowerLimitSwitch;
   private final DigitalInput m_upperLimitSwitch;
+  private final DigitalInput m_backupLimitSwitch;
   // this is probably not going to be used for homing the elevator
   // private final Counter m_distanceSensor;
 
@@ -103,6 +104,7 @@ public class Elevator extends SubsystemBase {
     // initialize sensors
     m_lowerLimitSwitch = new DigitalInput(lowerLimitPort);
     m_upperLimitSwitch = new DigitalInput(upperLimitPort);
+    m_backupLimitSwitch = new DigitalInput(backupLimitPort);
     // m_distanceSensor = new Counter(distanceSensorPort);
     // initialize control requests
     m_PositionRequest = new DynamicMotionMagicTorqueCurrentFOC(0, 0, 0, 0);
@@ -322,7 +324,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean getLowerLimit() {
-    return !m_lowerLimitSwitch.get();
+    return !m_lowerLimitSwitch.get() || !m_backupLimitSwitch.get();
   }
 
   @Override

@@ -114,9 +114,13 @@ public class CoralIntake extends SubsystemBase {
       // m_CoralMotor.getConfigurator().apply(PIDConfig);
     }
 
-    // if (m_CoralBeamBreak.get()) {
-    //   m_CoralIntakeState = CoralStates.HASGAMEPIECE;
-    // }
+    if (m_CoralBeamBreak.get() && m_CoralIntakeState == CoralStates.DEFAULT) {
+      m_CoralIntakeState = CoralStates.HASGAMEPIECE;
+    }
+    
+    if (!m_CoralBeamBreak.get()) {
+      m_CoralIntakeState = CoralStates.DEFAULT;
+    }
 
     switch (m_CoralIntakeState) {
       case HASGAMEPIECE -> {

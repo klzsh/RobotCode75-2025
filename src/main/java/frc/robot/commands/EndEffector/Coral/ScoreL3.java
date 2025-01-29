@@ -4,13 +4,11 @@
 
 package frc.robot.commands.EndEffector.Coral;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.EndEffector.CoralIntake;
-import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
@@ -22,12 +20,10 @@ public class ScoreL3 extends SequentialCommandGroup {
   public ScoreL3(Elevator elevator, CoralIntake coralIntake) {
     addRequirements(elevator, coralIntake);
     addCommands(
-        new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
+        new SetElevatorPosition(elevator, ElevatorPositions.L3, false),
         new ParallelCommandGroup(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> coralIntake.setState(CoralStates.SCORING), coralIntake),
-                new WaitCommand(1)),
-            new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
+            new ScoreCoral(coralIntake),
+            new SetElevatorPosition(elevator, ElevatorPositions.L3, false)),
         new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
   }
 }

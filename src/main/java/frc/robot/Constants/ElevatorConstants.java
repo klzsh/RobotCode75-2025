@@ -17,6 +17,7 @@ public class ElevatorConstants {
   public static final int elevatorMotor2CANID = 42; // right
   public static final int lowerLimitPort = 1;
   public static final int upperLimitPort = 0;
+  public static final int backupLimitPort = 3;
   //   public static final int distanceSensorPort = 2;
 
   public static final Distance pulleyCircumference =
