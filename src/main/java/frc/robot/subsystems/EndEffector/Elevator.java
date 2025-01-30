@@ -161,7 +161,10 @@ public class Elevator extends SubsystemBase {
     m_SetpointPosition = position;
     m_IsAlgae = isAlgae;
   }
-
+  /**
+   * average position between the two motors
+   * @return the position in rotations of the elevator
+   */
   @Logged(name = "Elevator Position")
   public Angle getPosition() {
     return Rotations.of(
@@ -169,10 +172,17 @@ public class Elevator extends SubsystemBase {
                 + m_ElevatorMotor2.getPosition().getValue().in(Rotations))
             / 2);
   }
-
+  /**
+   * checks if the elevator is at the correct position, including if the elevator is going to the algae position
+   * @param position position to check
+   * @param isAlgae apply the algae offset
+   * @return if the elevator is at the correct position
+   */
   public boolean isAtPosition(ElevatorPositions position, boolean isAlgae) {
-    if (position == ElevatorPositions.HOME) return getLowerLimit();
-    double currentPosition = m_ElevatorMotor1.getPosition().getValue().in(Rotations);
+    if (position == ElevatorPositions.HOME) {
+      return getLowerLimit();
+    }
+    double currentPosition = getPosition().in(Rotations);
     double algaeOffset =
         (isAlgae && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
             ? algaeRemovalOffset.in(Rotations)
@@ -357,8 +367,8 @@ public class Elevator extends SubsystemBase {
       m_ElevatorMotor2.setPosition(Rotations.of(0));
     }
     if (getUpperLimit()) {
-      m_ElevatorMotor1.setPosition(Rotations.of(25));
-      m_ElevatorMotor2.setPosition(Rotations.of(25));
+      m_ElevatorMotor1.setPosition(Rotations.of(26));
+      m_ElevatorMotor2.setPosition(Rotations.of(26));
     }
 
     if (getPosition().in(Rotations) < m_SetpointPosition.Rotations.in(Rotations)) {
