@@ -25,4 +25,6 @@ public class EndEffectorConstants {
   public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(60);
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(500);
   public static final AngularVelocity algaeHoldSpeed = RotationsPerSecond.of(3);
+
+  public static final double coralIntakeDelay = 0.9;
 }

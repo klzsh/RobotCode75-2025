@@ -165,12 +165,20 @@ public class Elevator extends SubsystemBase {
    * average position between the two motors
    * @return the position in rotations of the elevator
    */
-  @Logged(name = "Elevator Position")
+  @Logged(name = "Elevator Position Radians")
   public Angle getPosition() {
     return Rotations.of(
         (m_ElevatorMotor1.getPosition().getValue().in(Rotations)
                 + m_ElevatorMotor2.getPosition().getValue().in(Rotations))
             / 2);
+  }
+  /**
+   * logs elevator position in rotations
+   * @return the position in rotations of the elevator
+   */
+  @Logged(name = "Elevator Position")
+  public double logPosition() {
+    return getPosition().in(Rotations);
   }
   /**
    * checks if the elevator is at the correct position, including if the elevator is going to the algae position

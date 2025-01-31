@@ -32,12 +32,14 @@ public class ScoreCoral extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_Intake.setState(CoralStates.DEFAULT);
+    if (interrupted) {
+      m_Intake.setState(CoralStates.DEFAULT);
+    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_Intake.getState() == CoralStates.DEFAULT;
+    return !m_Intake.getBeamBreak();
   }
 }

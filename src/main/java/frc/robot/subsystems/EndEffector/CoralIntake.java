@@ -29,6 +29,7 @@ public class CoralIntake extends SubsystemBase {
     // no intaking state because coral sits on top of the intake wheels
     HASGAMEPIECE,
     SCORING,
+    INTAKING,
     DEFAULT // default is when the intake is doing nothing
   }
 
@@ -92,6 +93,10 @@ public class CoralIntake extends SubsystemBase {
     return m_CoralIntakeState;
   }
 
+  public boolean getBeamBreak() {
+    return !m_CoralBeamBreak.get();
+  }
+
   public Command coralIntakeTimedCommand(CoralStates state, double delay) {
     return new SequentialCommandGroup(
         new InstantCommand(() -> setState(state)),
@@ -115,13 +120,14 @@ public class CoralIntake extends SubsystemBase {
       // m_CoralMotor.getConfigurator().apply(PIDConfig);
     }
 
-    SmartDashboard.putBoolean("Coral Beam Break", m_CoralBeamBreak.get());
+    SmartDashboard.putBoolean("Coral Beam Break", getBeamBreak());
+    SmartDashboard.putString("Coral State", m_CoralIntakeState.toString());
 
-    if (m_CoralBeamBreak.get() && m_CoralIntakeState == CoralStates.DEFAULT) {
+    if (getBeamBreak() && m_CoralIntakeState == CoralStates.INTAKING) {
       m_CoralIntakeState = CoralStates.HASGAMEPIECE;
     }
 
-    if (!m_CoralBeamBreak.get()) {
+    if (!getBeamBreak() && m_CoralIntakeState != CoralStates.INTAKING) {
       m_CoralIntakeState = CoralStates.DEFAULT;
     }
 
@@ -135,6 +141,10 @@ public class CoralIntake extends SubsystemBase {
         m_tempCoralMotor.set(ControlMode.PercentOutput, 0);
       }
       case SCORING -> {
+        // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed));
+        m_tempCoralMotor.set(ControlMode.PercentOutput, -1);
+      }
+      case INTAKING -> {
         // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed));
         m_tempCoralMotor.set(ControlMode.PercentOutput, -1);
       }

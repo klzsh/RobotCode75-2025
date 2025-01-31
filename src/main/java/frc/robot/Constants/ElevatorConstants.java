@@ -36,8 +36,8 @@ public class ElevatorConstants {
   public static final Angle algaeRemovalOffset = Rotations.of(0);
   public static final Angle l1Position = Rotations.of(2);
   public static final Angle l2Position = Rotations.of(7);
-  public static final Angle l3Position = Rotations.of(15);
-  public static final Angle l4Position = Rotations.of(25);
+  public static final Angle l3Position = Rotations.of(15.3);
+  public static final Angle l4Position = Rotations.of(26.3);
   public static final Angle homePosition = Rotations.of(0);
   public static final Angle processorPosition = Rotations.of(2);
 
@@ -45,7 +45,7 @@ public class ElevatorConstants {
   public static double[] MotionMagicProfileUp = {70, 70, 1000};
   public static double[] MotionMagicProfileDown = {40, 40, 400};
 
-  public static final Angle deadband = Rotations.of(0.25);
+  public static final Angle deadband = Rotations.of(0.5);
 
   public static final Angle maxDeviation = Rotations.of(0.5);
 }

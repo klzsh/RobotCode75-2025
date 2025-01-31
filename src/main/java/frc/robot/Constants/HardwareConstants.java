@@ -40,7 +40,7 @@ public final class HardwareConstants {
 
     /* Motor Inverts */
     public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
-    public static final InvertedValue driveMotorInvert = InvertedValue.CounterClockwise_Positive;
+    public static final InvertedValue driveMotorInvert = InvertedValue.Clockwise_Positive;
 
     /* Angle Encoder Invert */
     public static final SensorDirectionValue cancoderInvert =
@@ -79,7 +79,7 @@ public final class HardwareConstants {
 
     /* Drive Motor PID Values */
     // TODO: tune
-    public static final double driveTorqueKP = 2;
+    public static final double driveTorqueKP = 1.93;
     public static final double driveTorqueKI = 0.0;
     public static final double driveTorqueKD = 0.0;
     public static final double driveTorqueKS = 10; // static feedforward
@@ -340,7 +340,7 @@ public final class HardwareConstants {
 
     public static final double kA = 0.5; // current per unit of acceleration
     public static final double kG = 21; // current to overcome gravity
-    public static final double kS = 15; // current to overcome static friction
+    public static final double kS = 17; // current to overcome static friction
     public static final double kV = 0.12; // current per unit of requested velocity
     public static final double kP = 20;
     public static final double kI = 0;
