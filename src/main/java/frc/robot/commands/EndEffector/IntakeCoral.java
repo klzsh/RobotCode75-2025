@@ -4,16 +4,12 @@
 
 package frc.robot.commands.EndEffector;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.EndEffectorConstants;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class IntakeCoral extends Command {
   private final CoralIntake m_coralIntake;
-  private double startTimestamp = -1;
 
   /** Creates a new IntakeCoral. */
   public IntakeCoral(CoralIntake coralIntake) {
@@ -26,7 +22,6 @@ public class IntakeCoral extends Command {
   @Override
   public void initialize() {
     m_coralIntake.setState(CoralStates.INTAKING);
-    startTimestamp = -1;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -44,11 +39,6 @@ public class IntakeCoral extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (m_coralIntake.getState() == CoralStates.HASGAMEPIECE && startTimestamp == -1) {
-      startTimestamp = Timer.getFPGATimestamp();
-      return false;
-    }
-    if (startTimestamp == -1) return false;
-    return (Timer.getFPGATimestamp() - startTimestamp >= EndEffectorConstants.coralIntakeDelay);
-}
+    return m_coralIntake.getState() == CoralStates.HASGAMEPIECE;
+  }
 }
