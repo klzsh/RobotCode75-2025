@@ -74,13 +74,15 @@ public class RobotContainer {
       new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final Map<Integer, Command> m_AutoMap = Map.of(
+    1, new ScoreL1(m_Elevator, m_CoralIntake),
+    3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
+    4, new ScoreL4(m_Elevator, m_CoralIntake),
+    6, new IntakeCoral(m_CoralIntake) //TODO add left/middle/right distinction
+  );
   private final AutoSelector m_Selector =
       new AutoSelector(
-          Map.of(
-            1, new ResetHeading(m_Swerve),
-            2, new XStance(m_Swerve),
-            3, new LEDsDefaultCommand(m_Wrapper)
-          ),
+          m_AutoMap,
           m_Swerve,
           new ArrayList<Command>(),
           new ArrayList<Command>());
