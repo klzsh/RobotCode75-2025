@@ -33,6 +33,8 @@ import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
+import frc.robot.subsystems.EndGame.Climber;
+import frc.robot.subsystems.EndGame.Climber.ClimberPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /**
@@ -60,6 +62,7 @@ public class RobotContainer {
 
   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
+  private final Climber m_Climber = new Climber();
 
   @Logged(name = "Alage Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
@@ -134,6 +137,9 @@ public class RobotContainer {
             .repeatedly());
     m_AlgaeIntake.setDefaultCommand(
         new InstantCommand(() -> m_AlgaeIntake.resetStates(), m_AlgaeIntake).repeatedly());
+    m_Climber.setDefaultCommand(
+        new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
+            .repeatedly());
   }
 
   /**
