@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  // @Logged(strategy = Strategy.OPT_IN)
+  @Logged(strategy = Strategy.OPT_IN)
   private final RobotContainer m_robotContainer;
 
   /**
