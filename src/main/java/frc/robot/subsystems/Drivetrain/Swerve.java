@@ -92,8 +92,8 @@ public class Swerve extends SubsystemBase {
   // private final TunableNumber rotationKI;
   // private final TunableNumber rotationKD;
 
-  @Logged(name = "PDH", importance = Importance.DEBUG)
-  private final PowerDistribution m_PDH;
+  // @Logged(name = "PDH", importance = Importance.DEBUG)
+  // private final PowerDistribution m_PDH;
 
   // gryo
   private Pigeon2 m_gyro;
@@ -103,7 +103,7 @@ public class Swerve extends SubsystemBase {
 
     m_ModuleCamera = moduleCamera;
     m_CenterCamera = centerCamera;
-    m_PDH = new PowerDistribution(1, ModuleType.kRev);
+    // m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized

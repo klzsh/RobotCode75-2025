@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -17,7 +18,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
@@ -41,11 +45,11 @@ public class RobotContainer {
   // define subsystems first
   private final AprilTagCamera dummy1 = new AprilTagCamera("dummy1", new Transform3d());
   private final AprilTagCamera dummy2 = new AprilTagCamera("dummy2", new Transform3d());
-  @Logged(name = "swerve")
+  @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(dummy1, dummy2);
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
-
+  @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
@@ -113,16 +117,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // resetHeading.onTrue(new ResetHeading(m_Swerve));
-    // Xstance.whileTrue(new XStance(m_Swerve));
-    // holdButton.whileTrue(
-    //     new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
-    // alignButton.onTrue(
-    //     new SnapHoldRotation(
-    //         m_Swerve,
-    //         Rotation2d.fromDegrees(90),
-    //         () -> -m_LeftStick.getY(),
-    //         () -> -m_LeftStick.getX()));
+    resetHeading.onTrue(new ResetHeading(m_Swerve));
+    Xstance.whileTrue(new XStance(m_Swerve));
+    holdButton.whileTrue(
+        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
     m_Controller
         .povDown()
