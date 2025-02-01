@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.lib.dashboard.AutoSelector;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.EndEffector.IntakeCoral;
@@ -29,6 +31,10 @@ import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Drivetrain.Swerve;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -50,11 +56,6 @@ public class RobotContainer {
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
-  // define auto factory for autos
-  // private final AutoFactory factory =
-  //     new AutoFactory(
-  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
-
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
   private final Joystick m_RightStick = new Joystick(OIConstants.rightStickPort);
@@ -73,6 +74,16 @@ public class RobotContainer {
       new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final AutoSelector m_Selector =
+      new AutoSelector(
+          Map.of(
+            1, new ResetHeading(m_Swerve),
+            2, new XStance(m_Swerve),
+            3, new LEDsDefaultCommand(m_Wrapper)
+          ),
+          m_Swerve,
+          new ArrayList<Command>(),
+          new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -173,7 +184,10 @@ public class RobotContainer {
     //             .repeatedly());
   }
 
-  private void configureChooser() {}
+  private void configureChooser() {
+    m_Selector.setupAutoTab();
+    m_Selector.clearField();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
