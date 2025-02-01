@@ -9,39 +9,47 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.*;
 import frc.lib.util.SwerveModuleConstants;
 
-/** Add your docs here. */
+/** Swerve drive constants */
 public final class DrivetrainConstants {
   // TODO: make sure this is correct
   public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
   public static final int kPigeonID = 18;
 
-  public static final boolean USE_ANGLE_TORQUE = true;
-  public static final boolean USE_DRIVE_TORQUE = true;
-
   /* Drivetrain Constants */
-  // TODO: Find these
-  public static final Distance trackWidth = Inches.of(22.5);
-  public static final Distance wheelBase = Inches.of(22.5);
-  // distance between the center of the wheel to the center of the robot
-  public static final Distance kCenterToWheel =
-      Meters.of(Math.hypot(trackWidth.in(Meters), wheelBase.in(Meters)) / 2);
-  public static final Distance wheelDiameter = Inches.of(2);
+  public static final Distance trackLength = Inches.of(22.75);
+  public static final Distance trackWidth = Inches.of(22.75);
+
+  public static final Distance wheelDiameter = Inches.of(4);
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
+    // TODO: tune
     public static final double kp = 0.08;
     public static final double kd = 0.03;
     public static final double maxVelocityMultiplier = 0.8;
     public static final double maxAccelerationMultiplier = 0.8;
     public static final double loopPeriodSeconds = 0.02;
     public static final double toleranceRadians = .15;
+    public static final double toleranceTranslation = .05;
+
+    public static final LinearVelocity maxVelocity = MetersPerSecond.of(3);
+    public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
+
+    /** Radians per Second */
+    public static final AngularVelocity maxAngularVelocity =
+        RadiansPerSecond.of(
+            maxSpeed.in(MetersPerSecond)
+                / Math.hypot(trackWidth.in(Meters) / 2.0, trackLength.in(Meters) / 2.0));
+
+    /** Radians per Second per Second */
+    public static final AngularAcceleration maxAngularAcceleration =
+        RadiansPerSecondPerSecond.of(
+            maxSpeed.in(MetersPerSecond)
+                / Math.hypot(trackWidth.in(Meters) / 2.0, trackLength.in(Meters) / 2.0));
   }
 
   /*
@@ -52,53 +60,51 @@ public final class DrivetrainConstants {
   public static final SwerveDriveKinematics swerveKinematics =
       new SwerveDriveKinematics(
           new Translation2d(
-              DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              DrivetrainConstants.trackWidth.in(Meters) / 2.0),
+              DrivetrainConstants.trackWidth.in(Meters) / 2.0,
+              DrivetrainConstants.trackLength.in(Meters) / 2.0),
           new Translation2d(
-              DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              -DrivetrainConstants.trackWidth.in(Meters) / 2.0),
+              DrivetrainConstants.trackWidth.in(Meters) / 2.0,
+              -DrivetrainConstants.trackLength.in(Meters) / 2.0),
           new Translation2d(
-              -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              DrivetrainConstants.trackWidth.in(Meters) / 2.0),
+              -DrivetrainConstants.trackWidth.in(Meters) / 2.0,
+              DrivetrainConstants.trackLength.in(Meters) / 2.0),
           new Translation2d(
-              -DrivetrainConstants.wheelBase.in(Meters) / 2.0,
-              -DrivetrainConstants.trackWidth.in(Meters) / 2.0));
+              -DrivetrainConstants.trackWidth.in(Meters) / 2.0,
+              -DrivetrainConstants.trackLength.in(Meters) / 2.0));
 
   /* Module Gear Ratios */
   // ratio of motor turns to mechanism turns
-  public static final double driveGearRatio = 6.75;
-  public static final double angleGearRatio = 12.8;
+  public static final double driveGearRatio = 6.75; // L2
+  public static final double angleGearRatio = 150.0 / 7.0; // ~21:1 ratio
 
   /** Meters per Second */
   public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.49);
+
+  public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
 
   /** Radians per Second */
   public static final AngularVelocity maxAngularVelocity =
       RadiansPerSecond.of(
           maxSpeed.in(MetersPerSecond)
-              / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
+              / Math.hypot(trackLength.in(Meters) / 2.0, trackWidth.in(Meters) / 2.0));
 
   /** Radians per Second per Second */
   public static final AngularAcceleration maxAngularAcceleration =
       RadiansPerSecondPerSecond.of(
           maxSpeed.in(MetersPerSecond)
-              / Math.hypot(trackWidth.in(Meters) / 2.0, wheelBase.in(Meters) / 2.0));
+              / Math.hypot(trackLength.in(Meters) / 2.0, trackWidth.in(Meters) / 2.0));
 
   /** Drivetrain CANBus name */
   public static final String driveBusName = "Drivetrain";
 
-  /** Radius of robot from center to wheel */
-
   /* Module Specific Constants */
-  // ! module offsets are configured. Only change if a serious deviation is seen,
-  // as well as in
-  // ! each comp
+  // ! Only change if a serious deviation is seen, as well as in each comp
   /* Front Left Module - Module 0 */
   public static final class FrontLeft {
     public static final int driveMotorID = 14;
     public static final int angleMotorID = 24;
     public static final int canCoderID = 34;
-    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(75.14);
+    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-47.373);
 
     public static final SwerveModuleConstants constants =
         new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -109,7 +115,7 @@ public final class DrivetrainConstants {
     public static final int driveMotorID = 11;
     public static final int angleMotorID = 21;
     public static final int canCoderID = 31;
-    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(73.38);
+    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(113.906);
 
     public static final SwerveModuleConstants constants =
         new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -120,7 +126,7 @@ public final class DrivetrainConstants {
     public static final int driveMotorID = 13;
     public static final int angleMotorID = 23;
     public static final int canCoderID = 33;
-    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(127.44);
+    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(113.818);
 
     public static final SwerveModuleConstants constants =
         new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -131,7 +137,7 @@ public final class DrivetrainConstants {
     public static final int driveMotorID = 12;
     public static final int angleMotorID = 22;
     public static final int canCoderID = 32;
-    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-125.85);
+    public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-147.744);
 
     public static final SwerveModuleConstants constants =
         new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);

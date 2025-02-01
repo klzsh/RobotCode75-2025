@@ -92,6 +92,6 @@ public class SnapHoldRotation extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_Controller.atSetpoint() && !holdHeading;
+    return m_Controller.atGoal() && !holdHeading;
   }
 }

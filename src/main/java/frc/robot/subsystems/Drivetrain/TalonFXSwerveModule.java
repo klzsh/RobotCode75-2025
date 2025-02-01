@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -54,7 +55,9 @@ public class TalonFXSwerveModule {
   private TalonFX mDriveMotor;
 
   // sets the "forward" position of the wheel
+  @Logged(name = "CanCoder", importance = Importance.DEBUG)
   private CANcoder angleEncoder;
+
   // used for logging
   private SwerveModuleState setpoint;
 
@@ -201,9 +204,13 @@ public class TalonFXSwerveModule {
   /**
    * @return CANCoder angle
    */
-  @Logged(name = "CANCoder angle", importance = Importance.DEBUG)
   public Rotation2d getCANCoder() {
     return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue().in(Rotations));
+  }
+  
+  @Logged(name = "CANCoder angle", importance = Importance.DEBUG)
+  public double logCanCoderDegrees(){
+    return angleEncoder.getAbsolutePosition().refresh().getValue().in(Degrees);
   }
 
   /**
@@ -239,6 +246,14 @@ public class TalonFXSwerveModule {
   private void configDriveMotor() {
     mDriveMotor.getConfigurator().apply(HardwareConstants.Swerve.getDriveConfiguration());
     mDriveMotor.getConfigurator().setPosition(0);
+  }
+
+  public void setDrivePIDS(Slot0Configs config) {
+    mDriveMotor.getConfigurator().apply(config);
+  }
+
+  public void setAnglePIDS(Slot0Configs config) {
+    mAngleMotor.getConfigurator().apply(config);
   }
 
   /**

@@ -5,8 +5,8 @@
 package frc.lib.util.Loggers;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Fahrenheit;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -43,21 +43,10 @@ public class TalonFXLogger extends ClassSpecificLogger<TalonFX> {
       logger.log("Undervoltage Event", motor.getFault_Undervoltage().refresh().getValue());
       logger.log("Unstable supply voltage", motor.getFault_UnstableSupplyV().refresh().getValue());
       logger.log("Processor Temp Exceeded", motor.getFault_ProcTemp().refresh().getValue());
-
-    } else if (Epilogue.shouldLog(Importance.INFO)) {
-      if (motor.getDeviceID() == 11
-          || motor.getDeviceID() == 12
-          || motor.getDeviceID() == 13
-          || motor.getDeviceID() == 14) {
-        logger.log("Velocity", motor.getVelocity().refresh().getValue().in(RotationsPerSecond));
-
-      } else if (motor.getDeviceID() == 21
-          || motor.getDeviceID() == 22
-          || motor.getDeviceID() == 23
-          || motor.getDeviceID() == 24) {
-        logger.log("Position", motor.getPosition().refresh().getValue().in(Degrees));
-      }
-
+    }
+    if (Epilogue.shouldLog(Importance.INFO) || Epilogue.shouldLog(Importance.DEBUG)) {
+      logger.log("Velocity", motor.getVelocity().refresh().getValue().in(RotationsPerSecond));
+      logger.log("Position", motor.getPosition().refresh().getValue().in(Rotations));
       logger.log("Output Voltage", motor.getMotorVoltage().refresh().getValue().in(Volts));
       logger.log("Device Temp", motor.getDeviceTemp().refresh().getValue().in(Fahrenheit));
     }
@@ -67,16 +56,5 @@ public class TalonFXLogger extends ClassSpecificLogger<TalonFX> {
 
     logger.log("Hardware Fault", motor.getFault_Hardware().refresh().getValue());
     logger.log("OverVoltage Event", motor.getFault_OverSupplyV().refresh().getValue());
-
-    if (motor.getDeviceID() != 11
-        || motor.getDeviceID() != 12
-        || motor.getDeviceID() != 13
-        || motor.getDeviceID() != 14
-        || motor.getDeviceID() != 21
-        || motor.getDeviceID() != 22
-        || motor.getDeviceID() != 23
-        || motor.getDeviceID() != 24) {
-      logger.log("Velocity", motor.getVelocity().refresh().getValue().in(RotationsPerSecond));
-    }
   }
 }
