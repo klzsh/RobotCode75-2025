@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.Drivetrain.VisionController;
+// import frc.robot.subsystems.Drivetrain.VisionController;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,17 +54,17 @@ public class VisionConstants {
 
 
 
-  public static final Map<Integer, Map<VisionController.AlignTargets, Pose2d>> aprilTagPoses = Map.ofEntries(
-      Map.entry(0, Map.of(
-          VisionController.AlignTargets.REEF_LEFT, new Pose2d(0, 0, Rotation2d.fromDegrees(0))
-      )),
-      Map.entry(1, Map.of(
-          VisionController.AlignTargets.REEF_LEFT, new Pose2d(0, 0, Rotation2d.fromDegrees(0))
-      )),
-      Map.entry(2, Map.of(
-              null, 
-      )),
-  );
+//   public static final Map<Integer, Map<VisionController.AlignTargets, Pose2d>> aprilTagPoses = Map.ofEntries(
+//       Map.entry(0, Map.of(
+//           VisionController.AlignTargets.REEF_LEFT, new Pose2d(0, 0, Rotation2d.fromDegrees(0))
+//       )),
+//       Map.entry(1, Map.of(
+//           VisionController.AlignTargets.REEF_LEFT, new Pose2d(0, 0, Rotation2d.fromDegrees(0))
+//       )),
+//       Map.entry(2, Map.of(
+//               null, null
+//       ))
+//   );
 
   public static double maxTimeUntilFallbackToOdometry = 1.0;
 }
