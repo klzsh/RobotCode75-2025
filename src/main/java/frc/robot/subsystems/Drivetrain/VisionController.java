@@ -99,14 +99,14 @@ public class VisionController {
         thetaPID[0].getNumber(), thetaPID[1].getNumber(), thetaPID[2].getNumber());
 
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
-        // so we don't need to set new offsets for every reef position
-        // instead we just map all reef positions to REEFA
-        targetPose = new FieldPose(targetPose.side, FieldElement.REEFA, targetPose.offset);
+      // so we don't need to set new offsets for every reef position
+      // instead we just map all reef positions to REEFA
+      targetPose = new FieldPose(targetPose.side, FieldElement.REEFA, targetPose.offset);
     }
     if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
-        // so we don't need to set new offsets for both HP stations
-        // instead we just map all reef positions to TOPHPSTATION
-        targetPose = new FieldPose(targetPose.side, FieldElement.TOPHPSTATION, targetPose.offset);
+      // so we don't need to set new offsets for both HP stations
+      // instead we just map all reef positions to TOPHPSTATION
+      targetPose = new FieldPose(targetPose.side, FieldElement.TOPHPSTATION, targetPose.offset);
     }
 
     Translation2d targetOffset = fieldPoseOffsets.get(targetPose);

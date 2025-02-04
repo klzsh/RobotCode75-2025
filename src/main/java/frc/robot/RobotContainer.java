@@ -124,18 +124,6 @@ public class RobotContainer {
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
-    m_Controller
-        .povDown()
-        .whileTrue(new InstantCommand(() -> m_Elevator.runSetpoint(), m_Elevator).repeatedly());
-    // m_Controller
-    //     .povDown()
-    //     .whileTrue(
-    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
-    // m_Controller
-    //     .povLeft()
-    //     .whileTrue(
-    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
-
     m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
     m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
     m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
