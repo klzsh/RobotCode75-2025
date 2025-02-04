@@ -6,8 +6,8 @@ import edu.wpi.first.units.measure.Angle;
 
 public final class ClimberConstants {
   // TODO: Change to actual values
-  public static final int climberMotor1CANID = 0;
-  public static final int climberMotor2CANID = 1;
+  public static final int climberMotor1CANID = 46;
+  public static final int climberMotor2CANID = 47;
   public static final int limitPort = 2;
 
   // if needed
