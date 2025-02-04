@@ -5,12 +5,21 @@
 package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoAlign extends Command {
-  /** Creates a new AutoAlign. */
-  public AutoAlign() {
-    // Use addRequirements() here to declare subsystem dependencies.
+  private final Swerve m_Swerve;
+  private final AprilTagCamera m_Camera;
+  private final int targetId;
+
+  public AutoAlign(Swerve swerve, AprilTagCamera camera, int target) {
+    m_Swerve = swerve;
+    m_Camera = camera;
+    targetId = target;
+
+    addRequirements(swerve);
   }
 
   // Called when the command is initially scheduled.

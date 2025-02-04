@@ -23,8 +23,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
@@ -92,8 +90,8 @@ public class Swerve extends SubsystemBase {
   // private final TunableNumber rotationKI;
   // private final TunableNumber rotationKD;
 
-  @Logged(name = "PDH", importance = Importance.DEBUG)
-  private final PowerDistribution m_PDH;
+  // @Logged(name = "PDH", importance = Importance.DEBUG)
+  // private final PowerDistribution m_PDH;
 
   // gryo
   private Pigeon2 m_gyro;
@@ -103,7 +101,7 @@ public class Swerve extends SubsystemBase {
 
     m_ModuleCamera = moduleCamera;
     m_CenterCamera = centerCamera;
-    m_PDH = new PowerDistribution(1, ModuleType.kRev);
+    // m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized

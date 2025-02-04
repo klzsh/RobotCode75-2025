@@ -12,8 +12,10 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -166,7 +168,7 @@ public final class HardwareConstants {
     public static final TalonFXConfiguration m_PivotConfig = new TalonFXConfiguration();
     /* CANIDS */
     // TODO: find these
-    public static final int coralMotorCanID = 0;
+    public static final int coralMotorCanID = 43;
     public static final int algaeMotorCanID = 0;
     public static final int pivotCanID = 0;
     public static final int coralBeamBreakDIO = 2;
@@ -183,12 +185,12 @@ public final class HardwareConstants {
     public static final Frequency TimeSyncFreq = Hertz.of(250);
 
     // coral current limiting
-    public static final Current coralCurrentLimit = Amps.of(30);
-    public static final Current coralCurrentLowerThreshold = Amps.of(20);
+    public static final Current coralCurrentLimit = Amps.of(40);
+    public static final Current coralCurrentLowerThreshold = Amps.of(30);
 
-    public static final Current coralStatorCurrentLimit = Amps.of(40);
-    public static final Current coralStatorCurrentLimitForward = Amps.of(40);
-    public static final Current coralStatorCurrentLimitReverse = Amps.of(-40);
+    public static final Current coralStatorCurrentLimit = Amps.of(60);
+    public static final Current coralStatorCurrentLimitForward = Amps.of(60);
+    public static final Current coralStatorCurrentLimitReverse = Amps.of(-60);
 
     public static final Time coralCurrentThresholdTime = Seconds.of(0.50);
 
@@ -216,10 +218,14 @@ public final class HardwareConstants {
     public static final double openLoopRamp = 0.1;
     public static final double closedLoopRamp = 0.1;
 
-    public static final double coralKP = 0.5;
-    public static final double coralKI = 0.0;
-    public static final double coralKD = 0.0;
-    public static final double coralkS = 0.0;
+    public static final double coralVelocityKP = 2;
+    public static final double coralVelocityKI = 0.0;
+    public static final double coralVelocityKD = 0.0;
+    public static final double coralVelocityKS = 10;
+
+    public static final double coralPositionKP = 0.75;
+    public static final double coralPositionKI = 0.0;
+    public static final double coralPositionKD = 0.0;
 
     public static final double algaeKP = 0.5;
     public static final double algaeKI = 0.0;
@@ -234,6 +240,10 @@ public final class HardwareConstants {
       m_CoralMotorConfig.MotorOutput.Inverted = coralMotorInvert;
       m_CoralMotorConfig.MotorOutput.NeutralMode = coralMotorNuetralMode;
 
+      m_CoralMotorConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+      m_CoralMotorConfig.Commutation.AdvancedHallSupport = AdvancedHallSupportValue.Enabled;
+      m_CoralMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
       /* Current Limiting */
       m_CoralMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
       m_CoralMotorConfig.CurrentLimits.SupplyCurrentLimit = coralCurrentLimit.in(Amps);
@@ -246,10 +256,14 @@ public final class HardwareConstants {
       m_CoralMotorConfig.CurrentLimits.StatorCurrentLimit = coralStatorCurrentLimit.in(Amps);
 
       /* PID Config */
-      m_CoralMotorConfig.Slot0.kP = coralKP;
-      m_CoralMotorConfig.Slot0.kI = coralKI;
-      m_CoralMotorConfig.Slot0.kD = coralKD;
-      m_CoralMotorConfig.Slot0.kS = coralkS;
+      m_CoralMotorConfig.Slot0.kP = coralVelocityKP;
+      m_CoralMotorConfig.Slot0.kI = coralVelocityKI;
+      m_CoralMotorConfig.Slot0.kD = coralVelocityKD;
+      m_CoralMotorConfig.Slot0.kS = coralVelocityKS;
+
+      m_CoralMotorConfig.Slot1.kP = coralPositionKP;
+      m_CoralMotorConfig.Slot1.kI = coralPositionKI;
+      m_CoralMotorConfig.Slot1.kD = coralPositionKD;
 
       /* Open and Closed Loop Ramping */
       m_CoralMotorConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp;

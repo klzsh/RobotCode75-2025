@@ -15,26 +15,23 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.lib.dashboard.AutoSelector;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
-import frc.robot.commands.EndEffector.IntakeCoral;
-import frc.robot.commands.EndEffector.ScoreCoral;
+import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
+import frc.robot.commands.EndEffector.IntakeCoral;
+import frc.robot.commands.EndEffector.ScoreCoral;
+import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
-import frc.robot.subsystems.Drivetrain.Swerve;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -47,14 +44,22 @@ public class RobotContainer {
   // define subsystems first
   private final AprilTagCamera dummy1 = new AprilTagCamera("dummy1", new Transform3d());
   private final AprilTagCamera dummy2 = new AprilTagCamera("dummy2", new Transform3d());
-  @Logged(name = "swerve")
+
+  @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(dummy1, dummy2);
+
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
+  @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
+
+  // define auto factory for autos
+  // private final AutoFactory factory =
+  //     new AutoFactory(
+  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
@@ -74,18 +79,18 @@ public class RobotContainer {
       new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
-  private final Map<Integer, Command> m_AutoMap = Map.of(
-    1, new ScoreL1(m_Elevator, m_CoralIntake),
-    3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
-    4, new ScoreL4(m_Elevator, m_CoralIntake),
-    6, new IntakeCoral(m_CoralIntake) //TODO add left/middle/right distinction
-  );
-  private final AutoSelector m_Selector =
-      new AutoSelector(
-          m_AutoMap,
-          m_Swerve,
-          new ArrayList<Command>(),
-          new ArrayList<Command>());
+//   private final Map<Integer, Command> m_AutoMap = Map.of(
+//     1, new ScoreL1(m_Elevator, m_CoralIntake),
+//     3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
+//     4, new ScoreL4(m_Elevator, m_CoralIntake),
+//     6, new IntakeCoral(m_CoralIntake) //TODO add left/middle/right distinction
+//   );
+//   private final AutoSelector m_Selector =
+//       new AutoSelector(
+//           m_AutoMap,
+//           m_Swerve,
+//           new ArrayList<Command>(),
+//           new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -126,40 +131,18 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // resetHeading.onTrue(new ResetHeading(m_Swerve));
-    // Xstance.whileTrue(new XStance(m_Swerve));
-    // holdButton.whileTrue(
-    //     new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
-    // alignButton.onTrue(
-    //     new SnapHoldRotation(
-    //         m_Swerve,
-    //         Rotation2d.fromDegrees(90),
-    //         () -> -m_LeftStick.getY(),
-    //         () -> -m_LeftStick.getX()));
-
-    m_Controller
-        .povDown()
-        .whileTrue(new InstantCommand(() -> m_Elevator.runSetpoint(), m_Elevator).repeatedly());
-    // m_Controller
-    //     .povDown()
-    //     .whileTrue(
-    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.runSetpoint2(), m_Elevator)));
-    // m_Controller
-    //     .povLeft()
-    //     .whileTrue(
-    //         new RepeatCommand(new InstantCommand(() -> m_Elevator.stopMotors(), m_Elevator)));
+    resetHeading.onTrue(new ResetHeading(m_Swerve));
+    Xstance.whileTrue(new XStance(m_Swerve));
+    holdButton.whileTrue(
+        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
     m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
     m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
     m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
     m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
-    m_Controller
-        .povUp()
-        .whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller
-        .povDown()
-        .whileTrue(new ScoreCoral(m_CoralIntake));
+    m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
+    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
     // m_Controller
     //     .a()
     //     .whileTrue(
@@ -186,10 +169,7 @@ public class RobotContainer {
     //             .repeatedly());
   }
 
-  private void configureChooser() {
-    m_Selector.setupAutoTab();
-    m_Selector.clearField();
-  }
+  private void configureChooser() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

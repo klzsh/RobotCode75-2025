@@ -207,9 +207,9 @@ public class TalonFXSwerveModule {
   public Rotation2d getCANCoder() {
     return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue().in(Rotations));
   }
-  
+
   @Logged(name = "CANCoder angle", importance = Importance.DEBUG)
-  public double logCanCoderDegrees(){
+  public double logCanCoderDegrees() {
     return angleEncoder.getAbsolutePosition().refresh().getValue().in(Degrees);
   }
 

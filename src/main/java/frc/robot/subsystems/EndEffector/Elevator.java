@@ -9,6 +9,7 @@ import static frc.robot.Constants.ElevatorConstants.*;
 import static frc.robot.Constants.HardwareConstants.Elevator.*;
 import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -19,6 +20,8 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -161,27 +164,38 @@ public class Elevator extends SubsystemBase {
     m_SetpointPosition = position;
     m_IsAlgae = isAlgae;
   }
+
   /**
    * average position between the two motors
+   *
    * @return the position in rotations of the elevator
    */
   @Logged(name = "Elevator Position Radians")
   public Angle getPosition() {
-    return Rotations.of(
-        (m_ElevatorMotor1.getPosition().getValue().in(Rotations)
-                + m_ElevatorMotor2.getPosition().getValue().in(Rotations))
-            / 2);
+    Measure<AngleUnit> motor1Position =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            m_ElevatorMotor1.getPosition(), m_ElevatorMotor1.getVelocity());
+    Measure<AngleUnit> motor2Position =
+        BaseStatusSignal.getLatencyCompensatedValue(
+            m_ElevatorMotor2.getPosition(), m_ElevatorMotor2.getVelocity());
+
+    return Rotations.of((motor1Position.in(Rotations) + motor2Position.in(Rotations)) / 2);
   }
+
   /**
    * logs elevator position in rotations
+   *
    * @return the position in rotations of the elevator
    */
   @Logged(name = "Elevator Position")
   public double logPosition() {
     return getPosition().in(Rotations);
   }
+
   /**
-   * checks if the elevator is at the correct position, including if the elevator is going to the algae position
+   * checks if the elevator is at the correct position, including if the elevator is going to the
+   * algae position
+   *
    * @param position position to check
    * @param isAlgae apply the algae offset
    * @return if the elevator is at the correct position
@@ -204,131 +218,6 @@ public class Elevator extends SubsystemBase {
   public Command positionCommand(ElevatorPositions position, boolean algae) {
     return Commands.runOnce(() -> setPosition(position, algae), this)
         .until(() -> isAtPosition(position, algae));
-  }
-
-  // temp methods
-  public void runSetpoint() {
-
-    Angle rotations = Rotations.of(0);
-    if (setpoint.getNumber() >= 0 && setpoint.getNumber() <= 26) {
-      rotations = Rotations.of(setpoint.getNumber());
-    } else {
-      rotations = Rotations.of(10);
-    }
-    if (getPosition().in(Rotations) < rotations.in(Rotations)) {
-      m_PositionRequest.Velocity = upVelocity.getNumber();
-      m_PositionRequest.Acceleration = upAcceleration.getNumber();
-      m_PositionRequest.Jerk = upJerk.getNumber();
-    } else {
-      m_PositionRequest.Velocity = downVelocity.getNumber();
-      m_PositionRequest.Acceleration = downAcceleration.getNumber();
-      m_PositionRequest.Jerk = downJerk.getNumber();
-    }
-    if (getLowerLimit() && rotations.in(Rotations) == 0) {
-      m_ElevatorMotor1.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-    } else {
-      m_ElevatorMotor1.setControl(
-          m_PositionRequest
-              .withPosition(rotations)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_PositionRequest
-              .withPosition(rotations)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-    }
-  }
-
-  public void runSetpoint1() {
-    Angle rotations = Rotations.of(0);
-    if (setpoint1.getNumber() >= 0 && setpoint1.getNumber() <= 26) {
-      rotations = Rotations.of(setpoint1.getNumber());
-    } else {
-      rotations = Rotations.of(10);
-    }
-    if (getPosition().in(Rotations) < rotations.in(Rotations)) {
-      m_PositionRequest.Velocity = upVelocity.getNumber();
-      m_PositionRequest.Acceleration = upAcceleration.getNumber();
-      m_PositionRequest.Jerk = upJerk.getNumber();
-    } else {
-      m_PositionRequest.Velocity = downVelocity.getNumber();
-      m_PositionRequest.Acceleration = downAcceleration.getNumber();
-      m_PositionRequest.Jerk = downJerk.getNumber();
-    }
-    if (getLowerLimit() && rotations.in(Rotations) == 0) {
-      m_ElevatorMotor1.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-    } else {
-      m_ElevatorMotor1.setControl(
-          m_PositionRequest
-              .withPosition(rotations)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_PositionRequest
-              .withPosition(rotations)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-    }
-  }
-
-  public void runSetpoint2() {
-    Angle rotations = Rotations.of(0);
-    if (setpoint2.getNumber() >= 0 && setpoint2.getNumber() <= 26) {
-      rotations = Rotations.of(setpoint2.getNumber());
-    } else {
-      rotations = Rotations.of(10);
-    }
-    if (getPosition().in(Rotations) < rotations.in(Rotations)) {
-      m_PositionRequest.Velocity = upVelocity.getNumber();
-      m_PositionRequest.Acceleration = upAcceleration.getNumber();
-      m_PositionRequest.Jerk = upJerk.getNumber();
-    } else {
-      m_PositionRequest.Velocity = downVelocity.getNumber();
-      m_PositionRequest.Acceleration = downAcceleration.getNumber();
-      m_PositionRequest.Jerk = downJerk.getNumber();
-    }
-    if (getLowerLimit() && rotations.in(Rotations) == 0) {
-      m_ElevatorMotor1.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-    } else {
-      m_ElevatorMotor1.setControl(
-          m_PositionRequest
-              .withPosition(rotations)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_PositionRequest
-              .withPosition(rotations)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-    }
   }
 
   public void stopMotors() {

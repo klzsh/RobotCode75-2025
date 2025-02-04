@@ -12,11 +12,13 @@ import edu.wpi.first.units.measure.AngularVelocity;
 
 /** Add your docs here. */
 public class EndEffectorConstants {
-  public static final double coralMotorGearRatio = 5.0;
+  public static final double coralMotorGearRatio = 16.0;
   public static final double algaeMotorGearRatio = 25.0;
   public static final double pivotMotorGearRatio = 9.0 * (50.0 / 26.0);
 
-  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(300);
+  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(125);
+  public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(100);
+  public static final Angle coralRotationsAfterIntake = Rotations.of(0.5);
 
   public static final Angle pivotHomePosition = Rotations.of(0);
   public static final Angle pivotGroundIntakePosition = Rotations.of(0);
@@ -26,5 +28,5 @@ public class EndEffectorConstants {
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(500);
   public static final AngularVelocity algaeHoldSpeed = RotationsPerSecond.of(3);
 
-  public static final double coralIntakeDelay = 0.9;
+  public static final double positionDeadband = 0.5;
 }
