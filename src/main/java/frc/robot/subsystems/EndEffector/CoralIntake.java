@@ -7,27 +7,22 @@ package frc.robot.subsystems.EndEffector;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
-import static frc.robot.Constants.HardwareConstants.EndEffector.*;
 import static frc.robot.Constants.EndEffectorConstants.*;
+import static frc.robot.Constants.HardwareConstants.EndEffector.*;
+import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
@@ -42,8 +37,10 @@ public class CoralIntake extends SubsystemBase {
   }
 
   private static CoralStates m_CoralIntakeState;
+
   @Logged(name = "Coral Motor", importance = Importance.DEBUG)
   private TalonFXS m_CoralMotor;
+
   private DigitalInput m_CoralBeamBreak;
   // TODO: add tunable numbers for PID configs, velocity speed
   private Slot0Configs VelocityPIDConfig = new Slot0Configs();
@@ -88,10 +85,7 @@ public class CoralIntake extends SubsystemBase {
 
     m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
 
-    VelocityPIDConfig
-        .withKS(coralVelocityKS)
-        .withKP(coralVelocityKP)
-        .withKD(coralVelocityKD);
+    VelocityPIDConfig.withKS(coralVelocityKS).withKP(coralVelocityKP).withKD(coralVelocityKD);
 
     PositionPIDConfig.withKP(coralPositionKP).withKI(coralPositionKI).withKD(coralPositionKD);
 
@@ -103,30 +97,38 @@ public class CoralIntake extends SubsystemBase {
     coralIntakePositionKd = new TunableNumber("Coral Intake/Position kI", coralPositionKI);
     coralIntakePositionKI = new TunableNumber("Coral Intake/Position kD", coralPositionKD);
 
-    coralScoreVelocity = new TunableNumber("Coral Intake/Score Velocity", coralScoreSpeed.in(RotationsPerSecond));
-    coralIntakeVelocity = new TunableNumber("Coral Intake/Intake Velocity", coralIntakeSpeed.in(RotationsPerSecond));
-    coralPositionToMove = new TunableNumber("Coral Intake/Position To Move", coralRotationsAfterIntake.in(Rotations));
-
+    coralScoreVelocity =
+        new TunableNumber("Coral Intake/Score Velocity", coralScoreSpeed.in(RotationsPerSecond));
+    coralIntakeVelocity =
+        new TunableNumber("Coral Intake/Intake Velocity", coralIntakeSpeed.in(RotationsPerSecond));
+    coralPositionToMove =
+        new TunableNumber("Coral Intake/Position To Move", coralRotationsAfterIntake.in(Rotations));
   }
 
   public void setState(CoralStates state) {
     m_CoralIntakeState = state;
   }
+
   @Logged(name = "Coral State", importance = Importance.CRITICAL)
   public CoralStates getState() {
     return m_CoralIntakeState;
   }
+
   @Logged(name = "Beam Break", importance = Importance.CRITICAL)
   public boolean getBeamBreak() {
     return !m_CoralBeamBreak.get();
   }
-  public void setCoralPosition(Angle angle){
-    m_CoralMotor.setPosition(angle); 
+
+  public void setCoralPosition(Angle angle) {
+    m_CoralMotor.setPosition(angle);
   }
-  
+
   private boolean atPosition() {
-    return Math.abs(m_CoralMotor.getPosition().getValue().in(Rotations) - coralRotationsAfterIntake.in(Rotations)) < positionDeadband;
-   }
+    return Math.abs(
+            m_CoralMotor.getPosition().getValue().in(Rotations)
+                - coralRotationsAfterIntake.in(Rotations))
+        < positionDeadband;
+  }
 
   @Override
   public void periodic() {
@@ -174,13 +176,13 @@ public class CoralIntake extends SubsystemBase {
       }
       case SCORING -> {
         m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreVelocity.getNumber()));
-
       }
       case INTAKING -> {
         m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralIntakeVelocity.getNumber()));
       }
       case POSITIONING -> {
-        m_CoralMotor.setControl(m_PositionRequest.withPosition(coralPositionToMove.getNumber()*coralMotorGearRatio));
+        m_CoralMotor.setControl(
+            m_PositionRequest.withPosition(coralPositionToMove.getNumber() * coralMotorGearRatio));
       }
       case DEFAULT -> {
         m_CoralMotor.setControl(m_CharacterizationRequest.withOutput(0));

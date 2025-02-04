@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.TalonFXS;
-
 import edu.wpi.first.epilogue.CustomLoggerFor;
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged.Importance;

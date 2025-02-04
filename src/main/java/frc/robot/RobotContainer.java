@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
@@ -16,18 +15,18 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.EndEffector.IntakeCoral;
-import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
+import frc.robot.commands.EndEffector.IntakeCoral;
+import frc.robot.commands.EndEffector.ScoreCoral;
+import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -45,10 +44,13 @@ public class RobotContainer {
   // define subsystems first
   private final AprilTagCamera dummy1 = new AprilTagCamera("dummy1", new Transform3d());
   private final AprilTagCamera dummy2 = new AprilTagCamera("dummy2", new Transform3d());
+
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(dummy1, dummy2);
+
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
+
   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
@@ -139,12 +141,8 @@ public class RobotContainer {
     m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
     m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
-    m_Controller
-        .povUp()
-        .whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller
-        .povDown()
-        .whileTrue(new ScoreCoral(m_CoralIntake));
+    m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
+    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
     // m_Controller
     //     .a()
     //     .whileTrue(
