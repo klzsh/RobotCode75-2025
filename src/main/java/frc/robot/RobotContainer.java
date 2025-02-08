@@ -62,6 +62,7 @@ public class RobotContainer {
 
   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
+  @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
   @Logged(name = "Alage Intake")

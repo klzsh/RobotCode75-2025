@@ -420,7 +420,7 @@ public final class HardwareConstants {
       m_ElevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
       m_ElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+      m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
       m_ElevatorMotorConfig.Slot0.StaticFeedforwardSign =
           StaticFeedforwardSignValue.UseVelocitySign;
       m_ElevatorMotorConfig.Slot0.kA = kA; // tune third
@@ -494,7 +494,7 @@ public final class HardwareConstants {
       m_ClimberMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
       m_ClimberMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      m_ClimberMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+      m_ClimberMotorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
       m_ClimberMotorConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
       m_ClimberMotorConfig.Slot0.kA = kA; // tune third
       m_ClimberMotorConfig.Slot0.kG = kG; // tune first
@@ -509,10 +509,10 @@ public final class HardwareConstants {
       m_ClimberMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
           torqueReverseCurrentLimit.in(Amps);
 
-      m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+      m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardLimit.in(Rotations);
-      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
           reverseLimit.in(Rotations);
 
