@@ -6,6 +6,11 @@ package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +26,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+@Logged(strategy = Strategy.OPT_IN)
 public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
@@ -177,6 +183,28 @@ public class AprilTagCamera extends SubsystemBase {
       } else {
         m_pose = null;
       }
+    }
+  }
+  private Pose3d getTagPose(int id){
+    return m_tagLayout.getTagPose(id).get();
+  }
+
+  @Logged(name = "Vision Targets", importance = Importance.INFO)
+  public Pose3d[] getPoses() {
+    List<Pose3d> targets = new ArrayList<>();
+    if(getAllTagIds().isPresent()){
+      for(Integer tag: getAllTagIds().get()) {
+        targets.add(getTagPose(tag));
+      }
+    }
+    return targets.toArray(new Pose3d[targets.size()]);
+  }
+  @Logged(name = "Estimated Pose", importance = Importance.INFO)
+  public Pose2d getVisionPose(){
+    if(m_pose != null){
+      return m_pose.estimatedPose.toPose2d();
+    } else {
+      return null;
     }
   }
 

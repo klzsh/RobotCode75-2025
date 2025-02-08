@@ -75,7 +75,18 @@ public class VisionConstants {
           );
 
   public static final double maxTimeUntilFallbackToOdometry = 1.0;
-  public static final Transform3d CoralCamPose = new Transform3d(new Translation3d(Units.inchesToMeters(0.3505), Units.inchesToMeters(9.325), Units.inchesToMeters(5.85)), new Rotation3d(0,0,0));
-  public static final Transform3d CenterCamPose = new Transform3d(new Translation3d(Units.inchesToMeters(-10.201), Units.inchesToMeters(7.262), Units.inchesToMeters(6.638)), new Rotation3d(0,0,0));
-
+  public static final Transform3d CenterCamPose =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(9.325), // X
+              Units.inchesToMeters(0.3505), // Y
+              Units.inchesToMeters(5.85)), // Z
+          new Rotation3d(0, 0, 0));
+  public static final Transform3d CoralCamPose =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(7.262), // X
+              Units.inchesToMeters(10.201), // Y
+              Units.inchesToMeters(6.638)), // Z
+          new Rotation3d(0, 0, 0));
 }

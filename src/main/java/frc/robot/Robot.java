@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     // DataLogManager.start(); // do not start this when not in comp
     m_robotContainer = new RobotContainer();
-    
 
     Epilogue.configure(
         config -> {

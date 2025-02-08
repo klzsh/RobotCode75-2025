@@ -9,12 +9,12 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AutoAlign extends Command {
+public class VisionAlign extends Command {
   private final Swerve m_Swerve;
   private final AprilTagCamera m_Camera;
   private final int targetId;
 
-  public AutoAlign(Swerve swerve, AprilTagCamera camera, int target) {
+  public VisionAlign(Swerve swerve, AprilTagCamera camera, int target) {
     m_Swerve = swerve;
     m_Camera = camera;
     targetId = target;

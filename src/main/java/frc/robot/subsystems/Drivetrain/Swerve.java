@@ -79,7 +79,6 @@ public class Swerve extends SubsystemBase {
   private final TunableNumber VisionSTDY;
   private final TunableNumber VisionSTDTheta;
 
-
   private final Slot0Configs drivePIDS;
   private final Slot0Configs anglePIDS;
 
@@ -195,10 +194,9 @@ public class Swerve extends SubsystemBase {
    * @param speeds
    */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
-    speeds.omegaRadiansPerSecond = speeds.omegaRadiansPerSecond;
-    speeds = setpointSpeeds;
+    setpointSpeeds = speeds;
     var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
-    setModuleStates(swerveModuleStates, false);
+    // setModuleStates(swerveModuleStates, false);
   }
 
   /**
@@ -402,9 +400,15 @@ public class Swerve extends SubsystemBase {
         || VisionSTDY.getNumber() != visionMatrix.get(1, 0)
         || VisionSTDTheta.getNumber() != visionMatrix.get(2, 0)) {
 
-          tempMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), VisionSTDX.getNumber(), VisionSTDY.getNumber(), VisionSTDTheta.getNumber());
-          swerveOdometry.setVisionMeasurementStdDevs(tempMatrix);
-        }
+      tempMatrix =
+          MatBuilder.fill(
+              Nat.N3(),
+              Nat.N1(),
+              VisionSTDX.getNumber(),
+              VisionSTDY.getNumber(),
+              VisionSTDTheta.getNumber());
+      swerveOdometry.setVisionMeasurementStdDevs(tempMatrix);
+    }
 
     if (angleKP.getNumber() != anglePIDS.kP || angleKD.getNumber() != anglePIDS.kD) {
 
