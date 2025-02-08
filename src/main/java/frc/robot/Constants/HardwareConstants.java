@@ -420,7 +420,7 @@ public final class HardwareConstants {
       m_ElevatorMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
       m_ElevatorMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-      m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+      m_ElevatorMotorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
       m_ElevatorMotorConfig.Slot0.StaticFeedforwardSign =
           StaticFeedforwardSignValue.UseVelocitySign;
       m_ElevatorMotorConfig.Slot0.kA = kA; // tune third

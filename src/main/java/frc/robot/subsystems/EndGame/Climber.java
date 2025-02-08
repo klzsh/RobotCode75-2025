@@ -12,6 +12,7 @@ import static frc.robot.Constants.HardwareConstants.Climber.*;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -54,6 +55,7 @@ public class Climber extends SubsystemBase {
 
   private final MotionMagicExpoTorqueCurrentFOC m_PositionRequest;
 
+  private final TorqueCurrentFOC m_TestRequest;
   private final DigitalInput m_LimitSwitch;
 
   public Climber() {
@@ -65,6 +67,7 @@ public class Climber extends SubsystemBase {
     climberMMKa = new TunableNumber("Climber/MM kA", MMkA);
 
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
+    m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
 
     PIDConfig.withKA(kA)
         .withKS(kS)
@@ -118,6 +121,10 @@ public class Climber extends SubsystemBase {
   @Logged(name = "Climber Limit", importance = Importance.DEBUG)
   public boolean getLimitSwitch() {
     return !m_LimitSwitch.get();
+  }
+  public void runPosition(double current){
+    m_ClimberMotor1.setControl(m_TestRequest.withOutput(current));
+    m_ClimberMotor2.setControl(m_TestRequest.withOutput(current));
   }
 
   @Override
