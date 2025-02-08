@@ -25,7 +25,7 @@ public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
   private AprilTagFieldLayout m_tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   private PhotonPoseEstimator m_poseEstimator;
   private EstimatedRobotPose m_pose;
 

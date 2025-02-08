@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -42,11 +43,11 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  private final AprilTagCamera dummy1 = new AprilTagCamera("dummy1", new Transform3d());
-  private final AprilTagCamera dummy2 = new AprilTagCamera("dummy2", new Transform3d());
+  private final AprilTagCamera CoralCam = new AprilTagCamera("Center_Cam", VisionConstants.CenterCamPose);
+  private final AprilTagCamera CenterCam = new AprilTagCamera("Coral_Cam", VisionConstants.CoralCamPose);
 
   @Logged(name = "Swerve")
-  private final Swerve m_Swerve = new Swerve(dummy1, dummy2);
+  private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
 
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();

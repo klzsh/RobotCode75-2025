@@ -73,7 +73,7 @@ public final class HardwareConstants {
      * etc
      */
     public static final Time openLoopRamp = Seconds.of(0.25);
-    public static final Time closedLoopRamp = Seconds.of(0.25);
+    public static final Time closedLoopRamp = Seconds.of(0.5);
     // TODO: tune
     public static final double angleTorqueKP = 50.0;
     public static final double angleTorqueKI = 0.0;

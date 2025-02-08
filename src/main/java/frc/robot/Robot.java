@@ -11,6 +11,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     // DataLogManager.start(); // do not start this when not in comp
     m_robotContainer = new RobotContainer();
+    
 
     Epilogue.configure(
         config -> {
@@ -71,6 +73,7 @@ public class Robot extends TimedRobot {
           config.minimumImportance = Importance.DEBUG;
         });
     Epilogue.bind(this);
+    PortForwarder.add(5800, "photon-frontcams.local", 5800);
   }
 
   /**

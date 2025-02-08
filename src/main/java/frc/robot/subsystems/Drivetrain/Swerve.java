@@ -13,6 +13,9 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +25,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
@@ -70,6 +75,11 @@ public class Swerve extends SubsystemBase {
   private final TunableNumber angleKP;
   private final TunableNumber angleKD;
 
+  private final TunableNumber VisionSTDX;
+  private final TunableNumber VisionSTDY;
+  private final TunableNumber VisionSTDTheta;
+
+
   private final Slot0Configs drivePIDS;
   private final Slot0Configs anglePIDS;
 
@@ -80,6 +90,8 @@ public class Swerve extends SubsystemBase {
 
   private final AprilTagCamera m_CenterCamera;
   private final AprilTagCamera m_ModuleCamera;
+
+  private Matrix<N3, N1> tempMatrix;
 
   // do this later
   // private final TunableNumber translationKP;
@@ -140,6 +152,11 @@ public class Swerve extends SubsystemBase {
 
     angleKP = new TunableNumber("Swerve/AngleMotor/kP", angleTorqueKP);
     angleKD = new TunableNumber("Swerve/AngleMotor/kD", angleTorqueKD);
+
+    VisionSTDX = new TunableNumber("Vision/STD Dev X", visionMatrix.get(0, 0));
+    VisionSTDY = new TunableNumber("Vision/STD Dev Y", visionMatrix.get(1, 0));
+    VisionSTDTheta = new TunableNumber("Vision/STD Dev Theta", visionMatrix.get(2, 0));
+    tempMatrix = visionMatrix;
 
     drivePIDS =
         new Slot0Configs()
@@ -329,7 +346,6 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     if (m_CenterCamera.getEstimatedPose() != null) {
       swerveOdometry.addVisionMeasurement(
           m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
@@ -354,6 +370,8 @@ public class Swerve extends SubsystemBase {
               > .5) {
         setPoseByVision(m_CenterCamera);
       }
+    }
+    if (m_ModuleCamera.getEstimatedPose() != null) {
       if (Math.abs(
                   m_ModuleCamera.getEstimatedPose().estimatedPose.getX()
                       - swerveOdometry.getEstimatedPosition().getX())
@@ -365,7 +383,6 @@ public class Swerve extends SubsystemBase {
         setPoseByVision(m_ModuleCamera);
       }
     }
-
     if (driveKP.getNumber() != drivePIDS.kP
         || driveKI.getNumber() != drivePIDS.kI
         || driveKD.getNumber() != drivePIDS.kD
@@ -380,6 +397,14 @@ public class Swerve extends SubsystemBase {
         mod.setDrivePIDS(drivePIDS);
       }
     }
+
+    if (VisionSTDX.getNumber() != visionMatrix.get(0, 0)
+        || VisionSTDY.getNumber() != visionMatrix.get(1, 0)
+        || VisionSTDTheta.getNumber() != visionMatrix.get(2, 0)) {
+
+          tempMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), VisionSTDX.getNumber(), VisionSTDY.getNumber(), VisionSTDTheta.getNumber());
+          swerveOdometry.setVisionMeasurementStdDevs(tempMatrix);
+        }
 
     if (angleKP.getNumber() != anglePIDS.kP || angleKD.getNumber() != anglePIDS.kD) {
 

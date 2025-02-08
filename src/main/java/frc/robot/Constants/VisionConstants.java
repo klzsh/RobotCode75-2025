@@ -5,9 +5,13 @@ import static java.util.Map.entry;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 // import frc.robot.subsystems.Drivetrain.VisionController;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
@@ -70,5 +74,8 @@ public class VisionConstants {
           // TODO: Auto field flipping for blue side (or red side ig)
           );
 
-  public static double maxTimeUntilFallbackToOdometry = 1.0;
+  public static final double maxTimeUntilFallbackToOdometry = 1.0;
+  public static final Transform3d CoralCamPose = new Transform3d(new Translation3d(Units.inchesToMeters(0.3505), Units.inchesToMeters(9.325), Units.inchesToMeters(5.85)), new Rotation3d(0,0,0));
+  public static final Transform3d CenterCamPose = new Transform3d(new Translation3d(Units.inchesToMeters(-10.201), Units.inchesToMeters(7.262), Units.inchesToMeters(6.638)), new Rotation3d(0,0,0));
+
 }
