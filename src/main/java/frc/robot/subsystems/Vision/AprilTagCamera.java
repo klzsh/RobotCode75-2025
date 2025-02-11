@@ -12,8 +12,13 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +28,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -45,7 +51,6 @@ public class AprilTagCamera extends SubsystemBase {
 
   public boolean hasTarget() {
     List<PhotonTrackedTarget> targets = m_result.getTargets();
-
     return (!targets.isEmpty());
   }
 
@@ -109,19 +114,19 @@ public class AprilTagCamera extends SubsystemBase {
     return Optional.empty();
   }
 
-  // public OptionalDouble getRange(int id) {
-  //   PhotonTrackedTarget target = getTarget(id);
-  //   if (target == null) {
-  //     return OptionalDouble.empty();
-  //   }
-  //   double targetHeight = getAprilTagHeight(id);
-  //   return OptionalDouble.of(
-  //       PhotonUtils.calculateDistanceToTargetMeters(
-  //           kCameraHeight,
-  //           targetHeight,
-  //           kCameraPitch,
-  //           Units.degreesToRadians(target.getPitch())));
-  // }
+  public OptionalDouble getRange(int id, Distance cameraHeight) {
+    PhotonTrackedTarget target = getTarget(id).isPresent() ? getTarget(id).get() : null;
+    if (target == null) {
+      return OptionalDouble.empty();
+    }
+    double targetHeight = getAprilTagHeight(id);
+    return OptionalDouble.of(
+        PhotonUtils.calculateDistanceToTargetMeters(
+            cameraHeight.in(Meters),
+            targetHeight,
+            0,
+            Units.degreesToRadians(target.getPitch())));
+  }
 
   public OptionalDouble getX(int id) {
     if (getTarget(id).isEmpty()) {
@@ -173,6 +178,7 @@ public class AprilTagCamera extends SubsystemBase {
       List<PhotonPipelineResult> m_unreadResults;
       m_unreadResults = m_camera.getAllUnreadResults();
       if (!m_unreadResults.isEmpty()) {
+        // gets the latest unread result
         m_result = m_unreadResults.get(m_unreadResults.size() - 1);
         pose = m_poseEstimator.update(m_result);
       } else { // Latest result is a duplicate
@@ -185,23 +191,31 @@ public class AprilTagCamera extends SubsystemBase {
       }
     }
   }
-  private Pose3d getTagPose(int id){
+
+  private Pose3d getTagPose(int id) {
     return m_tagLayout.getTagPose(id).get();
   }
-
-  @Logged(name = "Vision Targets", importance = Importance.INFO)
-  public Pose3d[] getPoses() {
+  /**
+   * Gets the 3d pose of the april tags that the camera sees. Used mainly for AdvantageScope Visualization
+   * @return poses of seen april tags
+   */
+  @Logged(name = "Seen Tag Poses", importance = Importance.DEBUG)
+  public Pose3d[] getSeenTags() {
     List<Pose3d> targets = new ArrayList<>();
-    if(getAllTagIds().isPresent()){
-      for(Integer tag: getAllTagIds().get()) {
+    if (getAllTagIds().isPresent()) {
+      for (Integer tag : getAllTagIds().get()) {
         targets.add(getTagPose(tag));
       }
     }
     return targets.toArray(new Pose3d[targets.size()]);
   }
-  @Logged(name = "Estimated Pose", importance = Importance.INFO)
-  public Pose2d getVisionPose(){
-    if(m_pose != null){
+  /**
+   * gets the estimated robot pose from the camera
+   * @return
+   */
+  @Logged(name = "Camera Estimated Pose", importance = Importance.DEBUG)
+  public Pose2d getVisionPose() {
+    if (m_pose != null) {
       return m_pose.estimatedPose.toPose2d();
     } else {
       return null;
