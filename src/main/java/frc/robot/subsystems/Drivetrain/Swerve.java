@@ -67,18 +67,7 @@ public class Swerve extends SubsystemBase {
   @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
-  private final TunableNumber driveKP;
-  private final TunableNumber driveKI;
-  private final TunableNumber driveKD;
-  private final TunableNumber driveKS;
-
-  private final TunableNumber angleKP;
-  private final TunableNumber angleKD;
-
-  private final TunableNumber VisionSTDX;
-  private final TunableNumber VisionSTDY;
-  private final TunableNumber VisionSTDTheta;
-
+ 
   private final Slot0Configs drivePIDS;
   private final Slot0Configs anglePIDS;
 
@@ -101,8 +90,6 @@ public class Swerve extends SubsystemBase {
   // private final TunableNumber rotationKI;
   // private final TunableNumber rotationKD;
 
-  // @Logged(name = "PDH", importance = Importance.DEBUG)
-  // private final PowerDistribution m_PDH;
 
   // gryo
   private Pigeon2 m_gyro;
@@ -112,7 +99,6 @@ public class Swerve extends SubsystemBase {
 
     m_ModuleCamera = moduleCamera;
     m_CenterCamera = centerCamera;
-    // m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized
@@ -144,17 +130,7 @@ public class Swerve extends SubsystemBase {
             moduleMatrix,
             visionMatrix);
     // init tunable numbers
-    driveKP = new TunableNumber("Swerve/DriveMotor/kP", driveTorqueKP);
-    driveKI = new TunableNumber("Swerve/DriveMotor/kI", driveTorqueKI);
-    driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
-    driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
-
-    angleKP = new TunableNumber("Swerve/AngleMotor/kP", angleTorqueKP);
-    angleKD = new TunableNumber("Swerve/AngleMotor/kD", angleTorqueKD);
-
-    VisionSTDX = new TunableNumber("Vision/STD Dev X", visionMatrix.get(0, 0));
-    VisionSTDY = new TunableNumber("Vision/STD Dev Y", visionMatrix.get(1, 0));
-    VisionSTDTheta = new TunableNumber("Vision/STD Dev Theta", visionMatrix.get(2, 0));
+   
     tempMatrix = visionMatrix;
 
     drivePIDS =
@@ -379,43 +355,6 @@ public class Swerve extends SubsystemBase {
                       - swerveOdometry.getEstimatedPosition().getY())
               > .5) {
         setPoseByVision(m_ModuleCamera);
-      }
-    }
-    if (driveKP.getNumber() != drivePIDS.kP
-        || driveKI.getNumber() != drivePIDS.kI
-        || driveKD.getNumber() != drivePIDS.kD
-        || driveKS.getNumber() != drivePIDS.kS) {
-
-      drivePIDS.kP = driveKP.getNumber();
-      drivePIDS.kI = driveKI.getNumber();
-      drivePIDS.kD = driveKI.getNumber();
-      drivePIDS.kS = driveKD.getNumber();
-
-      for (TalonFXSwerveModule mod : m_SwerveModules) {
-        mod.setDrivePIDS(drivePIDS);
-      }
-    }
-
-    if (VisionSTDX.getNumber() != visionMatrix.get(0, 0)
-        || VisionSTDY.getNumber() != visionMatrix.get(1, 0)
-        || VisionSTDTheta.getNumber() != visionMatrix.get(2, 0)) {
-
-      tempMatrix =
-          MatBuilder.fill(
-              Nat.N3(),
-              Nat.N1(),
-              VisionSTDX.getNumber(),
-              VisionSTDY.getNumber(),
-              VisionSTDTheta.getNumber());
-      swerveOdometry.setVisionMeasurementStdDevs(tempMatrix);
-    }
-
-    if (angleKP.getNumber() != anglePIDS.kP || angleKD.getNumber() != anglePIDS.kD) {
-
-      anglePIDS.kP = angleKP.getNumber();
-      anglePIDS.kS = angleKD.getNumber();
-      for (TalonFXSwerveModule mod : m_SwerveModules) {
-        mod.setAnglePIDS(anglePIDS);
       }
     }
   }

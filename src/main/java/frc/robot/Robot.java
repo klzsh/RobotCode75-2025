@@ -10,8 +10,11 @@ import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -35,7 +38,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    // DataLogManager.start(); // do not start this when not in comp
+    DataLogManager.start(); // do not start this when not in comp
     m_robotContainer = new RobotContainer();
 
     Epilogue.configure(
@@ -63,13 +66,14 @@ public class Robot extends TimedRobot {
           //   config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
           //   DataLogManager.stop();
           // ! FMS ATTACHED
-          //   // only disk log during comp
-          //   // do not log joysticks
-          //   config.minimumImportance = Logged.Importance.CRITICAL;
-          //   DriverStation.startDataLog(DataLogManager.getLog(), false);
-          //   config.backend = new FileBackend(DataLogManager.getLog());
-          // }
-          config.minimumImportance = Importance.DEBUG;
+            // only disk log during comp
+            // do not log joysticks
+            config.minimumImportance = Importance.CRITICAL;
+            DriverStation.startDataLog(DataLogManager.getLog(), false);
+            config.backend = new FileBackend(DataLogManager.getLog());
+
+            // only for warehouse debugging
+          // config.minimumImportance = Importance.DEBUG;
         });
     Epilogue.bind(this);
     PortForwarder.add(5800, "photon-frontcams.local", 5800);

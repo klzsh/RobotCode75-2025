@@ -23,7 +23,6 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
 public class CoralIntake extends SubsystemBase {
@@ -45,17 +44,6 @@ public class CoralIntake extends SubsystemBase {
   // TODO: add tunable numbers for PID configs, velocity speed
   private Slot0Configs VelocityPIDConfig = new Slot0Configs();
   private Slot1Configs PositionPIDConfig = new Slot1Configs();
-  private final TunableNumber coralIntakeVelocityKp;
-  private final TunableNumber coralIntakeVelocityKd;
-  private final TunableNumber coralIntakeVelocityKs;
-
-  private final TunableNumber coralIntakePositionKp;
-  private final TunableNumber coralIntakePositionKI;
-  private final TunableNumber coralIntakePositionKd;
-
-  private final TunableNumber coralScoreVelocity;
-  private final TunableNumber coralIntakeVelocity;
-  private final TunableNumber coralPositionToMove;
 
   private final VoltageOut m_CharacterizationRequest;
   private final VelocityVoltage m_VelocityRequest;
@@ -89,20 +77,6 @@ public class CoralIntake extends SubsystemBase {
 
     PositionPIDConfig.withKP(coralPositionKP).withKI(coralPositionKI).withKD(coralPositionKD);
 
-    coralIntakeVelocityKp = new TunableNumber("Coral Intake/Velocity kP", coralVelocityKP);
-    coralIntakeVelocityKd = new TunableNumber("Coral Intake/Velocity kD", coralVelocityKD);
-    coralIntakeVelocityKs = new TunableNumber("Coral Intake/Velocity kS", coralVelocityKS);
-
-    coralIntakePositionKp = new TunableNumber("Coral Intake/Position kP", coralPositionKP);
-    coralIntakePositionKd = new TunableNumber("Coral Intake/Position kI", coralPositionKI);
-    coralIntakePositionKI = new TunableNumber("Coral Intake/Position kD", coralPositionKD);
-
-    coralScoreVelocity =
-        new TunableNumber("Coral Intake/Score Velocity", coralScoreSpeed.in(RotationsPerSecond));
-    coralIntakeVelocity =
-        new TunableNumber("Coral Intake/Intake Velocity", coralIntakeSpeed.in(RotationsPerSecond));
-    coralPositionToMove =
-        new TunableNumber("Coral Intake/Position To Move", coralRotationsAfterIntake.in(Rotations));
   }
 
   public void setState(CoralStates state) {
@@ -133,25 +107,6 @@ public class CoralIntake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (coralIntakeVelocityKp.getNumber() != VelocityPIDConfig.kP
-        || coralIntakeVelocityKd.getNumber() != VelocityPIDConfig.kD
-        || coralIntakeVelocityKs.getNumber() != VelocityPIDConfig.kS) {
-      VelocityPIDConfig.kP = coralIntakeVelocityKp.getNumber();
-      VelocityPIDConfig.kD = coralIntakeVelocityKd.getNumber();
-      VelocityPIDConfig.kS = coralIntakeVelocityKs.getNumber();
-
-      m_CoralMotor.getConfigurator().apply(VelocityPIDConfig);
-    }
-
-    if (coralIntakePositionKp.getNumber() != PositionPIDConfig.kP
-        || coralIntakePositionKd.getNumber() != PositionPIDConfig.kD
-        || coralIntakePositionKI.getNumber() != PositionPIDConfig.kI) {
-      PositionPIDConfig.kP = coralIntakePositionKp.getNumber();
-      PositionPIDConfig.kD = coralIntakePositionKd.getNumber();
-      PositionPIDConfig.kI = coralIntakePositionKI.getNumber();
-
-      m_CoralMotor.getConfigurator().apply(PositionPIDConfig);
-    }
 
     if (getBeamBreak() && m_CoralIntakeState == CoralStates.INTAKING) {
       m_CoralIntakeState = CoralStates.POSITIONING;
@@ -176,16 +131,16 @@ public class CoralIntake extends SubsystemBase {
       }
       case SCORING -> {
         m_CoralMotor.setControl(
-            m_VelocityRequest.withVelocity(coralScoreVelocity.getNumber()).withSlot(0));
+            m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
       }
       case INTAKING -> {
         m_CoralMotor.setControl(
-            m_VelocityRequest.withVelocity(coralIntakeVelocity.getNumber()).withSlot(0));
+            m_VelocityRequest.withVelocity(coralIntakeSpeed).withSlot(0));
       }
       case POSITIONING -> {
         m_CoralMotor.setControl(
             m_PositionRequest
-                .withPosition(coralPositionToMove.getNumber() * coralMotorGearRatio)
+                .withPosition(coralRotationsAfterIntake.in(Rotations) * coralMotorGearRatio)
                 .withSlot(1));
       }
       case DEFAULT -> {
