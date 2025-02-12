@@ -315,7 +315,7 @@ public final class HardwareConstants {
     public static TalonFXConfiguration getPivotConfiguration() {
 
       m_PivotConfig.MotorOutput.Inverted = algaeMotorInvert;
-      m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+      m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
       /* Current Limiting */
       m_PivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
