@@ -6,7 +6,13 @@ package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
@@ -18,18 +24,23 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
+import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+@Logged(strategy = Strategy.OPT_IN)
 public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
   private AprilTagFieldLayout m_tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   private PhotonPoseEstimator m_poseEstimator;
   private EstimatedRobotPose m_pose;
+  private Transform3d cameraToRobotPose;
 
   public AprilTagCamera(String name, Transform3d cameraPose) {
+    cameraToRobotPose = cameraPose;
     m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
     m_poseEstimator =
@@ -39,15 +50,20 @@ public class AprilTagCamera extends SubsystemBase {
 
   public boolean hasTarget() {
     List<PhotonTrackedTarget> targets = m_result.getTargets();
-
     return (!targets.isEmpty());
   }
 
+  /** number of targets the camera sees */
   public int numTargets() {
     List<PhotonTrackedTarget> targets = m_result.getTargets();
     return targets.size();
   }
 
+  /**
+   * get the targeted april tag
+   *
+   * @return ID of the targeted tag
+   */
   public OptionalInt getPrimaryTagID() {
     List<PhotonTrackedTarget> targets = m_result.getTargets();
     if (m_result.hasTargets()) {
@@ -57,7 +73,11 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  // TODO: null check for tag ids
+  /**
+   * returns tag Ids of all tags seen
+   *
+   * @return
+   */
   public Optional<List<Integer>> getAllTagIds() {
     List<PhotonTrackedTarget> targets = m_result.getTargets();
     ArrayList<Integer> ids = new ArrayList<Integer>();
@@ -72,27 +92,27 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
+  // height in meters of the chosen tag
   public double getAprilTagHeight(int id) {
     return m_tagLayout.getTagPose(id).get().getY();
   }
 
-  // public Optional<Pose2d> getMultiTagResult() {  // This doesn't work in 2025 ig
-  //   Optional<MultiTargetPNPResult> target = m_result.getMultiTagResult();
-  //   if (target.estimatedPose.isPresent) {
-  //     return Optional.of(
-  //         new Pose2d(
-  //             target.estimatedPose.best.getTranslation().toTranslation2d(),
-  //             target.estimatedPose.best.getRotation().toRotation2d()));
-  //   } else {
-  //     return Optional.empty();
-  //   }
-  // }
+  public Optional<Pose2d> getMultiTagResult() {
+    Optional<MultiTargetPNPResult> target = m_result.getMultiTagResult();
+    if (target.isPresent()) {
+      return Optional.of(
+          new Pose2d(
+              target.get().estimatedPose.best.getTranslation().toTranslation2d(),
+              target.get().estimatedPose.best.getRotation().toRotation2d()));
+    } else {
+      return Optional.empty();
+    }
+  }
 
   public PoseStrategy getStrategy() {
     return m_poseEstimator.getPrimaryStrategy();
   }
 
-  // todo: null check on getting target
   public Optional<PhotonTrackedTarget> getTarget(int id) {
     List<PhotonTrackedTarget> targets = m_result.getTargets();
     for (PhotonTrackedTarget target : targets) {
@@ -103,19 +123,16 @@ public class AprilTagCamera extends SubsystemBase {
     return Optional.empty();
   }
 
-  // public OptionalDouble getRange(int id) {
-  //   PhotonTrackedTarget target = getTarget(id);
-  //   if (target == null) {
-  //     return OptionalDouble.empty();
-  //   }
-  //   double targetHeight = getAprilTagHeight(id);
-  //   return OptionalDouble.of(
-  //       PhotonUtils.calculateDistanceToTargetMeters(
-  //           kCameraHeight,
-  //           targetHeight,
-  //           kCameraPitch,
-  //           Units.degreesToRadians(target.getPitch())));
-  // }
+  public OptionalDouble getRange(int id) {
+    PhotonTrackedTarget target = getTarget(id).isPresent() ? getTarget(id).get() : null;
+    if (target == null) {
+      return OptionalDouble.empty();
+    }
+    double targetHeight = getAprilTagHeight(id);
+    return OptionalDouble.of(
+        PhotonUtils.calculateDistanceToTargetMeters(
+            cameraToRobotPose.getZ(), targetHeight, 0, Units.degreesToRadians(target.getPitch())));
+  }
 
   public OptionalDouble getX(int id) {
     if (getTarget(id).isEmpty()) {
@@ -157,6 +174,11 @@ public class AprilTagCamera extends SubsystemBase {
     return m_pose;
   }
 
+  /**
+   * time the frame was taken
+   *
+   * @return timestamp in seconds
+   */
   public double getTimestamp() {
     return m_result.getTimestampSeconds();
   }
@@ -167,6 +189,7 @@ public class AprilTagCamera extends SubsystemBase {
       List<PhotonPipelineResult> m_unreadResults;
       m_unreadResults = m_camera.getAllUnreadResults();
       if (!m_unreadResults.isEmpty()) {
+        // gets the latest unread result
         m_result = m_unreadResults.get(m_unreadResults.size() - 1);
         pose = m_poseEstimator.update(m_result);
       } else { // Latest result is a duplicate
@@ -177,6 +200,41 @@ public class AprilTagCamera extends SubsystemBase {
       } else {
         m_pose = null;
       }
+    }
+  }
+
+  private Pose3d getTagPose(int id) {
+    return m_tagLayout.getTagPose(id).get();
+  }
+
+  /**
+   * Gets the 3d pose of the april tags that the camera sees. Used mainly for AdvantageScope
+   * Visualization
+   *
+   * @return poses of seen april tags
+   */
+  @Logged(name = "Seen Tag Poses", importance = Importance.DEBUG)
+  public Pose3d[] getSeenTags() {
+    List<Pose3d> targets = new ArrayList<>();
+    if (getAllTagIds().isPresent()) {
+      for (Integer tag : getAllTagIds().get()) {
+        targets.add(getTagPose(tag));
+      }
+    }
+    return targets.toArray(new Pose3d[targets.size()]);
+  }
+
+  /**
+   * gets the estimated robot pose from the camera
+   *
+   * @return
+   */
+  @Logged(name = "Camera Estimated Pose", importance = Importance.DEBUG)
+  public Pose2d getVisionPose() {
+    if (m_pose != null) {
+      return m_pose.estimatedPose.toPose2d();
+    } else {
+      return null;
     }
   }
 

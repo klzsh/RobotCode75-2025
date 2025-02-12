@@ -5,7 +5,6 @@
 package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.AutoAlignController;
@@ -25,7 +24,7 @@ public class DriveToPose extends Command {
     holdPose = hold;
     m_controller = new AutoAlignController(m_swerve);
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_swerve);
+    // addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.
@@ -35,12 +34,9 @@ public class DriveToPose extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
     ChassisSpeeds speeds = m_controller.update(m_swerve.getPose(), targetPose);
-    m_swerve.drive(
-        new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond),
-        speeds.omegaRadiansPerSecond,
-        false,
-        false);
+    m_swerve.setChassisSpeeds(speeds);
   }
 
   // Called once the command ends or is interrupted.
