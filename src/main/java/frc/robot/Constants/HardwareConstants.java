@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Frequency;
@@ -172,6 +173,10 @@ public final class HardwareConstants {
     public static final int algaeMotorCanID = 0;
     public static final int pivotCanID = 0;
     public static final int coralBeamBreakDIO = 2;
+    public static final int algaePivotEncoderPort = 0;
+
+    public static final Rotation2d algaePivotZeroPoint = Rotation2d.fromDegrees(0);
+    public static final Angle algaeEncoderOffset = Rotations.of(0);
 
     /* Neutral modes / inverts */
     public static final InvertedValue coralMotorInvert = InvertedValue.CounterClockwise_Positive;
@@ -307,7 +312,7 @@ public final class HardwareConstants {
       return m_AlgaeMotorConfig;
     }
 
-    public static TalonFXConfiguration getpivotConfiguration() {
+    public static TalonFXConfiguration getPivotConfiguration() {
 
       m_PivotConfig.MotorOutput.Inverted = algaeMotorInvert;
       m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -331,6 +336,9 @@ public final class HardwareConstants {
       m_PivotConfig.Slot0.kD = pivotKD;
 
       m_PivotConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
+
+      m_PivotConfig.ClosedLoopGeneral.ContinuousWrap = true;
+      m_PivotConfig.Feedback.RotorToSensorRatio = 25.0 / 1.0; // constants?
 
       return m_PivotConfig;
     }

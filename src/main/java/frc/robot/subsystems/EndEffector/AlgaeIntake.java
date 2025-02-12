@@ -18,6 +18,12 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 
@@ -33,6 +39,7 @@ public class AlgaeIntake extends SubsystemBase {
     RETRACTED,
     GROUNDINTAKE,
     DEAGLAEFY,
+    HOMING,
     NONE
   }
 
@@ -54,11 +61,15 @@ public class AlgaeIntake extends SubsystemBase {
   private final TunableNumber algaePivotKs;
   private final TunableNumber algaePivotKg;
 
+  public final TunableNumber absoluteEncoderOffset;
+
   private final VelocityTorqueCurrentFOC algaeRequest =
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
   private final PositionTorqueCurrentFOC pivotRequest =
       new PositionTorqueCurrentFOC(Rotations.of(0));
+
+  private final DutyCycleEncoder m_absoluteEncoder;
 
   /** Creates a new AlgaeIntake. */
   public AlgaeIntake() {
@@ -67,7 +78,7 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeIntakeState = AlgaeStates.NONE;
 
     m_AlgaePivot = new TalonFX(pivotCanID);
-    m_AlgaePivot.getConfigurator().apply(getpivotConfiguration());
+    m_AlgaePivot.getConfigurator().apply(getPivotConfiguration());
     m_PivotState = PivotState.NONE;
 
     algaeRequest.UpdateFreqHz = 0;
@@ -92,6 +103,8 @@ public class AlgaeIntake extends SubsystemBase {
     algaeIntakeKg = new TunableNumber("Algae Intake/kG", kG);
     algaeIntakeKs = new TunableNumber("Algae Intake/kS", kS);
 
+    absoluteEncoderOffset = new TunableNumber("Algae Encoder/Offset", algaeEncoderOffset.in(Rotations));
+
     PivotPIDConfig.withKA(kA)
         .withKS(kS)
         .withKV(kV)
@@ -104,6 +117,8 @@ public class AlgaeIntake extends SubsystemBase {
     algaePivotKd = new TunableNumber("Algae Pivot/kD", kD);
     algaePivotKg = new TunableNumber("Algae Pivot/kG", kG);
     algaePivotKs = new TunableNumber("Algae Pivot/kS", kS);
+
+    m_absoluteEncoder = new DutyCycleEncoder(algaePivotEncoderPort, 360.0, algaePivotZeroPoint.getRotations());
   }
 
   public void setAlgaeState(AlgaeStates state) {
@@ -124,6 +139,41 @@ public class AlgaeIntake extends SubsystemBase {
 
   public PivotState getPivotState() {
     return m_PivotState;
+  }
+
+  public void homePivotToAbsoluteEncoder() {
+    double absoluteRotations = m_absoluteEncoder.get();
+    double offset = absoluteEncoderOffset.getNumber();
+    double relativeRotationsAxleCandidate1 = offset - absoluteRotations;
+    double relativeRotationsAxleCandidate2 = offset - (absoluteRotations + 1);
+    double relativeRotationsAxleCandidate3 = offset - (absoluteRotations - 1);
+
+    double relativeRotationsAxle = Math.min(
+        Math.abs(relativeRotationsAxleCandidate1),
+        Math.min(
+            Math.abs(relativeRotationsAxleCandidate2),
+            Math.abs(relativeRotationsAxleCandidate3)
+        )
+    );
+
+    double relativeRotationsMotor = relativeRotationsAxle * pivotMotorGearRatio;
+
+    // find rotations from current relative position to home
+    double totalRotations = m_AlgaePivot.getPosition().getValue().in(Rotations) - relativeRotationsMotor;
+
+    m_AlgaePivot.setControl(pivotRequest.withPosition(Rotations.of(totalRotations)));
+  }
+
+  public boolean isAtPositionAbsolute(double absolutePosition) {
+    return Math.abs(absolutePosition - m_absoluteEncoder.get()) < algaePivotDeadband;
+  }
+
+//  public boolean isAtPosition(PivotState state) {
+//
+//  }
+
+  public void resetPivotMotor(Angle rotations) {
+    m_AlgaePivot.setPosition(rotations);
   }
 
   @Override
@@ -173,8 +223,9 @@ public class AlgaeIntake extends SubsystemBase {
         // set a NONE state for when there is no algae and we are not intaking anything
         m_AlgaeMotor.setControl(currentOut.withOutput(Amps.of(0)));
       }
-        // no default case because all states are accounted for
+      // no default case because all states are accounted for
     }
+
     switch (m_PivotState) {
       case RETRACTED -> {
         m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
@@ -189,8 +240,7 @@ public class AlgaeIntake extends SubsystemBase {
         // just keep the pivot retracted if there is no state
         m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
       }
-        // no default case because all states are accounted for
-
+      // no default case because all states are accounted for
     }
   }
 }

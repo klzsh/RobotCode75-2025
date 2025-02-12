@@ -127,7 +127,7 @@ public class CoralIntake extends SubsystemBase {
     return Math.abs(
             m_CoralMotor.getPosition().getValue().in(Rotations)
                 - coralRotationsAfterIntake.in(Rotations))
-        < positionDeadband;
+        < coralPositionDeadband;
   }
 
   @Override

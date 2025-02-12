@@ -1,5 +1,6 @@
 package frc.robot.commands.EndEffector;
 
+import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 
@@ -19,19 +20,17 @@ public class ResetAlgaePosition extends Command {
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
-    public void execute() {
-        m_Elevator.setPosition(m_Position, m_IsAlgae);
-    }
+    public void execute() {}
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        
+        m_algaeIntake.resetPivotMotor(Rotations.of(0));
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return m_Elevator.isAtPosition(m_Position, m_IsAlgae);
+        return m_algaeIntake.isAtPositionAbsolute(m_algaeIntake.absoluteEncoderOffset.getNumber());
     }
 }
