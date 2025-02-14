@@ -1,6 +1,199 @@
 <head>
-    <script src="autos.ts"></script>
-</head>>
+    <script>
+        class Pose {
+            constructor(x, y, heading, name) {
+                this.x = x;
+                this.y = y;
+                this.heading = heading;
+                this.name = name;
+            }
+        }
+        
+        const points = [
+            'st', // Start Top
+            'sm', // Start Middle
+            'sb', // Start Bottom
+            'rtr', // Reef Top Right
+            'rr', // Reef Right
+            'rbr', // Reef Buttom Right
+            'rtl', // Reef Top left
+            'rl', // Reef Left
+            'rbl', // Reef Bottom left
+            'p', // Processor
+            'ht', // Human Player Station Top
+            'hb' // Human Player Station Bottom
+        ]
+        
+        const actions = [
+            'l1', // Level 1
+            'l4l', // Level 4 Left
+            'l4r', // Level 4 Right
+            'dealgify', // De-Algify
+            'processor', // Processor
+            'hpl', // Human Player Station Left
+            'hpm',
+            'hpr'
+        ]
+        
+        const headings = {
+            'st': 180,
+            'sm': 180,
+            'sb': 180,
+            'rtr': 240,
+            'rr': 180,
+            'rbr': 120,
+            'rbl': 60,
+            'rl': 0,
+            'rtl': 300,
+            'p': 270,
+            'ht': 306,
+            'hb': 54
+        }
+
+        const validPaths = [
+            ['hb', 'rbl'],
+            ['ht', 'rtl'],
+            ['p', 'hb'],
+            ['p', 'rbr'],
+            ['rbl', 'hb'],
+            ['rbl', 'p'],
+            ['rbr', 'hb'],
+            ['rr', 'p'],
+            ['rtl', 'ht'],
+            ['rtr', 'ht'],
+            ['sb', 'rbr'],
+            ['sm', 'rr'],
+            ['st', 'rtr']
+        ]
+        
+        var field;
+        var startDots;
+        var startPose = null;
+        const xOffset = 461.16876;
+        const yOffset = 188.64792;
+        
+        window.onload = () => {
+            console.log('loaded');
+            field = document.getElementById('layer1');
+            startDots = document.getElementsByClassName('start');
+            for (let i = 0; i < startDots.length; i++) {
+                startDots[i].classList.add('active-dot');
+                startDots[i].addEventListener('mousedown', () => {
+                    setStart({
+                        x: parseInt(startDots[i].getAttribute('cx')),
+                        y: parseInt(startDots[i].getAttribute('cy')),
+                        heading: headings[startDots[i].id],
+                        name: startDots[i].id
+                    });
+                });
+            }
+        }
+        
+        function setStart(pose) {
+            if (startPose != null) {
+                return;
+            }
+            startPose = pose;
+            setPose(startPose);
+            for (let i = 0; i < startDots.length; i++) {
+                startDots[i].classList.remove('active-dot');
+            }
+        }   
+        
+        function toRad(deg) {
+            return deg * Math.PI / 180;
+        }
+
+        function setPose(pose) {
+            const poseElem = document.getElementById('currentposedisplay');
+            const dot = document.getElementById(pose.name);
+            if (!dot.classList.contains('active-dot')) {
+                return;
+            }
+            if (poseElem == null) {
+                const toClone = document.getElementById('currentpose');
+                const newNode = toClone.cloneNode(true);
+                newNode.id = 'currentposedisplay';
+                field.appendChild(newNode);
+                const newElem = document.getElementById('currentposedisplay');
+                const rad = toRad(pose.heading);
+                const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
+                const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
+                newElem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
+            } else {
+                const rad = toRad(pose.heading);
+                const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
+                const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
+                poseElem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
+            }
+            changeActiveDots(pose);
+        }
+
+        function addGhost(pose, idx) {
+            const toClone = document.getElementById('nextpose');
+            const newNode = toClone.cloneNode(true);
+            newNode.id = 'ghost' + idx;
+            field.appendChild(newNode);
+            const newElem = document.getElementById(newNode.id);
+            newElem.setAttribute('opacity', 1);
+            const rad = toRad(pose.heading);
+            const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
+            const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
+            newElem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
+        }
+
+        function removeGhosts() {
+            const ghosts = document.getElementsByClassName('ghost');
+            for (let i = 0; i < ghosts.length; i++) {
+                if (ghosts[i].id != 'nextpose') {
+                    ghosts[i].remove();
+                }
+            }
+        }
+
+        function changeActiveDots(pose) {
+            removeGhosts();
+            const valid = validPaths.filter(path => path[0] == pose.name);
+            for (let i = 0; i < points.lenght; i++) {
+                if (!valid.includes(points[i])) {
+                    const dot = document.getElementById(points[i]);
+                    dot.classList.remove('active-dot');
+                }
+            }
+            for (let i = 0; i < valid.length; i++) {
+                const dot = document.getElementById(valid[i][1]);
+                console.log(valid[i][1]);
+                dot.classList.add('active-dot');
+                dot.addEventListener('mousedown', () => {
+                    setPose({
+                        x: parseInt(dot.getAttribute('cx')),
+                        y: parseInt(dot.getAttribute('cy')),
+                        heading: headings[dot.id],
+                        name: dot.id
+                    });
+                });
+                addGhost({
+                    x: parseInt(dot.getAttribute('cx')),
+                    y: parseInt(dot.getAttribute('cy')),
+                    heading: headings[dot.id],
+                    name: dot.id
+                }, i);
+            }
+        }
+    </script>
+    <style>
+        .active-dot:hover {
+            cursor: pointer;
+            r: 9.5 !important;
+        }
+        .dot {
+            transition: all 0.25s;
+        }
+        #currentposedisplay {
+            opacity: 1 !important;
+        }
+    </style>
+</head>
 
 <body>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -29,9 +222,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:document-units="mm"
-     inkscape:zoom="0.16"
-     inkscape:cx="340.625"
-     inkscape:cy="118.75"
+     inkscape:zoom="0.90509668"
+     inkscape:cx="-58.004853"
+     inkscape:cy="162.41359"
      inkscape:window-width="1152"
      inkscape:window-height="650"
      inkscape:window-x="-6"
@@ -72,7 +265,7 @@
        x2="-79.098953"
        y2="456.17786"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.83169291,0,0,0.83169291,-77.617972,-31.750782)" />
+       gradientTransform="matrix(0.83168886,0,0,-0.83169291,-360.01749,190.97221)" />
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -409,27 +602,27 @@
     </g>
     <path
        style="color:#000000;fill:#0066ff;stroke-width:0.831693;-inkscape-stroke:none"
-       d="m -17.943171,368.07441 h -1.764087 -40.640873 v -42.40497 h 42.404968 v 17.2028 l 6.161457,3.99968 -6.161457,3.99968 z m -3.528199,-3.52821 v -35.34856 h -35.348571 v 35.34856 z"
+       d="m -439.96627,-167.44545 h -1.76409 -40.6409 v -42.40497 h 42.405 z m -3.5282,-3.52821 v -35.34856 h -35.3486 v 35.34856 z m -8.20782,-21.67394 6.16147,4.00004 -6.16147,3.99932 z"
        id="currentpose"
-       sodipodi:nodetypes="cccccccccccccc"
+       sodipodi:nodetypes="ccccccccccccccc"
        class="pose"
        opacity="0" />
     <path
        id="rect4"
-       style="fill:url(#linearGradient2);stroke-width:3.74263"
-       d="m -143.40366,342.47185 v 3.5204 h -4.4e-4 -79.53335 c 0,1.10456 0,2.20912 0,3.31368 h 79.53335 4.4e-4 v 3.96093 l 8.80164,-5.61776 z"
+       style="fill:url(#linearGradient2);stroke-width:3.74262"
+       d="m -425.80286,-183.25041 v -3.5204 h -4.4e-4 -79.53296 c 0,-1.10456 0,-2.20912 0,-3.31368 h 79.53296 4.4e-4 v -3.96093 l 8.8016,5.61776 z"
        sodipodi:nodetypes="cccccccccc"
        opacity="0" />
     <path
-       style="color:#000000;fill:#55d400;stroke-width:0.831693;-inkscape-stroke:none"
-       d="m -79.557755,368.07441 h -1.764088 -40.640877 v -42.40497 h 42.404973 v 17.2028 l 6.161454,3.99968 -6.161454,3.99968 z m -3.5282,-3.52821 v -35.34856 h -35.348575 v 35.34856 z"
+       style="color:#000000;font-variation-settings:normal;vector-effect:none;fill:#55d400;stroke-width:0.831693;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000"
+       d="m -439.96627,-167.44545 h -1.76409 -40.6409 v -42.40497 h 42.40499 z m -3.5282,-3.52821 v -35.34856 h -35.3486 v 35.34856 z m -8.20782,-21.67394 6.16147,3.99968 -6.16147,3.99968 z"
        id="nextpose"
-       sodipodi:nodetypes="cccccccccccccc"
-       class="pose"
+       sodipodi:nodetypes="ccccccccccccccc"
+       class="pose ghost"
        opacity="0" />
   </g>
 </svg>
 
 
-    
+
 </body>
