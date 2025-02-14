@@ -25,12 +25,12 @@
 		];
 
 		const actions = [
-			'l1', // Level 1
-			'l4l', // Level 4 Left
-			'l4r', // Level 4 Right
-			'dealgify', // De-Algify
-			'algaeprocessor', // Processor
-			'hpl', // Human Player Station Left
+			'l1',
+			'l4l',
+			'l4r',
+			'dealgify',
+			'algaeprocessor',
+			'hpl',
 			'hpm',
 			'hpr',
 		];
@@ -49,35 +49,6 @@
 			ht: 306,
 			hb: 54,
 		};
-
-		const validPaths = [
-			['hb', 'rbl'],
-			['hb', 'rbr'],
-			['hb', 'rl'],
-			['ht', 'rl'],
-			['ht', 'rtl'],
-			['ht', 'rtr'],
-			['p', 'hb'],
-			['p', 'rbr'],
-			['rbl', 'hb'],
-			['rbl', 'p'],
-			['rbr', 'hb'],
-			['rbr', 'p'],
-			['rl', 'hb'],
-			['rl', 'ht'],
-			['rr', 'p'],
-			['rtl', 'ht'],
-			['rtr', 'ht'],
-			['sb', 'rbl'],
-			['sb', 'rbr'],
-			['sb', 'rr'],
-			['sm', 'rbr'],
-			['sm', 'rr'],
-			['sm', 'rtr'],
-			['st', 'rr'],
-			['st', 'rtl'],
-			['st', 'rtr'],
-		];
 
 		const adj = {
 			st: ['rtr', 'rr', 'rtl'],
@@ -143,7 +114,7 @@
 			if (!button.classList.contains('active-action')) {
 				return;
 			}
-			addString(name);
+			addString((actions.indexOf(name) + 1).toString());
 		}
 
 		function setStart(pose) {
