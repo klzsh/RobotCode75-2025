@@ -23,10 +23,6 @@ import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.EndEffector.Coral.ScoreL1;
-import frc.robot.commands.EndEffector.Coral.ScoreL2;
-import frc.robot.commands.EndEffector.Coral.ScoreL3;
-import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -34,7 +30,6 @@ import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
@@ -135,7 +130,8 @@ public class RobotContainer {
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
-    m_AlgaeIntake.setDefaultCommand(new InstantCommand(()-> m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
+    m_AlgaeIntake.setDefaultCommand(
+        new InstantCommand(() -> m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
   }
 
   /**
@@ -163,9 +159,14 @@ public class RobotContainer {
 
     testDrivePose.whileTrue(
         new DriveToPose(m_Swerve, new Pose2d(2.9, 4.0, new Rotation2d(0)), false));
-    
-    m_Controller.povLeft().whileTrue(new InstantCommand(()->m_AlgaeIntake.runSetpoint(), m_AlgaeIntake).repeatedly());
-    m_Controller.povRight().whileTrue(new InstantCommand(()->m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
+
+    m_Controller
+        .povLeft()
+        .whileTrue(
+            new InstantCommand(() -> m_AlgaeIntake.runSetpoint(), m_AlgaeIntake).repeatedly());
+    m_Controller
+        .povRight()
+        .whileTrue(new InstantCommand(() -> m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
 
     m_Controller
         .a()

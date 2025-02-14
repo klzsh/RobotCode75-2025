@@ -220,7 +220,6 @@ public final class HardwareConstants {
     public static final Angle pivotForwardSoftLimit = Rotations.of(10);
     public static final Angle pivotReverseSoftLimit = Rotations.of(0);
 
-
     public static final Time pivotCurrentThresholdTime = Seconds.of(0.50);
 
     /* Torque PID */
@@ -241,7 +240,6 @@ public final class HardwareConstants {
     public static final double algaeKD = 0.0;
     public static final double algaeKS = 0.0;
 
-
     public static final double pivotKP = 4;
     public static final double pivotKI = 0.0;
     public static final double pivotKD = 2;
@@ -253,7 +251,6 @@ public final class HardwareConstants {
     public static final double pivotMMAcc = 10;
     public static final double pivotMMVel = 20;
     public static final double pivotMMJerk = 100;
-
 
     public static TalonFXSConfiguration getCoralMotorConfiguration() {
 
@@ -323,7 +320,6 @@ public final class HardwareConstants {
       m_AlgaeMotorConfig.Slot0.kD = algaeKD;
       m_AlgaeMotorConfig.Slot0.kS = algaeKS;
 
-
       m_AlgaeMotorConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
       return m_AlgaeMotorConfig;
@@ -363,10 +359,11 @@ public final class HardwareConstants {
       m_PivotConfig.MotionMagic.MotionMagicExpo_kV = pivotMMKv;
 
       m_PivotConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-      m_PivotConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = pivotForwardSoftLimit.in(Rotations);
+      m_PivotConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+          pivotForwardSoftLimit.in(Rotations);
       m_PivotConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-      m_PivotConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = pivotReverseSoftLimit.in(Rotations);
-
+      m_PivotConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+          pivotReverseSoftLimit.in(Rotations);
 
       m_PivotConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
