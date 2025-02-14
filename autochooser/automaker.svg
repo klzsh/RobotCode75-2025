@@ -175,6 +175,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect13"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="-423.46564"
@@ -198,12 +199,13 @@
            y="-135.66331">1</tspan></text>
     </g>
     <g
-       id="l4l"
+       id="dealgify"
        transform="matrix(0.65611089,0,0,0.65611089,-172.38193,-62.202742)"
        class="action raction">
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect15"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="-68.924065"
@@ -231,12 +233,13 @@
            y="-119.94086">D</tspan></text>
     </g>
     <g
-       id="processor"
+       id="algaeprocessor"
        transform="matrix(0.65611089,0,0,0.65611089,-109.88736,-62.202742)"
        class="action paction">
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect21"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="-68.924065"
@@ -264,11 +267,12 @@
            y="-119.94086">P</tspan></text>
     </g>
     <g
-       id="l4r"
+       id="l4l"
        transform="matrix(0.65611089,0,0,0.65611089,-127.24697,-62.202742)"
        class="action raction">
       <path
          id="rect14"
+		 class="rect"
          style="fill:#333333;stroke:#000000;stroke-width:2.64583"
          d="m -328.21583,-172.11147 h 56.66852 v 56.66853 h -56.66852 z" />
       <path
@@ -293,11 +297,12 @@
            y="-119.41169">L</tspan></text>
     </g>
     <g
-       id="dealgify"
+       id="l4r"
        transform="matrix(0.65611089,0,0,0.65611089,-127.24697,-62.202742)"
        class="action raction">
       <path
          id="path28"
+		 class="rect"
          style="fill:#333333;stroke:#000000;stroke-width:2.64583"
          d="m -232.96582,-172.11147 h 56.66852 v 56.66853 h -56.66852 z" />
       <path
@@ -328,6 +333,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect31"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="52.784286"
@@ -355,6 +361,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect34"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="148.03429"
@@ -382,6 +389,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect35"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="243.28438"
