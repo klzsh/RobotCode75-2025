@@ -170,10 +170,10 @@ public final class HardwareConstants {
     /* CANIDS */
     // TODO: find these
     public static final int coralMotorCanID = 43;
-    public static final int algaeMotorCanID = 0;
-    public static final int pivotCanID = 0;
+    public static final int algaeMotorCanID = 45;
+    public static final int pivotCanID = 44;
     public static final int coralBeamBreakDIO = 2;
-    public static final int algaePivotEncoderPort = 0;
+    public static final int algaePivotEncoderPort = 4;
 
     public static final Rotation2d algaePivotZeroPoint = Rotation2d.fromDegrees(0);
     public static final Angle algaeEncoderOffset = Rotations.of(0);
@@ -217,6 +217,10 @@ public final class HardwareConstants {
     public static final Current pivotStatorCurrentLimitForward = Amps.of(60);
     public static final Current pivotStatorCurrentLimitReverse = Amps.of(-60);
 
+    public static final Angle pivotForwardSoftLimit = Rotations.of(10);
+    public static final Angle pivotReverseSoftLimit = Rotations.of(0);
+
+
     public static final Time pivotCurrentThresholdTime = Seconds.of(0.50);
 
     /* Torque PID */
@@ -235,10 +239,21 @@ public final class HardwareConstants {
     public static final double algaeKP = 0.5;
     public static final double algaeKI = 0.0;
     public static final double algaeKD = 0.0;
+    public static final double algaeKS = 0.0;
 
-    public static final double pivotKP = 0.5;
+
+    public static final double pivotKP = 4;
     public static final double pivotKI = 0.0;
-    public static final double pivotKD = 0.0;
+    public static final double pivotKD = 2;
+    public static final double pivotKS = 2;
+    public static final double pivotKG = 7;
+
+    public static final double pivotMMKa = 0.5;
+    public static final double pivotMMKv = 0.5;
+    public static final double pivotMMAcc = 10;
+    public static final double pivotMMVel = 20;
+    public static final double pivotMMJerk = 100;
+
 
     public static TalonFXSConfiguration getCoralMotorConfiguration() {
 
@@ -306,6 +321,8 @@ public final class HardwareConstants {
       m_AlgaeMotorConfig.Slot0.kP = algaeKP;
       m_AlgaeMotorConfig.Slot0.kI = algaeKI;
       m_AlgaeMotorConfig.Slot0.kD = algaeKD;
+      m_AlgaeMotorConfig.Slot0.kS = algaeKS;
+
 
       m_AlgaeMotorConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
@@ -314,8 +331,8 @@ public final class HardwareConstants {
 
     public static TalonFXConfiguration getPivotConfiguration() {
 
-      m_PivotConfig.MotorOutput.Inverted = algaeMotorInvert;
-      m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      m_PivotConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+      m_PivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
       /* Current Limiting */
       m_PivotConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -334,11 +351,27 @@ public final class HardwareConstants {
       m_PivotConfig.Slot0.kP = pivotKP;
       m_PivotConfig.Slot0.kI = pivotKI;
       m_PivotConfig.Slot0.kD = pivotKD;
+      m_PivotConfig.Slot0.kS = pivotKS;
+      m_PivotConfig.Slot0.kG = pivotKG;
+      m_PivotConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+      m_PivotConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+
+      m_PivotConfig.MotionMagic.MotionMagicAcceleration = pivotMMAcc;
+      m_PivotConfig.MotionMagic.MotionMagicCruiseVelocity = pivotMMVel;
+      m_PivotConfig.MotionMagic.MotionMagicJerk = pivotMMJerk;
+      m_PivotConfig.MotionMagic.MotionMagicExpo_kA = pivotMMKa;
+      m_PivotConfig.MotionMagic.MotionMagicExpo_kV = pivotMMKv;
+
+      m_PivotConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+      m_PivotConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = pivotForwardSoftLimit.in(Rotations);
+      m_PivotConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+      m_PivotConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = pivotReverseSoftLimit.in(Rotations);
+
 
       m_PivotConfig.MotorOutput.ControlTimesyncFreqHz = TimeSyncFreq.in(Hertz);
 
-      m_PivotConfig.ClosedLoopGeneral.ContinuousWrap = true;
-      m_PivotConfig.Feedback.RotorToSensorRatio = 25.0 / 1.0; // constants?
+      // m_PivotConfig.ClosedLoopGeneral.ContinuousWrap = true;
+      // m_PivotConfig.Feedback.RotorToSensorRatio = 25.0 / 1.0; // constants?
 
       return m_PivotConfig;
     }

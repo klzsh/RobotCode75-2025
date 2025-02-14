@@ -30,9 +30,11 @@ import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
@@ -61,6 +63,9 @@ public class RobotContainer {
 
   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
+
+  @Logged(name = "Alage Intake")
+  private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -130,6 +135,7 @@ public class RobotContainer {
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
+    m_AlgaeIntake.setDefaultCommand(new InstantCommand(()-> m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
   }
 
   /**
@@ -147,40 +153,44 @@ public class RobotContainer {
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
-    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    // m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    // m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    // m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    // m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
     testDrivePose.whileTrue(
         new DriveToPose(m_Swerve, new Pose2d(2.9, 4.0, new Rotation2d(0)), false));
-    // m_Controller
-    //     .a()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .b()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .x()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .y()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
-    //             .repeatedly());
+    
+    m_Controller.povLeft().whileTrue(new InstantCommand(()->m_AlgaeIntake.runSetpoint(), m_AlgaeIntake).repeatedly());
+    m_Controller.povRight().whileTrue(new InstantCommand(()->m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
+
+    m_Controller
+        .a()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .b()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .x()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .y()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
+                .repeatedly());
   }
 
   private void configureChooser() {}
