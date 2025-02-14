@@ -1,211 +1,313 @@
 <head>
     <script>
-        class Pose {
-            constructor(x, y, heading, name) {
-                this.x = x;
-                this.y = y;
-                this.heading = heading;
-                this.name = name;
-            }
-        }
-        
-        const points = [
-            'st', // Start Top
-            'sm', // Start Middle
-            'sb', // Start Bottom
-            'rtr', // Reef Top Right
-            'rr', // Reef Right
-            'rbr', // Reef Buttom Right
-            'rtl', // Reef Top left
-            'rl', // Reef Left
-            'rbl', // Reef Bottom left
-            'p', // Processor
-            'ht', // Human Player Station Top
-            'hb' // Human Player Station Bottom
-        ]
-        
-        const actions = [
-            'l1', // Level 1
-            'l4l', // Level 4 Left
-            'l4r', // Level 4 Right
-            'dealgify', // De-Algify
-            'processor', // Processor
-            'hpl', // Human Player Station Left
-            'hpm',
-            'hpr'
-        ]
-        
-        const headings = {
-            'st': 180,
-            'sm': 180,
-            'sb': 180,
-            'rtr': 240,
-            'rr': 180,
-            'rbr': 120,
-            'rbl': 60,
-            'rl': 0,
-            'rtl': 300,
-            'p': 270,
-            'ht': 306,
-            'hb': 54
-        }
+	    class Pose {
+		    constructor(x, y, heading, name) {
+			    this.x = x;
+			    this.y = y;
+			    this.heading = heading;
+			    this.name = name;
+		    }
+	    }
 
-        const validPaths = [
-            ['hb', 'rbl'],
-            ['hb', 'rbr'],
-            ['hb', 'rl'],
-            ['ht', 'rl'],
-            ['ht', 'rtl'],
-            ['ht', 'rtr'],
-            ['p', 'hb'],
-            ['p', 'rbr'],
-            ['rbl', 'hb'],
-            ['rbl', 'p'],
-            ['rbr', 'hb'],
-            ['rbr', 'p'],
-            ['rl', 'hb'],
-            ['rl', 'ht'],
-            ['rr', 'p'],
-            ['rtl', 'ht'],
-            ['rtr', 'ht'],
-            ['sb', 'rbl'],
-            ['sb', 'rbr'],
-            ['sb', 'rr'],
-            ['sm', 'rbr'],
-            ['sm', 'rr'],
-            ['sm', 'rtr'],
-            ['st', 'rr'],
-            ['st', 'rtl'],
-            ['st', 'rtr']
-        ]
-        
-        var field;
-        var startDots;
-        var startPose = null;
-        const xOffset = 461.16876;
-        const yOffset = 188.64792;
-        
-        window.onload = () => {
-            console.log('loaded');
-            field = document.getElementById('layer1');
-            startDots = document.getElementsByClassName('start');
-            for (let i = 0; i < startDots.length; i++) {
-                startDots[i].classList.add('active-dot');
-                startDots[i].addEventListener('mousedown', () => {
-                    setStart({
-                        x: parseInt(startDots[i].getAttribute('cx')),
-                        y: parseInt(startDots[i].getAttribute('cy')),
-                        heading: headings[startDots[i].id],
-                        name: startDots[i].id
-                    });
-                });
-            }
-        }
-        
-        function setStart(pose) {
-            if (startPose != null) {
-                return;
-            }
-            startPose = pose;
-            setPose(startPose);
-            for (let i = 0; i < startDots.length; i++) {
-                startDots[i].classList.remove('active-dot');
-            }
-        }   
-        
-        function toRad(deg) {
-            return deg * Math.PI / 180;
-        }
+	    const points = [
+		    'st',
+		    'sm',
+		    'sb',
+		    'rtr',
+		    'rr',
+		    'rbr',
+		    'rtl',
+		    'rl',
+		    'rbl',
+		    'p',
+		    'ht',
+		    'hb'
+	    ]
 
-        function setPose(pose) {
-            const poseElem = document.getElementById('currentposedisplay');
-            const dot = document.getElementById(pose.name);
-            if (!dot.classList.contains('active-dot')) {
-                return;
-            }
-            if (poseElem == null) {
-                const toClone = document.getElementById('currentpose');
-                const newNode = toClone.cloneNode(true);
-                newNode.id = 'currentposedisplay';
-                field.appendChild(newNode);
-                const newElem = document.getElementById('currentposedisplay');
-                const rad = toRad(pose.heading);
-                const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
-                const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
-                newElem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
-            } else {
-                const rad = toRad(pose.heading);
-                const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
-                const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
-                poseElem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
-            }
-            changeActiveDots(pose);
-        }
+	    const actions = [
+		    'l1', // Level 1
+		    'l4l', // Level 4 Left
+		    'l4r', // Level 4 Right
+		    'dealgify', // De-Algify
+		    'algaeprocessor', // Processor
+		    'hpl', // Human Player Station Left
+		    'hpm',
+		    'hpr'
+	    ]
 
-        function addGhost(pose, idx) {
-            const toClone = document.getElementById('nextpose');
-            const newNode = toClone.cloneNode(true);
-            newNode.id = 'ghost' + idx;
-            field.appendChild(newNode);
-            const newElem = document.getElementById(newNode.id);
-            newElem.setAttribute('opacity', 1);
-            const rad = toRad(pose.heading);
-            const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
-            const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
-            newElem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
-        }
+	    const headings = {
+		    'st': 180,
+		    'sm': 180,
+		    'sb': 180,
+		    'rtr': 240,
+		    'rr': 180,
+		    'rbr': 120,
+		    'rbl': 60,
+		    'rl': 0,
+		    'rtl': 300,
+		    'p': 270,
+		    'ht': 306,
+		    'hb': 54
+	    }
 
-        function removeGhosts() {
-            const ghosts = document.getElementsByClassName('ghost');
-            for (let i = 0; i < ghosts.length; i++) {
-                if (ghosts[i].id != 'nextpose') {
-                    ghosts[i].remove();
-                    i--;
-                }
-            }
-        }
+	    const validPaths = [
+		    ['hb', 'rbl'],
+		    ['hb', 'rbr'],
+		    ['hb', 'rl'],
+		    ['ht', 'rl'],
+		    ['ht', 'rtl'],
+		    ['ht', 'rtr'],
+		    ['p', 'hb'],
+		    ['p', 'rbr'],
+		    ['rbl', 'hb'],
+		    ['rbl', 'p'],
+		    ['rbr', 'hb'],
+		    ['rbr', 'p'],
+		    ['rl', 'hb'],
+		    ['rl', 'ht'],
+		    ['rr', 'p'],
+		    ['rtl', 'ht'],
+		    ['rtr', 'ht'],
+		    ['sb', 'rbl'],
+		    ['sb', 'rbr'],
+		    ['sb', 'rr'],
+		    ['sm', 'rbr'],
+		    ['sm', 'rr'],
+		    ['sm', 'rtr'],
+		    ['st', 'rr'],
+		    ['st', 'rtl'],
+		    ['st', 'rtr']
+	    ]
 
-        function changeActiveDots(pose) {
-            removeGhosts();
-            const valid = validPaths.filter(path => path[0] == pose.name);
-            for (let i = 0; i < points.length; i++) {
-                if (!valid.includes(points[i])) {
-                    const dot = document.getElementById(points[i]);
-                    dot.classList.remove('active-dot');
-                }
-            }
-            for (let i = 0; i < valid.length; i++) {
-                const dot = document.getElementById(valid[i][1]);
-                console.log(valid[i][1]);
-                dot.classList.add('active-dot');
-                dot.addEventListener('mousedown', () => {
-                    setPose({
-                        x: parseInt(dot.getAttribute('cx')),
-                        y: parseInt(dot.getAttribute('cy')),
-                        heading: headings[dot.id],
-                        name: dot.id
-                    });
-                });
-                addGhost({
-                    x: parseInt(dot.getAttribute('cx')),
-                    y: parseInt(dot.getAttribute('cy')),
-                    heading: headings[dot.id],
-                    name: dot.id
-                }, i);
-            }
-        }
+		const adj = {
+			'st': ['rtr', 'rr', 'rtl'],
+		    'sm': ['rtr', 'rr', 'rbr'],
+		    'sb': ['rbl', 'rbr', 'rr'],
+		    'rtr': ['ht', 'p'],
+		    'rr': ['ht', 'hb', 'p'],
+		    'rbr': ['hb', 'p'],
+		    'rtl': ['ht', 'p'],
+		    'rl': ['ht', 'hb', 'p'],
+		    'rbl': ['hb', 'p'],
+		    'p': ['hb', 'rbl', 'rbr', 'rr'],
+		    'ht': ['rl', 'rtl', 'rtr', 'rr', 'rbl'],
+		    'hb': ['rl', 'rbl', 'rbr', 'rr', 'rtl']
+		};
+
+	    var field;
+	    var startDots;
+		var actionButtons;
+	    var startPose = null;
+		var lastPose = null;
+		var currentDot = '';
+	    const xOffset = 461.16876;
+	    const yOffset = 188.64792;
+		var numArrow = 0;
+		var string = '';
+		var stringDisplay;
+
+	    window.onload = () => {
+		    console.log('loaded');
+		    field = document.getElementById('layer1');
+		    startDots = document.getElementsByClassName('start');
+		    for (let i = 0; i < startDots.length; i++) {
+			    startDots[i].classList.add('active-dot');
+			    startDots[i].addEventListener('mousedown', () => {
+				    setStart({
+					    x: parseInt(startDots[i].getAttribute('cx')),
+					    y: parseInt(startDots[i].getAttribute('cy')),
+					    heading: headings[startDots[i].id],
+					    name: startDots[i].id
+				    });
+			    });
+		    }
+			actionButtons = document.getElementsByClassName('action');
+			for (let i = 0; i < actionButtons.length; i++) {
+				actionButtons[i].addEventListener('mousedown', () => {
+					doAction(actionButtons[i].id);
+				});
+			}
+			stringDisplay = document.getElementById('string');
+	    }
+
+		function addString(text) {
+			if (string != '') {
+				string += ' ';
+			}
+			string += text;
+			stringDisplay.innerHTML = string.toUpperCase();
+		}
+
+		function doAction(name) {
+			const button = document.getElementById(name);
+			if (!button.classList.contains('active-action')) {
+				return;
+			}
+			addString(name);
+		}
+
+	    function setStart(pose) {
+		    if (startPose != null) {
+			    return;
+		    }
+		    startPose = pose;
+		    setPose(startPose);
+		    for (let i = 0; i < startDots.length; i++) {
+			    startDots[i].classList.remove('active-dot');
+		    }
+	    }   
+
+	    function toRad(deg) {
+		    return deg * Math.PI / 180;
+	    }
+
+	    function moveElement(id, pose) {
+		    const elem = document.getElementById(id);
+		    if (elem == null) {
+			    return;
+		    }
+			const rad = toRad(pose.heading);
+			const x = (pose.x) * Math.cos(rad) - (pose.y) * Math.sin(rad);
+			const y = (pose.x) * Math.sin(rad) + (pose.y) * Math.cos(rad);
+			elem.setAttribute('transform', `rotate(${-pose.heading}) translate(${x+xOffset},${y+yOffset})`);
+	    }
+
+	    function setPose(pose) {
+		    const poseElem = document.getElementById('currentposedisplay');
+		    const dot = document.getElementById(pose.name);
+		    if (!dot.classList.contains('active-dot')) {
+			    return;
+		    }
+			if (currentDot != '') {
+				document.getElementById(currentDot).classList.remove('current-dot');
+			}
+			currentDot = pose.name;
+		    if (poseElem == null) {
+			    const toClone = document.getElementById('currentpose');
+			    const newNode = toClone.cloneNode(true);
+			    newNode.id = 'currentposedisplay';
+			    field.appendChild(newNode);
+		    } else {
+				// const toClone = document.getElementById('arrow');
+				// const dist = Math.sqrt(Math.pow(pose.x - lastPose.x, 2) + Math.pow(pose.y - lastPose.y, 2));
+				// // alert(dist / toClone.getBoundingClientRect().width);
+				// toClone.setAttribute('transform', `scaleX(${dist / toClone.getBoundingClientRect().width})`);
+				// toClone.setAttribute('opacity', '1');
+				// const newArrow = toClone.cloneNode(true);
+				// newArrow.id = 'arrow' + numArrow;
+				// field.appendChild(newArrow);
+				// const newElem = document.getElementById('arrow' + numArrow);
+				// newElem.setAttribute('opacity', '1');
+				// numArrow++;
+			}
+			moveElement('currentposedisplay', pose);
+		    changeActiveDots(pose);
+			document.getElementById(currentDot).classList.add('current-dot');
+			addString(pose.name);
+			lastPose = pose;
+	    }
+
+	    function addGhost(pose, idx) {
+		    const toClone = document.getElementById('nextpose');
+		    const newNode = toClone.cloneNode(true);
+		    newNode.id = 'ghost' + idx;
+		    field.appendChild(newNode);
+		    const newElem = document.getElementById(newNode.id);
+		    newElem.setAttribute('opacity', 1);
+			moveElement(newNode.id, pose);
+	    }
+
+	    function removeGhosts() {
+		    const ghosts = document.getElementsByClassName('ghost');
+		    for (let i = 0; i < ghosts.length; i++) {
+			    if (ghosts[i].id != 'nextpose') {
+				    ghosts[i].remove();
+				    i--;
+			    }
+		    }
+	    }
+
+	    function changeActiveDots(pose) {
+		    removeGhosts();
+		    const valid = adj[pose.name];
+		    for (let i = 0; i < points.length; i++) {
+			    if (!valid.includes(points[i])) {
+				    const dot = document.getElementById(points[i]);
+				    dot.classList.remove('active-dot');
+			    }
+		    }
+			const actions = document.getElementsByClassName('action');
+			for (let i = 0; i < actions.length; i++) {
+				actions[i].classList.remove('active-action');
+			}
+			actionClass = pose.name[0] + 'action';
+			const validActions = document.getElementsByClassName(actionClass);
+			for (let i = 0; i < validActions.length; i++) {
+				validActions[i].classList.add('active-action');
+			}
+		    for (let i = 0; i < valid.length; i++) {
+			    const dot = document.getElementById(valid[i]);
+			    dot.classList.add('active-dot');
+			    dot.addEventListener('mousedown', () => {
+				    setPose({
+					    x: parseInt(dot.getAttribute('cx')),
+					    y: parseInt(dot.getAttribute('cy')),
+					    heading: headings[dot.id],
+					    name: dot.id
+				    });
+			    });
+			    addGhost({
+				    x: parseInt(dot.getAttribute('cx')),
+				    y: parseInt(dot.getAttribute('cy')),
+				    heading: headings[dot.id],
+				    name: dot.id
+			    }, i);
+		    }
+	    }
+
+		function printString() {
+			alert(string);
+		}
     </script>
     <style>
+		body {
+			display: flex;
+			flex-direction: row;
+		}
         .active-dot:hover {
             cursor: pointer;
             r: 9.5 !important;
         }
+		.active-dot {
+			opacity: 1 !important;
+		}
+		.current-dot {
+			opacity: 1 !important;
+		}
         .dot {
             transition: all 0.25s;
+			opacity: 0;
         }
         #currentposedisplay {
             opacity: 1 !important;
         }
+		.action {
+			opacity: 0.35;
+			transition: all 0.25s;
+		}
+		.active-action {
+			opacity: 1 !important;
+		}
+		.active-action:hover {
+			cursor: pointer;
+			.rect {
+				fill: #505050 !important;
+			}
+		}
+		#string {
+			margin-left: 25px;
+			font-family: Verdana, Helvetica;
+		}
     </style>
 </head>
 
@@ -387,6 +489,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect13"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="-423.46564"
@@ -410,12 +513,13 @@
            y="-135.66331">1</tspan></text>
     </g>
     <g
-       id="l4l"
+       id="dealgify"
        transform="matrix(0.65611089,0,0,0.65611089,-172.38193,-62.202742)"
        class="action raction">
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect15"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="-68.924065"
@@ -443,12 +547,13 @@
            y="-119.94086">D</tspan></text>
     </g>
     <g
-       id="processor"
+       id="algaeprocessor"
        transform="matrix(0.65611089,0,0,0.65611089,-109.88736,-62.202742)"
        class="action paction">
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect21"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="-68.924065"
@@ -476,11 +581,12 @@
            y="-119.94086">P</tspan></text>
     </g>
     <g
-       id="l4r"
+       id="l4l"
        transform="matrix(0.65611089,0,0,0.65611089,-127.24697,-62.202742)"
        class="action raction">
       <path
          id="rect14"
+		 class="rect"
          style="fill:#333333;stroke:#000000;stroke-width:2.64583"
          d="m -328.21583,-172.11147 h 56.66852 v 56.66853 h -56.66852 z" />
       <path
@@ -505,11 +611,12 @@
            y="-119.41169">L</tspan></text>
     </g>
     <g
-       id="dealgify"
+       id="l4r"
        transform="matrix(0.65611089,0,0,0.65611089,-127.24697,-62.202742)"
        class="action raction">
       <path
          id="path28"
+		 class="rect"
          style="fill:#333333;stroke:#000000;stroke-width:2.64583"
          d="m -232.96582,-172.11147 h 56.66852 v 56.66853 h -56.66852 z" />
       <path
@@ -540,6 +647,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect31"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="52.784286"
@@ -567,6 +675,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect34"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="148.03429"
@@ -594,6 +703,7 @@
       <rect
          style="fill:#333333;stroke:#000000;stroke-width:2.64583;stroke-dasharray:none"
          id="rect35"
+		 class="rect"
          width="56.668522"
          height="56.668522"
          x="243.28438"
@@ -622,7 +732,7 @@
        class="pose"
        opacity="0" />
     <path
-       id="rect4"
+       id="arrow"
        style="fill:url(#linearGradient2);stroke-width:3.74262"
        d="m -425.80286,-183.25041 v -3.5204 h -4.4e-4 -79.53296 c 0,-1.10456 0,-2.20912 0,-3.31368 h 79.53296 4.4e-4 v -3.96093 l 8.8016,5.61776 z"
        sodipodi:nodetypes="cccccccccc"
@@ -637,6 +747,6 @@
   </g>
 </svg>
 
-
+<p id="string"></p>
 
 </body>
