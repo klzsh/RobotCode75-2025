@@ -32,6 +32,10 @@ import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Drivetrain.Swerve;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,11 +59,6 @@ public class RobotContainer {
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
-
-  // define auto factory for autos
-  // private final AutoFactory factory =
-  //     new AutoFactory(
-  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
@@ -169,7 +168,10 @@ public class RobotContainer {
     //             .repeatedly());
   }
 
-  private void configureChooser() {}
+  private void configureChooser() {
+    m_Selector.setupAutoTab();
+    m_Selector.clearField();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
