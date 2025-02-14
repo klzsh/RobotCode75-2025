@@ -154,7 +154,7 @@
         function changeActiveDots(pose) {
             removeGhosts();
             const valid = validPaths.filter(path => path[0] == pose.name);
-            for (let i = 0; i < points.lenght; i++) {
+            for (let i = 0; i < points.length; i++) {
                 if (!valid.includes(points[i])) {
                     const dot = document.getElementById(points[i]);
                     dot.classList.remove('active-dot');
