@@ -52,17 +52,30 @@
 
         const validPaths = [
             ['hb', 'rbl'],
+            ['hb', 'rbr'],
+            ['hb', 'rl'],
+            ['ht', 'rl'],
             ['ht', 'rtl'],
+            ['ht', 'rtr'],
             ['p', 'hb'],
             ['p', 'rbr'],
             ['rbl', 'hb'],
             ['rbl', 'p'],
             ['rbr', 'hb'],
+            ['rbr', 'p'],
+            ['rl', 'hb'],
+            ['rl', 'ht'],
             ['rr', 'p'],
             ['rtl', 'ht'],
             ['rtr', 'ht'],
+            ['sb', 'rbl'],
             ['sb', 'rbr'],
+            ['sb', 'rr'],
+            ['sm', 'rbr'],
             ['sm', 'rr'],
+            ['sm', 'rtr'],
+            ['st', 'rr'],
+            ['st', 'rtl'],
             ['st', 'rtr']
         ]
         
@@ -147,6 +160,7 @@
             for (let i = 0; i < ghosts.length; i++) {
                 if (ghosts[i].id != 'nextpose') {
                     ghosts[i].remove();
+                    i--;
                 }
             }
         }
