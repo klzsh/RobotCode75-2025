@@ -410,7 +410,7 @@
        class="pose"
        opacity="0" />
     <path
-       id="rect4"
+       id="arrow"
        style="fill:url(#linearGradient2);stroke-width:3.74262"
        d="m -425.80286,-183.25041 v -3.5204 h -4.4e-4 -79.53296 c 0,-1.10456 0,-2.20912 0,-3.31368 h 79.53296 4.4e-4 v -3.96093 l 8.8016,5.61776 z"
        sodipodi:nodetypes="cccccccccc"
