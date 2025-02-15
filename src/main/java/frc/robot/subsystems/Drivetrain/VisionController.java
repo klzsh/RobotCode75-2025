@@ -7,6 +7,8 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import org.photonvision.PhotonUtils;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -111,20 +113,21 @@ public class VisionController {
 
     Translation2d targetOffset = fieldPoseOffsets.get(targetPose);
 
-    double currentX = 0;
-    double currentY = 0;
-    double targetX = 0;
-    double targetY = 0;
+    double tX = 0;
     boolean hasTarget = true;
+    double targetYaw = 0;
+    double targetMeters = 0;
 
     if (!primaryCamera.getTarget(targetTagID).isEmpty()) {
-      targetX = targetOffset.getX();
-      targetY = targetOffset.getY();
-      currentX = primaryCamera.getX(targetTagID).getAsDouble();
-      currentY = primaryCamera.getY(targetTagID).getAsDouble();
-    }
 
-    if (hasTarget) {
+      tX = primaryCamera.getX(targetTagID).getAsDouble();
+      // targetYaw = primaryCamera.getYaw(targetTagID).getAsDouble();
+
+      targetMeters = PhotonUtils.calculateDistanceToTargetMeters(0.5,
+  1.435,
+  0, // TODO FIND 
+  primaryCamera.getPitch(targetTagID).getAsDouble());
+
       lastSeenAprilTagTime = Timer.getFPGATimestamp();
     } else {
       if ((Timer.getFPGATimestamp() - lastSeenAprilTagTime) > maxTimeUntilFallbackToOdometry) {
