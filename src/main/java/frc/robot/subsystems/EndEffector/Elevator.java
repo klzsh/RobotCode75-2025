@@ -277,6 +277,14 @@ public class Elevator extends SubsystemBase {
       m_PositionRequest.Acceleration = downAcceleration.getNumber();
       m_PositionRequest.Jerk = downJerk.getNumber();
     }
+    double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
+    double algaeOffset =
+        (m_IsAlgae
+                && (m_SetpointPosition == ElevatorPositions.L2
+                    || m_SetpointPosition == ElevatorPositions.L3))
+            ? algaeRemovalOffset.in(Rotations)
+            : 0;
+    double targetRotations = currentPosition + algaeOffset;
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
       m_ElevatorMotor1.setControl(
           m_CharacterizationRequest
@@ -291,12 +299,12 @@ public class Elevator extends SubsystemBase {
     } else {
       m_ElevatorMotor1.setControl(
           m_PositionRequest
-              .withPosition(m_SetpointPosition.Rotations)
+              .withPosition(Rotations.of(targetRotations))
               .withLimitForwardMotion(getUpperLimit())
               .withLimitReverseMotion(getLowerLimit()));
       m_ElevatorMotor2.setControl(
           m_PositionRequest
-              .withPosition(m_SetpointPosition.Rotations)
+              .withPosition(Rotations.of(targetRotations))
               .withLimitForwardMotion(getUpperLimit())
               .withLimitReverseMotion(getLowerLimit()));
     }

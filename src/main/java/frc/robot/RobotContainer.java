@@ -23,18 +23,23 @@ import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
+import frc.robot.commands.EndEffector.Coral.ScoreL1;
+import frc.robot.commands.EndEffector.Coral.ScoreL2;
+import frc.robot.commands.EndEffector.Coral.ScoreL3;
+import frc.robot.commands.EndEffector.Coral.ScoreL4;
+import frc.robot.commands.EndEffector.DeAlgaefy;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
-import frc.robot.subsystems.EndEffector.AlgaeIntake.PivotState;
+import frc.robot.subsystems.EndEffector.AlgaePivot;
+import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
-import frc.robot.subsystems.EndGame.Climber.ClimberPositions;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /**
@@ -57,16 +62,20 @@ public class RobotContainer {
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
 
-//   @Logged(name = "Elevator")
+  @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
-//   @Logged(name = "Coral Intake")
+  @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
-//   @Logged(name = "Climber")
+
+  @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
-//   @Logged(name = "Alage Intake")
+  @Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
+
+  @Logged(name = "Algae Pivot")
+  private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -136,13 +145,15 @@ public class RobotContainer {
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
-    // m_AlgaeIntake.setDefaultCommand(
-    //     new InstantCommand(() -> m_AlgaeIntake.resetStates(), m_AlgaeIntake).repeatedly());
+    m_AlgaeIntake.setDefaultCommand(
+        new InstantCommand(() -> m_AlgaeIntake.resetAlgaeState(), m_AlgaeIntake).repeatedly());
+    m_AlgaePivot.setDefaultCommand(
+        new InstantCommand(() -> m_AlgaePivot.resetPivotState(), m_AlgaePivot).repeatedly());
     // m_Climber.setDefaultCommand(
     //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
     //         .repeatedly());
-    m_Climber.setDefaultCommand(new InstantCommand(()->m_Climber.runPosition(-m_Controller.getLeftY()*100), m_Climber));
-
+    m_Climber.setDefaultCommand(
+        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 100), m_Climber));
   }
 
   /**
@@ -160,23 +171,38 @@ public class RobotContainer {
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
-    // m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    // m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    // m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    // m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
-    m_Controller.povLeft().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
-    m_Controller.povLeft().whileFalse(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.NONE)).repeatedly());
-    m_Controller.leftBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setPivotState(PivotState.GROUNDINTAKE)).repeatedly());
-    m_Controller.leftBumper().whileFalse(new InstantCommand(() -> m_AlgaeIntake.setPivotState(PivotState.RETRACTED)).repeatedly());
-    // m_Controller.leftBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
-    // m_Controller.rightBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake).repeatedly());
-
+    m_Controller
+        .povLeft()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING), m_AlgaeIntake)
+                .repeatedly());
+    m_Controller
+        .povRight()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake)
+                .repeatedly());
+    m_Controller
+        .leftBumper()
+        .whileTrue(
+            new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE))
+                .repeatedly());
+    // m_Controller.leftBumper().whileTrue(new InstantCommand(() ->
+    // m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
-    m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, new Pose2d(2.94, 4.02, Rotation2d.fromDegrees(0)), false));
+    m_Controller
+        .rightBumper()
+        .whileTrue(
+            new DriveToPose(m_Swerve, new Pose2d(2.94, 4.02, Rotation2d.fromDegrees(0)), false));
 
     m_Controller
         .a()
@@ -186,12 +212,14 @@ public class RobotContainer {
                 .repeatedly());
     m_Controller
         .b()
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .x()
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
@@ -202,6 +230,15 @@ public class RobotContainer {
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
                 .repeatedly());
+
+    m_Controller
+        .b()
+        .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
+    m_Controller
+        .x()
+        .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
   }
 
   private void configureChooser() {}

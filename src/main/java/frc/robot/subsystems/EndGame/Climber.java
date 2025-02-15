@@ -18,13 +18,12 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
-import frc.robot.Constants.ClimberConstants;
 
 @Logged(name = "Climber", strategy = Strategy.OPT_IN)
 public class Climber extends SubsystemBase {
@@ -125,7 +124,8 @@ public class Climber extends SubsystemBase {
   public boolean getLimitSwitch() {
     return !m_LimitSwitch.get();
   }
-  public void runPosition(double current){
+
+  public void runPosition(double current) {
     current = MathUtil.applyDeadband(current, 5);
     m_ClimberMotor1.setControl(m_TestRequest.withOutput(current));
     m_ClimberMotor2.setControl(m_TestRequest.withOutput(current));

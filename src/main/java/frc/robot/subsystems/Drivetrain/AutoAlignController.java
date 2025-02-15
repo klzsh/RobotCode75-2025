@@ -53,12 +53,14 @@ public class AutoAlignController {
 
     xController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond) / Math.sqrt(2),
+            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond)
+                / Math.sqrt(2),
             DrivetrainConstants.ControllerConstants.maxAccelerationAuto.in(MetersPerSecondPerSecond)
                 / Math.sqrt(2)));
     yController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond) / Math.sqrt(2),
+            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond)
+                / Math.sqrt(2),
             DrivetrainConstants.ControllerConstants.maxAccelerationAuto.in(MetersPerSecondPerSecond)
                 / Math.sqrt(2)));
     thetaController.setConstraints(

@@ -23,10 +23,10 @@ public class EndEffectorConstants {
   public static final Angle pivotHomePosition = Rotations.of(9);
   // TODO: need to tune
   public static final Angle pivotGroundIntakePosition = Rotations.of(4);
-  public static final Angle pivotDeAlgifyPosition = Rotations.of(7);
+  public static final Angle pivotDeAlgifyPosition = Rotations.of(4);
 
   public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(150);
-  public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(500);
+  public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(-20);
   public static final AngularVelocity algaeHoldSpeed = RotationsPerSecond.of(100);
 
   public static final double coralPositionDeadband = 0.5;

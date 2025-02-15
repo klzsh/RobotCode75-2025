@@ -3,20 +3,20 @@ package frc.robot.commands.EndEffector;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.EndEffector.AlgaeIntake;
+import frc.robot.subsystems.EndEffector.AlgaePivot;
 
 public class ResetAlgaePosition extends Command {
-  private final AlgaeIntake m_algaeIntake;
+  private final AlgaePivot m_algaePivot;
 
-  public ResetAlgaePosition(AlgaeIntake intake) {
-    m_algaeIntake = intake;
-    addRequirements(m_algaeIntake);
+  public ResetAlgaePosition(AlgaePivot pivot) {
+    m_algaePivot = pivot;
+    addRequirements(m_algaePivot);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_algaeIntake.homePivotToAbsoluteEncoder();
+    m_algaePivot.homePivotToAbsoluteEncoder();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -26,12 +26,12 @@ public class ResetAlgaePosition extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_algaeIntake.resetPivotMotor(Rotations.of(0));
+    m_algaePivot.resetPivotMotor(Rotations.of(0));
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_algaeIntake.isAtPositionAbsolute(m_algaeIntake.absoluteEncoderOffset.getNumber());
+    return m_algaePivot.isAtPositionAbsolute(m_algaePivot.absoluteEncoderOffset.getNumber());
   }
 }
