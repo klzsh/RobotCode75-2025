@@ -200,12 +200,12 @@ public final class HardwareConstants {
     public static final Time coralCurrentThresholdTime = Seconds.of(0.50);
 
     // algae current limiting
-    public static final Current algaeCurrentLimit = Amps.of(30);
+    public static final Current algaeCurrentLimit = Amps.of(40);
     public static final Current algaeLowerCurrentThreshold = Amps.of(15);
 
-    public static final Current algaeStatorCurrentLimit = Amps.of(20);
-    public static final Current algaeStatorCurrentLimitForward = Amps.of(20);
-    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-20);
+    public static final Current algaeStatorCurrentLimit = Amps.of(40);
+    public static final Current algaeStatorCurrentLimitForward = Amps.of(40);
+    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-40);
 
     public static final Time algaeCurrentThresholdTime = Seconds.of(1);
 
@@ -240,17 +240,17 @@ public final class HardwareConstants {
     public static final double algaeKD = 0.0;
     public static final double algaeKS = 0.0;
 
-    public static final double pivotKP = 4;
+    public static final double pivotKP = 10;
     public static final double pivotKI = 0.0;
-    public static final double pivotKD = 2;
-    public static final double pivotKS = 2;
-    public static final double pivotKG = 7;
+    public static final double pivotKD = 3;
+    public static final double pivotKS = 4;
+    public static final double pivotKG = 6;
 
-    public static final double pivotMMKa = 0.5;
-    public static final double pivotMMKv = 0.5;
-    public static final double pivotMMAcc = 10;
-    public static final double pivotMMVel = 20;
-    public static final double pivotMMJerk = 100;
+    public static final double pivotMMKa = 0.1;
+    public static final double pivotMMKv = 0.15;
+    public static final double pivotMMAcc = 50;
+    public static final double pivotMMVel = 50;
+    public static final double pivotMMJerk = 500;
 
     public static TalonFXSConfiguration getCoralMotorConfiguration() {
 
