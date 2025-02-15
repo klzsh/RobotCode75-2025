@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.measure.*;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -37,7 +38,10 @@ public final class DrivetrainConstants {
     public static final double toleranceTranslation = .05;
 
     public static final LinearVelocity maxVelocity = MetersPerSecond.of(3);
+    public static final LinearVelocity maxVelocityAuto = maxVelocity.div(2);
     public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
+    public static final LinearAcceleration maxAccelerationAuto = maxAcceleration.div(2);
+
 
     /** Radians per Second */
     public static final AngularVelocity maxAngularVelocity =
@@ -50,6 +54,10 @@ public final class DrivetrainConstants {
         RadiansPerSecondPerSecond.of(
             maxSpeed.in(MetersPerSecond)
                 / Math.hypot(trackWidth.in(Meters) / 2.0, trackLength.in(Meters) / 2.0));
+
+    public static final AngularVelocity maxAngularVelocityAuto = maxAngularVelocity.div(2);
+    public static final AngularAcceleration maxAngularAccelerationAuto = maxAngularAcceleration.div(2);
+
   }
 
   /*

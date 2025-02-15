@@ -57,15 +57,15 @@ public class RobotContainer {
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
 
-  @Logged(name = "Elevator")
+//   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
-  @Logged(name = "Coral Intake")
+//   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
-  @Logged(name = "Climber")
+//   @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
-  @Logged(name = "Alage Intake")
+//   @Logged(name = "Alage Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
@@ -136,11 +136,13 @@ public class RobotContainer {
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
-    m_AlgaeIntake.setDefaultCommand(
-        new InstantCommand(() -> m_AlgaeIntake.resetStates(), m_AlgaeIntake).repeatedly());
-    m_Climber.setDefaultCommand(
-        new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
-            .repeatedly());
+    // m_AlgaeIntake.setDefaultCommand(
+    //     new InstantCommand(() -> m_AlgaeIntake.resetStates(), m_AlgaeIntake).repeatedly());
+    // m_Climber.setDefaultCommand(
+    //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
+    //         .repeatedly());
+    m_Climber.setDefaultCommand(new InstantCommand(()->m_Climber.runPosition(-m_Controller.getLeftY()*100), m_Climber));
+
   }
 
   /**
@@ -163,8 +165,10 @@ public class RobotContainer {
     // m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
     // m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
-    m_Controller.povLeft().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setStates(AlgaeStates.INTAKING, PivotState.RETRACTED), m_AlgaeIntake).repeatedly());
-    m_Controller.povRight().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setStates(AlgaeStates.OUTAKING, PivotState.RETRACTED), m_AlgaeIntake).repeatedly());
+    m_Controller.povLeft().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
+    m_Controller.povLeft().whileFalse(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.NONE)).repeatedly());
+    m_Controller.leftBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setPivotState(PivotState.GROUNDINTAKE)).repeatedly());
+    m_Controller.leftBumper().whileFalse(new InstantCommand(() -> m_AlgaeIntake.setPivotState(PivotState.RETRACTED)).repeatedly());
     // m_Controller.leftBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
     // m_Controller.rightBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake).repeatedly());
 
@@ -172,8 +176,7 @@ public class RobotContainer {
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
-    testDrivePose.whileTrue(
-        new DriveToPose(m_Swerve, new Pose2d(2.9, 4.0, new Rotation2d(0)), false));
+    m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, new Pose2d(2.94, 4.02, Rotation2d.fromDegrees(0)), false));
 
     m_Controller
         .a()

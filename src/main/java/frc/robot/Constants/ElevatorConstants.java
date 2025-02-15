@@ -37,7 +37,7 @@ public class ElevatorConstants {
   public static final Angle l1Position = Rotations.of(2);
   public static final Angle l2Position = Rotations.of(7);
   public static final Angle l3Position = Rotations.of(15.3);
-  public static final Angle l4Position = Rotations.of(26.3);
+  public static final Angle l4Position = Rotations.of(25.5);
   public static final Angle homePosition = Rotations.of(0);
   public static final Angle processorPosition = Rotations.of(2);
 

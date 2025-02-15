@@ -300,21 +300,21 @@ public class AlgaeIntake extends SubsystemBase {
       // no default case because all states are accounted for
     }
 
-    // switch (m_PivotState) {
-    //   case RETRACTED -> {
-    //     m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
-    //   }
-    //   case GROUNDINTAKE -> {
-    //     m_AlgaePivot.setControl(pivotRequest.withPosition(pivotGroundIntakePosition));
-    //   }
-    //   case DEALGAEFY -> {
-    //     m_AlgaePivot.setControl(pivotRequest.withPosition(pivotDeAlgifyPosition));
-    //   }
-    //   case NONE -> {
-    //     // just keep the pivot retracted if there is no state
-    //     m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
-    //   }
-    //   // no default case because all states are accounted for
-    // }
+    switch (m_PivotState) {
+      case RETRACTED -> {
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
+      }
+      case GROUNDINTAKE -> {
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotGroundIntakePosition));
+      }
+      case DEALGAEFY -> {
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotDeAlgifyPosition));
+      }
+      case NONE -> {
+        // just keep the pivot retracted if there is no state
+        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
+      }
+      // no default case because all states are accounted for
+    }
   }
 }

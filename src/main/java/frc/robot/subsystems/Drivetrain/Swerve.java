@@ -196,7 +196,7 @@ public class Swerve extends SubsystemBase {
   public void setChassisSpeeds(ChassisSpeeds speeds) {
     setpointSpeeds = speeds;
     var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
-    // setModuleStates(swerveModuleStates, false);
+    setModuleStates(swerveModuleStates, false);
   }
 
   /**
@@ -228,7 +228,7 @@ public class Swerve extends SubsystemBase {
    * @param desiredStates The desired module state to set the wheels
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, 1); // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }

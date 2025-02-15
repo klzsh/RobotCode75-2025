@@ -53,18 +53,18 @@ public class AutoAlignController {
 
     xController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            DrivetrainConstants.ControllerConstants.maxAcceleration.in(MetersPerSecondPerSecond)
+            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond) / Math.sqrt(2),
+            DrivetrainConstants.ControllerConstants.maxAccelerationAuto.in(MetersPerSecondPerSecond)
                 / Math.sqrt(2)));
     yController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            DrivetrainConstants.ControllerConstants.maxAcceleration.in(MetersPerSecondPerSecond)
+            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond) / Math.sqrt(2),
+            DrivetrainConstants.ControllerConstants.maxAccelerationAuto.in(MetersPerSecondPerSecond)
                 / Math.sqrt(2)));
     thetaController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxAngularVelocity.in(RadiansPerSecond),
-            DrivetrainConstants.ControllerConstants.maxAngularAcceleration.in(
+            DrivetrainConstants.ControllerConstants.maxAngularVelocityAuto.in(RadiansPerSecond),
+            DrivetrainConstants.ControllerConstants.maxAngularAccelerationAuto.in(
                 RadiansPerSecondPerSecond)));
 
     m_Swerve = swerve;
@@ -91,7 +91,7 @@ public class AutoAlignController {
     double radiansSetpoint = targetPose.getRotation().getRadians();
 
     double thetaVel =
-        -thetaController.calculate(m_Swerve.getRotation2D().getRadians(), radiansSetpoint);
+        thetaController.calculate(m_Swerve.getRotation2D().getRadians(), radiansSetpoint);
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, thetaVel, currentPose.getRotation());
   }
