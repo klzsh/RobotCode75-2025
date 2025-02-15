@@ -54,7 +54,7 @@
 			st: ['rtr', 'rr', 'rtl'],
 			sm: ['rtr', 'rr', 'rbr'],
 			sb: ['rbl', 'rbr', 'rr'],
-			rtr: ['ht'],
+			rtr: ['ht', 'p'],
 			rr: ['ht', 'hb', 'p'],
 			rbr: ['hb', 'p'],
 			rtl: ['ht'],
@@ -64,6 +64,40 @@
 			ht: ['rl', 'rtl', 'rtr', 'rr', 'rbl'],
 			hb: ['rl', 'rbl', 'rbr', 'rr', 'rtl'],
 		};
+
+        var algaeLeft = {
+            'rtr': true,
+            'rr': true,
+            'rbr': true,
+            'rbl': true
+        }
+
+        var l4Filled = {
+            'rtl': {
+                'l': false,
+                'r': false
+            },
+            'rl': {
+                'l': false,
+                'r': false
+            },
+            'rbl': {
+                'l': false,
+                'r': false
+            },
+            'rbr': {
+                'l': false,
+                'r': false
+            },
+            'rr': {
+                'l': false,
+                'r': false
+            },
+            'rtr': {
+                'l': false,
+                'r': false
+            }
+        }
 
 		var field;
 		var startDots;
@@ -76,9 +110,15 @@
 		var numArrow = 0;
 		var string = '';
 		var stringDisplay;
+        var hasCoral = true;
+        var hasAlgae = false;
+        var coralIndicator;
+        var algaeIndicator;
+        var gamePointIndicator;
+        var gamePoints = 0;
+        var leave = false;
 
 		window.onload = () => {
-			console.log('loaded');
 			field = document.getElementById('layer1');
 			startDots = document.getElementsByClassName('start');
 			for (let i = 0; i < startDots.length; i++) {
@@ -99,6 +139,9 @@
 				});
 			}
 			stringDisplay = document.getElementById('string');
+            coralIndicator = document.getElementById('hasCoral');
+            algaeIndicator = document.getElementById('hasAlgae');
+            gamePointIndicator = document.getElementById('gamePoints');
 		};
 
 		function addString(text) {
@@ -114,7 +157,32 @@
 			if (!button.classList.contains('active-action')) {
 				return;
 			}
+            if (name === 'dealgify') {
+                hasAlgae = true;
+                algaeLeft[currentDot] = false;
+            }
+            if (name === 'algaeprocessor') {
+                hasAlgae = false;
+                gamePoints += 6;
+                gamePointIndicator.innerHTML = gamePoints.toString();
+            }
+            if (name.startsWith('hp')) {
+                hasCoral = true;
+            }
+            if (name.startsWith('l')) {
+                hasCoral = false;
+                if (name[1] == '4') {
+                    l4Filled[currentDot][name[2]] = true;
+                    gamePoints += 7;
+                } else {
+                    gamePoints += 3;
+                }
+                gamePointIndicator.innerHTML = gamePoints.toString();
+            }
+            coralIndicator.innerHTML = hasCoral ? '✅' : '❌';
+            algaeIndicator.innerHTML = hasAlgae ? '✅' : '❌';
 			addString((actions.indexOf(name) + 1).toString());
+            updateActions();
 		}
 
 		function setStart(pose) {
@@ -151,6 +219,11 @@
 			if (!dot.classList.contains('active-dot')) {
 				return;
 			}
+            if (pose.name[0] !== 's' && !leave) {
+                leave = true;
+                gamePoints += 3;
+                gamePointIndicator.innerHTML = gamePoints.toString();
+            }
 			if (currentDot != '') {
 				document
 					.getElementById(currentDot)
@@ -224,23 +297,22 @@
 			}
 		}
 
+        function removeArrows() {
+            for (let i = numArrow - 1; i >= 0; i--) {
+                document.getElementById('arrow' + i).remove();
+            }
+            numArrow = 0;
+        }
+
 		function changeActiveDots(pose) {
 			removeGhosts();
+            updateActions();
 			const valid = adj[pose.name];
 			for (let i = 0; i < points.length; i++) {
 				if (!valid.includes(points[i])) {
 					const dot = document.getElementById(points[i]);
 					dot.classList.remove('active-dot');
 				}
-			}
-			const actions = document.getElementsByClassName('action');
-			for (let i = 0; i < actions.length; i++) {
-				actions[i].classList.remove('active-action');
-			}
-			actionClass = pose.name[0] + 'action';
-			const validActions = document.getElementsByClassName(actionClass);
-			for (let i = 0; i < validActions.length; i++) {
-				validActions[i].classList.add('active-action');
 			}
 			for (let i = 0; i < valid.length; i++) {
 				const dot = document.getElementById(valid[i]);
@@ -265,14 +337,130 @@
 			}
 		}
 
-		function printString() {
-			alert(string);
-		}
+        function updateActions() {
+            const actions = document.getElementsByClassName('action');
+			for (let i = 0; i < actions.length; i++) {
+				actions[i].classList.remove('active-action');
+			}
+			actionClass = currentDot[0] + 'action';
+			const validActions = document.getElementsByClassName(actionClass);
+			for (let i = 0; i < validActions.length; i++) {
+				if (!adj[currentDot].includes('p') && validActions[i].id === 'dealgify') {
+                    continue;
+                }
+                if (validActions[i].classList.contains('raction') && validActions[i].id !== 'dealgify' && !hasCoral) {
+                    continue;
+                }
+                if (validActions[i].classList.contains('haction') && hasCoral) {
+                    continue;
+                }
+                if (validActions[i].id === 'dealgify' && (hasAlgae || !algaeLeft[currentDot])) {
+                    continue;
+                }
+                if (validActions[i].id === 'algaeprocessor' && !hasAlgae) {
+                    continue;
+                }
+                if (validActions[i].id.startsWith('l4') && l4Filled[currentDot][validActions[i].id[2]]) {
+                    continue;
+                }
+                validActions[i].classList.add('active-action');
+			}
+        }
+
+		function copyString() {
+            navigator.clipboard.writeText(string);
+            alert('Copied \"' + string + '\"');
+        }
+
+        function undo() {
+            removeGhosts();
+            removeArrows();
+            for (let i = 0; i < points.length; i++) {
+                document.getElementById(points[i]).classList.remove('active-dot');
+            }
+            for (let i = 0; i < startDots.length; i++) {
+                startDots[i].classList.add('active-dot');
+            }
+            document.getElementById('currentposedisplay').remove();
+            algaeLeft = {
+                'rtr': true,
+                'rr': true,
+                'rbr': true,
+                'rbl': true
+            }
+    
+            l4Filled = {
+                'rtl': {
+                    'l': false,
+                    'r': false
+                },
+                'rl': {
+                    'l': false,
+                    'r': false
+                },
+                'rbl': {
+                    'l': false,
+                    'r': false
+                },
+                'rbr': {
+                    'l': false,
+                    'r': false
+                },
+                'rr': {
+                    'l': false,
+                    'r': false
+                },
+                'rtr': {
+                    'l': false,
+                    'r': false
+                }
+            }
+            startPose = null;
+            lastPose = null;
+            currentDot = '';
+            const xOffset = 461.16876;
+            const yOffset = 188.64792;
+            numArrow = 0;
+            hasCoral = true;
+            hasAlgae = false;
+            gamePoints = 0;
+            leave = false;
+            const things = string.split(' ');
+            string = '';
+            for (let i = 0; i < things.length - 1; i++) {
+                if (i === 0) {
+                    const start = document.getElementById(things[i]);
+                    setStart({
+						x: parseInt(start.getAttribute('cx')),
+						y: parseInt(start.getAttribute('cy')),
+						heading: headings[things[i]],
+						name: things[i]
+					});
+                    continue;
+                }
+                if (things[i] >= '0' && things[i] <= '9') {
+                    doAction(actions[parseInt(things[i]) - 1]);
+                } else {
+                    console.log(things[i]);
+                    const pose = document.getElementById(things[i]);
+                    setPose({
+                        x: parseInt(pose.getAttribute('cx')),
+						y: parseInt(pose.getAttribute('cy')),
+						heading: headings[things[i]],
+						name: things[i]
+                    });
+                }
+            }
+            coralIndicator.innerHTML = hasCoral ? '✅' : '❌';
+            algaeIndicator.innerHTML = hasAlgae ? '✅' : '❌';
+            gamePointIndicator.innerHTML = gamePoints.toString();
+        }
 	</script>
 	<style>
 		body {
 			display: flex;
 			flex-direction: row;
+            background-color: #3E3E3E;
 		}
 		.active-dot:hover {
 			cursor: pointer;
@@ -304,12 +492,19 @@
 				fill: #505050 !important;
 			}
 		}
+        .div {
+            margin-left: 25px;
+            font-family: Verdana, Helvetica;
+            color: white;
+        }
 		#string {
-			margin-left: 25px;
-			font-family: Verdana, Helvetica;
 			max-width: 600px;
+            min-height: 25px;
 			overflow: wrap;
 		}
+        .state {
+            margin-top: 15px;
+        }
 	</style>
 </head>
 
@@ -749,5 +944,18 @@
   </g>
 </svg>
 
-	<p id="string"></p>
+	<div class="div">
+        <p id="string"></p>
+        <button id="copy" onclick="copyString()">Copy String</button>
+        <div class="state">
+            Total Points: <span id="gamePoints">0</span>
+        </div>
+        <div class="state">
+            Has Coral? <span id="hasCoral">✅</span> <br/>
+            Has Algae? <span id="hasAlgae">❌</span>
+        </div>
+        <div class="state">
+            <button id="undo" onclick="undo()">Undo</button>
+        </div>
+    </div>
 </body>
