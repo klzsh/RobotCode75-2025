@@ -45,6 +45,7 @@ public class TalonFXLogger extends ClassSpecificLogger<TalonFX> {
       logger.log("Processor Temp Exceeded", motor.getFault_ProcTemp().refresh().getValue());
     }
     if (Epilogue.shouldLog(Importance.INFO) || Epilogue.shouldLog(Importance.DEBUG)) {
+      logger.log("Stator Current Limit Exceeded", motor.getFault_StatorCurrLimit(true).getValue());
       logger.log("Velocity", motor.getVelocity().refresh().getValue().in(RotationsPerSecond));
       logger.log("Position", motor.getPosition().refresh().getValue().in(Rotations));
       logger.log("Output Voltage", motor.getMotorVoltage().refresh().getValue().in(Volts));

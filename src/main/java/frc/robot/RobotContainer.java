@@ -27,6 +27,8 @@ import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
+import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
+import frc.robot.subsystems.EndEffector.AlgaeIntake.PivotState;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -131,7 +133,7 @@ public class RobotContainer {
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
     m_AlgaeIntake.setDefaultCommand(
-        new InstantCommand(() -> m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
+        new InstantCommand(() -> m_AlgaeIntake.resetStates(), m_AlgaeIntake).repeatedly());
   }
 
   /**
@@ -154,19 +156,17 @@ public class RobotContainer {
     // m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
     // m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
+    m_Controller.povLeft().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setStates(AlgaeStates.INTAKING, PivotState.RETRACTED), m_AlgaeIntake).repeatedly());
+    m_Controller.povRight().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setStates(AlgaeStates.OUTAKING, PivotState.RETRACTED), m_AlgaeIntake).repeatedly());
+    // m_Controller.leftBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
+    // m_Controller.rightBumper().whileTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake).repeatedly());
+
+
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
     testDrivePose.whileTrue(
         new DriveToPose(m_Swerve, new Pose2d(2.9, 4.0, new Rotation2d(0)), false));
-
-    m_Controller
-        .povLeft()
-        .whileTrue(
-            new InstantCommand(() -> m_AlgaeIntake.runSetpoint(), m_AlgaeIntake).repeatedly());
-    m_Controller
-        .povRight()
-        .whileTrue(new InstantCommand(() -> m_AlgaeIntake.setZero(), m_AlgaeIntake).repeatedly());
 
     m_Controller
         .a()

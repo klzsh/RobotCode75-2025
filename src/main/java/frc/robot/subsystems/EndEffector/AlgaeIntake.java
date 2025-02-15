@@ -40,7 +40,7 @@ public class AlgaeIntake extends SubsystemBase {
   public static enum PivotState {
     RETRACTED,
     GROUNDINTAKE,
-    DEAGLAEFY,
+    DEALGAEFY,
     NONE
   }
 
@@ -157,6 +157,11 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
+  public void setStates(AlgaeStates algaeState, PivotState pivotState) {
+    setAlgaeState(algaeState);
+    setPivotState(pivotState);
+  }
+
   public void setPivotState(PivotState state) {
     m_PivotState = state;
   }
@@ -192,13 +197,26 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaePivot.setControl(pivotRequest.withPosition(Rotations.of(totalRotations)));
   }
 
+  public void resetStates() {
+    resetAlgaeState();
+    resetPivotState();
+  }
+
+  public void resetAlgaeState() {
+    if (m_AlgaeIntakeState != AlgaeStates.HASGAMEPIECE) {
+      m_AlgaeIntakeState = AlgaeStates.NONE;
+    }
+  }
+
+  public void resetPivotState() {
+    m_PivotState = PivotState.NONE;
+  }
+
   public boolean isAtPositionAbsolute(double absolutePosition) {
     return Math.abs(absolutePosition - m_absoluteEncoder.get()) < algaePivotDeadband;
   }
 
-  //  public boolean isAtPosition(PivotState state) {
-  //
-  //  }
+
   public void runSetpoint() {
     m_AlgaePivot.setControl(pivotRequest.withPosition(1));
   }
@@ -260,29 +278,27 @@ public class AlgaeIntake extends SubsystemBase {
     }
 
     // This method will be called once per scheduler run
-    if (m_AlgaeMotor.getFault_StatorCurrLimit().getValue()) {
+    if (m_AlgaeMotor.getStatorCurrent(true).getValue().in(Amps) >= 38 && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
     }
 
-    // switch (m_AlgaeIntakeState) {
-    //   case INTAKING -> {
-    //     m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeIntakeSpeed));
-    //   }
-    //   case HASGAMEPIECE -> {
-    //     // set the velocity control to a very low value (like 1-2 rps) to hold the algae in. The
-    //     // motor will stall trying to get to the desired speed, and that will help hold the ball
-    // in;
-    //     m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeHoldSpeed));
-    //   }
-    //   case OUTAKING -> {
-    //     m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeOutakeSpeed));
-    //   }
-    //   case NONE -> {
-    //     // set a NONE state for when there is no algae and we are not intaking anything
-    //     m_AlgaeMotor.setControl(currentOut.withOutput(Amps.of(0)));
-    //   }
-    //   // no default case because all states are accounted for
-    // }
+    switch (m_AlgaeIntakeState) {
+      case INTAKING -> {
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeIntakeSpeed));
+      }
+      case HASGAMEPIECE -> {
+        // set the velocity control to a very low value (like 1-2 rps) to hold the algae in. The
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeHoldSpeed));
+      }
+      case OUTAKING -> {
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeOutakeSpeed));
+      }
+      case NONE -> {
+        // set a NONE state for when there is no algae and we are not intaking anything
+        m_AlgaeMotor.setControl(currentOut.withOutput(Amps.of(0)));
+      }
+      // no default case because all states are accounted for
+    }
 
     // switch (m_PivotState) {
     //   case RETRACTED -> {
@@ -291,7 +307,7 @@ public class AlgaeIntake extends SubsystemBase {
     //   case GROUNDINTAKE -> {
     //     m_AlgaePivot.setControl(pivotRequest.withPosition(pivotGroundIntakePosition));
     //   }
-    //   case DEAGLAEFY -> {
+    //   case DEALGAEFY -> {
     //     m_AlgaePivot.setControl(pivotRequest.withPosition(pivotDeAlgifyPosition));
     //   }
     //   case NONE -> {
