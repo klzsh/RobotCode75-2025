@@ -377,6 +377,7 @@
             removeArrows();
             for (let i = 0; i < points.length; i++) {
                 document.getElementById(points[i]).classList.remove('active-dot');
+                document.getElementById(points[i]).classList.remove('current-dot');
             }
             for (let i = 0; i < startDots.length; i++) {
                 startDots[i].classList.add('active-dot');
