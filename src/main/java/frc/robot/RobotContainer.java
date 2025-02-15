@@ -30,6 +30,7 @@ import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -61,6 +62,9 @@ public class RobotContainer {
 
   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
+  
+  @Logged(name = "Algae Intake")
+  private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -130,6 +134,8 @@ public class RobotContainer {
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
+
+    m_AlgaeInt
   }
 
   /**

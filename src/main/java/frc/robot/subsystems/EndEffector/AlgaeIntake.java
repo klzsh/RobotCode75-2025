@@ -39,7 +39,6 @@ public class AlgaeIntake extends SubsystemBase {
     RETRACTED,
     GROUNDINTAKE,
     DEAGLAEFY,
-    HOMING,
     NONE
   }
 
