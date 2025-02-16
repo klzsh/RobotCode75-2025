@@ -42,6 +42,10 @@ import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Drivetrain.Swerve;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -77,11 +81,6 @@ public class RobotContainer {
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
-
-  // define auto factory for autos
-  // private final AutoFactory factory =
-  //     new AutoFactory(
-  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -237,7 +236,10 @@ public class RobotContainer {
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
   }
 
-  private void configureChooser() {}
+  private void configureChooser() {
+    m_Selector.setupAutoTab();
+    m_Selector.clearField();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
