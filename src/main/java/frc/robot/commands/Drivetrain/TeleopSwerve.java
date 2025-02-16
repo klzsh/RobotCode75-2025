@@ -2,10 +2,10 @@ package frc.robot.commands.Drivetrain;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.robot.Constants.DrivetrainConstants.*;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.commands.Util.Joysticks;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import java.util.function.DoubleSupplier;
@@ -45,12 +45,11 @@ public class TeleopSwerve extends Command {
     // you must negate the translation because FRC coordinates and Joystick axis values are
     // opposite to each other. This is done in robotContainer
     Translation2d translation2d =
-        new Translation2d(DriverInput[0], DriverInput[1])
-            .times(DrivetrainConstants.maxSpeed.in(MetersPerSecond));
+        new Translation2d(DriverInput[0], DriverInput[1]).times(maxSpeed.in(MetersPerSecond));
 
     m_Swerve.drive(
         translation2d,
-        DriverInput[2] * DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
+        DriverInput[2] * maxAngularVelocity.in(RadiansPerSecond),
         isOpenLoop,
         fieldRelative);
   }

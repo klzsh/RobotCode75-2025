@@ -6,8 +6,8 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.HardwareConstants.Elevator.*;
-import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
+import static frc.robot.Constants.ElevatorConstants.MotorConfigs.*;
+import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -72,21 +72,10 @@ public class Elevator extends SubsystemBase {
   private final DigitalInput m_lowerLimitSwitch;
   private final DigitalInput m_upperLimitSwitch;
   private final DigitalInput m_backupLimitSwitch;
-  // this is probably not going to be used for homing the elevator
-  // private final Counter m_distanceSensor;
 
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
-
-  // tunable numbers
-  private final TunableNumber upVelocity;
-  private final TunableNumber upAcceleration;
-  private final TunableNumber upJerk;
-
-  private final TunableNumber downVelocity;
-  private final TunableNumber downAcceleration;
-  private final TunableNumber downJerk;
 
   private Slot0Configs PIDConfig = new Slot0Configs();
   private final TunableNumber elevatorKp;
@@ -95,10 +84,6 @@ public class Elevator extends SubsystemBase {
   private final TunableNumber elevatorKs;
   private final TunableNumber elevatorKa;
   private final TunableNumber elevatorKv;
-
-  private final TunableNumber setpoint;
-  private final TunableNumber setpoint1;
-  private final TunableNumber setpoint2;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -118,19 +103,6 @@ public class Elevator extends SubsystemBase {
     // set the position of the elevator
     m_ElevatorMotor1.setPosition(ElevatorPositions.HOME.Rotations);
     m_ElevatorMotor2.setPosition(ElevatorPositions.HOME.Rotations);
-
-    // sets the default values for the tunable numbers
-    upVelocity = new TunableNumber("Elevator/UpVelocity", MotionMagicProfileUp[0]);
-    upAcceleration = new TunableNumber("Elevator/UpAcceleration", MotionMagicProfileUp[1]);
-    upJerk = new TunableNumber("Elevator/UpJerk", MotionMagicProfileUp[2]);
-
-    downVelocity = new TunableNumber("Elevator/DownVelocity", MotionMagicProfileDown[0]);
-    downAcceleration = new TunableNumber("Elevator/DownAcceleration", MotionMagicProfileDown[1]);
-    downJerk = new TunableNumber("Elevator/DownJerk", MotionMagicProfileDown[2]);
-
-    setpoint = new TunableNumber("Elevator/Setpoint", 0);
-    setpoint1 = new TunableNumber("Elevator/Setpoint1", 10);
-    setpoint2 = new TunableNumber("Elevator/Setpoint2", 5);
 
     PIDConfig.withKA(kA)
         .withKS(kS)
@@ -269,13 +241,13 @@ public class Elevator extends SubsystemBase {
     }
 
     if (getPosition().in(Rotations) < m_SetpointPosition.Rotations.in(Rotations)) {
-      m_PositionRequest.Velocity = upVelocity.getNumber();
-      m_PositionRequest.Acceleration = upAcceleration.getNumber();
-      m_PositionRequest.Jerk = upJerk.getNumber();
+      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
+      m_PositionRequest.Jerk = MotionMagicProfileUp[2];
     } else {
-      m_PositionRequest.Velocity = downVelocity.getNumber();
-      m_PositionRequest.Acceleration = downAcceleration.getNumber();
-      m_PositionRequest.Jerk = downJerk.getNumber();
+      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
+      m_PositionRequest.Jerk = MotionMagicProfileDown[2];
     }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
     double algaeOffset =

@@ -4,11 +4,10 @@
 
 package frc.robot.subsystems.EndEffector;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.EndEffectorConstants.*;
-import static frc.robot.Constants.HardwareConstants.EndEffector.*;
-import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
+import static frc.robot.Constants.EndEffectorConstants.MotorConfigs.*;
+import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -43,8 +42,10 @@ public class AlgaeIntake extends SubsystemBase {
   private final TunableNumber algaeIntakeKd;
   private final TunableNumber algaeIntakeKs;
 
+  // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+  // hold request
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
 
   /** Creates a new AlgaeIntake. */
@@ -55,7 +56,6 @@ public class AlgaeIntake extends SubsystemBase {
 
     algaeRequest.UpdateFreqHz = 0;
     algaeRequest.UseTimesync = true;
-    ;
 
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;

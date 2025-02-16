@@ -5,6 +5,8 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.*;
+import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,8 +18,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
-import frc.robot.Constants.DrivetrainConstants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /** Add your docs here. */
@@ -57,25 +57,22 @@ public class VisionController {
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    xController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceTranslation);
-    yController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceTranslation);
-    thetaController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceRadians);
+    xController.setTolerance(toleranceTranslation);
+    yController.setTolerance(toleranceTranslation);
+    thetaController.setTolerance(toleranceRadians);
 
     xController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            DrivetrainConstants.ControllerConstants.maxAcceleration.in(MetersPerSecondPerSecond)
-                / Math.sqrt(2)));
+            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
+            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
     yController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            DrivetrainConstants.ControllerConstants.maxAcceleration.in(MetersPerSecondPerSecond)
-                / Math.sqrt(2)));
+            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
+            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
     thetaController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxAngularVelocity.in(RadiansPerSecond),
-            DrivetrainConstants.ControllerConstants.maxAngularAcceleration.in(
-                RadiansPerSecondPerSecond)));
+            maxAngularVelocity.in(RadiansPerSecond),
+            maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
 
     fallbackController = fallback;
 
@@ -128,8 +125,7 @@ public class VisionController {
       lastSeenAprilTagTime = Timer.getFPGATimestamp();
     } else {
       if ((Timer.getFPGATimestamp() - lastSeenAprilTagTime) > maxTimeUntilFallbackToOdometry) {
-        return fallbackController.update(
-            m_Swerve.getPose(), FieldConstants.fieldPoses.get(targetPose));
+        return fallbackController.update(m_Swerve.getPose(), fieldPoses.get(targetPose));
       } else {
         return m_Swerve.getChassisSpeeds();
       }
@@ -138,7 +134,7 @@ public class VisionController {
     double xVel = xController.calculate(currentX, targetX);
     double yVel = yController.calculate(currentY, targetY);
 
-    double radiansSetpoint = FieldConstants.fieldPoses.get(targetPose).getRotation().getRadians();
+    double radiansSetpoint = fieldPoses.get(targetPose).getRotation().getRadians();
 
     double thetaVel =
         -thetaController.calculate(m_Swerve.getRotation2D().getRadians(), radiansSetpoint);

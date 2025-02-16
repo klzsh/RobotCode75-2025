@@ -6,12 +6,12 @@ package frc.robot.commands.Drivetrain;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.robot.Constants.DrivetrainConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.commands.Util.Joysticks;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -71,18 +71,14 @@ public class SnapHoldRotation extends Command {
         Joysticks.processJoystick(translationSup, strafeSup, () -> Double.valueOf(7542869.420));
 
     Translation2d translation2d =
-        new Translation2d(state[0], state[1])
-            .times(DrivetrainConstants.maxSpeed.in(MetersPerSecond));
+        new Translation2d(state[0], state[1]).times(maxSpeed.in(MetersPerSecond));
 
     double rotationOutput = m_Controller.getOutput();
     if (holdHeading) {
       rotationOutput = MathUtil.applyDeadband(rotationOutput, 0.05);
     }
     m_Swerve.drive(
-        translation2d,
-        rotationOutput * DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
-        false,
-        true);
+        translation2d, rotationOutput * maxAngularVelocity.in(RadiansPerSecond), false, true);
   }
 
   // Called once the command ends or is interrupted.

@@ -6,6 +6,11 @@ package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -14,7 +19,9 @@ import frc.lib.util.SwerveModuleConstants;
 
 /** Swerve drive constants */
 public final class DrivetrainConstants {
-  // TODO: make sure this is correct
+  /** Drivetrain CANBus name */
+  public static final String driveBusName = "Drivetrain";
+
   public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
   public static final int kPigeonID = 18;
@@ -37,9 +44,7 @@ public final class DrivetrainConstants {
     public static final double toleranceTranslation = .05;
 
     public static final LinearVelocity maxVelocity = MetersPerSecond.of(3);
-    public static final LinearVelocity maxVelocityAuto = maxVelocity.div(2);
     public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
-    public static final LinearAcceleration maxAccelerationAuto = maxAcceleration.div(2);
 
     /** Radians per Second */
     public static final AngularVelocity maxAngularVelocity =
@@ -100,9 +105,6 @@ public final class DrivetrainConstants {
           maxSpeed.in(MetersPerSecond)
               / Math.hypot(trackLength.in(Meters) / 2.0, trackWidth.in(Meters) / 2.0));
 
-  /** Drivetrain CANBus name */
-  public static final String driveBusName = "Drivetrain";
-
   /* Module Specific Constants */
   // ! Only change if a serious deviation is seen, as well as in each comp
   /* Front Left Module - Module 0 */
@@ -147,5 +149,131 @@ public final class DrivetrainConstants {
 
     public static final SwerveModuleConstants constants =
         new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+  }
+
+  public static final class MotorConfigs {
+    public static final TalonFXConfiguration m_DriveConfig = new TalonFXConfiguration();
+    public static final TalonFXConfiguration m_AngleConfig = new TalonFXConfiguration();
+    public static final CANcoderConfiguration m_EncoderConfig = new CANcoderConfiguration();
+    /* define actual constants */
+
+    /* Motor Inverts */
+    public static final InvertedValue angleMotorInvert = InvertedValue.Clockwise_Positive;
+    public static final InvertedValue driveMotorInvert = InvertedValue.Clockwise_Positive;
+
+    /* Angle Encoder Invert */
+    public static final SensorDirectionValue cancoderInvert =
+        SensorDirectionValue.CounterClockwise_Positive;
+
+    /* Swerve Current Limiting (Amps) */
+    public static final Current angleSupplyCurrentLimit = Amps.of(80);
+    public static final Current angleLowerCurrentThreshold = Amps.of(40);
+
+    public static final Current angleStatorCurrentLimit = Amps.of(120);
+    public static final Current angleStatorCurrentLimitForward = Amps.of(120);
+    public static final Current angleStatorCurrentLimitReverse = Amps.of(-120);
+    // Seconds
+    public static final Time angleCurrentThresholdTime = Seconds.of(0.50);
+    public static final Time driveCurrentThresholdTime = Seconds.of(0.50);
+    // amps
+    public static final Current driveSupplyCurrentLimit = Amps.of(80);
+    public static final Current driveCurrentLowerThreshold = Amps.of(40);
+
+    public static final Current driveStatorCurrentLimit = Amps.of(80);
+    public static final Current driveStatorCurrentLimitForward = Amps.of(80);
+    public static final Current driveStatorCurrentLimitReverse = Amps.of(-80);
+
+    /*
+     * These values are used by the drive motor to ramp in open loop and closed
+     * loop driving.
+     * We found a small open loop ramp (0.25 sec) helps with tread wear, tipping,
+     * etc
+     */
+    public static final Time openLoopRamp = Seconds.of(0.25);
+    public static final Time closedLoopRamp = Seconds.of(0.5);
+    public static final double angleTorqueKP = 50.0;
+    public static final double angleTorqueKI = 0.0;
+    public static final double angleTorqueKD = 1.0;
+
+    /* Drive Motor PID Values */
+    public static final double driveTorqueKP = 1.93;
+    public static final double driveTorqueKI = 0.0;
+    public static final double driveTorqueKD = 0.0;
+    public static final double driveTorqueKS = 10; // static feedforward
+
+    /* Neutral Modes */
+    public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
+    public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
+
+    public static final Frequency timeSyncFreq = Hertz.of(250);
+
+    public static TalonFXConfiguration getDriveConfiguration() {
+
+      m_DriveConfig.MotorOutput.Inverted = driveMotorInvert;
+      m_DriveConfig.MotorOutput.NeutralMode = driveNeutralMode;
+
+      /* Current Limiting */
+      m_DriveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+      m_DriveConfig.CurrentLimits.SupplyCurrentLimit = driveSupplyCurrentLimit.in(Amps);
+      m_DriveConfig.CurrentLimits.SupplyCurrentLowerTime = driveCurrentThresholdTime.in(Seconds);
+      m_DriveConfig.CurrentLimits.SupplyCurrentLowerLimit = driveCurrentLowerThreshold.in(Amps);
+
+      m_DriveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      m_DriveConfig.CurrentLimits.StatorCurrentLimit = driveStatorCurrentLimit.in(Amps);
+      m_DriveConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          driveStatorCurrentLimitForward.in(Amps);
+      m_DriveConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          driveStatorCurrentLimitReverse.in(Amps);
+
+      /* PID Config */
+      m_DriveConfig.Slot0.kP = driveTorqueKP;
+      m_DriveConfig.Slot0.kI = driveTorqueKI;
+      m_DriveConfig.Slot0.kD = driveTorqueKD;
+      m_DriveConfig.Slot0.kS = driveTorqueKS;
+
+      /* Open and Closed Loop Ramping */
+      m_DriveConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = openLoopRamp.in(Seconds);
+      m_DriveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = openLoopRamp.in(Seconds);
+
+      m_DriveConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
+      m_DriveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
+
+      m_DriveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = closedLoopRamp.in(Seconds);
+      m_DriveConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
+
+      return m_DriveConfig;
+    }
+
+    public static TalonFXConfiguration getAngleConfiguration() {
+      m_AngleConfig.MotorOutput.Inverted = angleMotorInvert;
+      m_AngleConfig.MotorOutput.NeutralMode = angleNeutralMode;
+
+      /* Current Limiting */
+      m_AngleConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+      m_AngleConfig.CurrentLimits.SupplyCurrentLimit = angleSupplyCurrentLimit.in(Amps);
+      m_AngleConfig.CurrentLimits.SupplyCurrentLowerTime = angleCurrentThresholdTime.in(Seconds);
+      m_AngleConfig.CurrentLimits.SupplyCurrentLowerLimit = angleLowerCurrentThreshold.in(Amps);
+
+      m_AngleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      m_AngleConfig.CurrentLimits.StatorCurrentLimit = angleStatorCurrentLimit.in(Amps);
+      m_AngleConfig.TorqueCurrent.PeakForwardTorqueCurrent =
+          angleStatorCurrentLimitForward.in(Amps);
+      m_AngleConfig.TorqueCurrent.PeakReverseTorqueCurrent =
+          angleStatorCurrentLimitReverse.in(Amps);
+
+      /* PID Config */
+      m_AngleConfig.Slot0.kP = angleTorqueKP;
+      m_AngleConfig.Slot0.kI = angleTorqueKI;
+      m_AngleConfig.Slot0.kD = angleTorqueKD;
+
+      m_AngleConfig.MotorOutput.ControlTimesyncFreqHz = timeSyncFreq.in(Hertz);
+
+      return m_AngleConfig;
+    }
+
+    public static CANcoderConfiguration getEncoderConfiguration() {
+      m_EncoderConfig.MagnetSensor.SensorDirection = cancoderInvert;
+      return m_EncoderConfig;
+    }
   }
 }

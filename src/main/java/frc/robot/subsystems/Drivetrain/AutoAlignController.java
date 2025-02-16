@@ -5,13 +5,13 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.*;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.lib.dashboard.TunableNumber;
-import frc.robot.Constants.DrivetrainConstants;
 
 /** Add your docs here. */
 public class AutoAlignController {
@@ -47,27 +47,22 @@ public class AutoAlignController {
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    xController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceTranslation);
-    yController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceTranslation);
-    thetaController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceRadians);
+    xController.setTolerance(toleranceTranslation);
+    yController.setTolerance(toleranceTranslation);
+    thetaController.setTolerance(toleranceRadians);
 
     xController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond)
-                / Math.sqrt(2),
-            DrivetrainConstants.ControllerConstants.maxAccelerationAuto.in(MetersPerSecondPerSecond)
-                / Math.sqrt(2)));
+            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
+            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
     yController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxVelocityAuto.in(MetersPerSecond)
-                / Math.sqrt(2),
-            DrivetrainConstants.ControllerConstants.maxAccelerationAuto.in(MetersPerSecondPerSecond)
-                / Math.sqrt(2)));
+            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
+            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
     thetaController.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.ControllerConstants.maxAngularVelocityAuto.in(RadiansPerSecond),
-            DrivetrainConstants.ControllerConstants.maxAngularAccelerationAuto.in(
-                RadiansPerSecondPerSecond)));
+            maxAngularVelocityAuto.in(RadiansPerSecond),
+            maxAngularAccelerationAuto.in(RadiansPerSecondPerSecond)));
 
     m_Swerve = swerve;
     reset();

@@ -1,10 +1,10 @@
 package frc.robot.subsystems.Drivetrain;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.*;
+import static frc.lib.math.Conversions.*;
+import static frc.lib.util.CTREModuleState.optimize;
+import static frc.robot.Constants.DrivetrainConstants.*;
+import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -24,11 +24,7 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
-import frc.lib.math.Conversions;
-import frc.lib.util.CTREModuleState;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.Constants.DrivetrainConstants;
-import frc.robot.Constants.HardwareConstants;
 
 /*
  * OVERVIEW OF A SWERVE MODULE
@@ -78,22 +74,21 @@ public class TalonFXSwerveModule {
     this.angleOffset = moduleConstants.angleOffset();
 
     /* Angle Encoder Config */
-    angleEncoder = new CANcoder(moduleConstants.cancoderID(), DrivetrainConstants.driveBusName);
+    angleEncoder = new CANcoder(moduleConstants.cancoderID(), driveBusName);
     configAngleEncoder();
 
     /* Angle Motor Config */
-    mAngleMotor = new TalonFX(moduleConstants.angleMotorID(), DrivetrainConstants.driveBusName);
+    mAngleMotor = new TalonFX(moduleConstants.angleMotorID(), driveBusName);
     configAngleMotor();
 
     /* Drive Motor Config */
-    mDriveMotor = new TalonFX(moduleConstants.driveMotorID(), DrivetrainConstants.driveBusName);
+    mDriveMotor = new TalonFX(moduleConstants.driveMotorID(), driveBusName);
     configDriveMotor();
 
     lastAngle = getState().angle;
     setpoint = new SwerveModuleState();
 
     // set control requests to be one shot + enable timesync:
-    // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/api-usage/status-signals.html#canivore-timesync
     driveDutyCycle.UpdateFreqHz = 0;
     driveDutyCycle.UseTimesync = true;
 
@@ -120,7 +115,7 @@ public class TalonFXSwerveModule {
      * continuous controller which CTRE and Rev onboard is not
      */
 
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
+    desiredState = optimize(desiredState, getState().angle);
     setpoint = desiredState;
     setAngle(desiredState, steerWhenStationary);
     // will either be percent output or velocity based on open loop
@@ -135,16 +130,15 @@ public class TalonFXSwerveModule {
    */
   private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
     if (isOpenLoop) {
-      driveDutyCycle.Output =
-          desiredState.speedMetersPerSecond / DrivetrainConstants.maxSpeed.in(MetersPerSecond);
+      driveDutyCycle.Output = desiredState.speedMetersPerSecond / maxSpeed.in(MetersPerSecond);
       mDriveMotor.setControl(driveDutyCycle.withEnableFOC(true));
     } else {
       mDriveMotor.setControl(
           torqueDrivevelocity.withVelocity(
-              Conversions.MPSToTalon(
+              MPSToTalon(
                   MetersPerSecond.of(desiredState.speedMetersPerSecond),
-                  DrivetrainConstants.wheelCircumference,
-                  DrivetrainConstants.driveGearRatio)));
+                  wheelCircumference,
+                  driveGearRatio)));
     }
   }
 
@@ -168,8 +162,7 @@ public class TalonFXSwerveModule {
     Rotation2d angle = new Rotation2d();
     if (!steerWhenStationary) {
       angle =
-          (Math.abs(desiredState.speedMetersPerSecond)
-                  <= (DrivetrainConstants.maxSpeed.in(MetersPerSecond) * 0.01))
+          (Math.abs(desiredState.speedMetersPerSecond) <= (maxSpeed.in(MetersPerSecond) * 0.01))
               ? lastAngle
               : desiredState
                   .angle; // Prevent rotating module if speed is less then 1%. Prevents Jittering.
@@ -179,8 +172,7 @@ public class TalonFXSwerveModule {
 
     mAngleMotor.setControl(
         torqueAngleCurrent.withPosition(
-            Conversions.degreesToTalon(
-                Degrees.of(angle.getDegrees()), DrivetrainConstants.angleGearRatio)));
+            degreesToTalon(Degrees.of(angle.getDegrees()), angleGearRatio)));
 
     lastAngle = angle;
   }
@@ -195,9 +187,7 @@ public class TalonFXSwerveModule {
             mAngleMotor.getPosition().refresh(), mAngleMotor.getVelocity().refresh());
 
     return Rotation2d.fromDegrees(
-        Conversions.talonToDegrees(
-                Rotations.of(LatencyCompensatedPosition.in(Rotations)),
-                DrivetrainConstants.angleGearRatio)
+        talonToDegrees(Rotations.of(LatencyCompensatedPosition.in(Rotations)), angleGearRatio)
             .in(Degrees));
   }
 
@@ -225,26 +215,25 @@ public class TalonFXSwerveModule {
   /** resets the module to the "forward" position */
   public void resetToAbsolute() {
     Angle absolutePosition =
-        Conversions.degreesToTalon(
-            Degrees.of(waitForCANcoder().getDegrees() - angleOffset.getDegrees()),
-            DrivetrainConstants.angleGearRatio);
+        degreesToTalon(
+            Degrees.of(waitForCANcoder().getDegrees() - angleOffset.getDegrees()), angleGearRatio);
     mAngleMotor.setPosition(absolutePosition);
   }
 
   /** configures angle encoder based on ctreConfigs */
   private void configAngleEncoder() {
-    angleEncoder.getConfigurator().apply(HardwareConstants.Swerve.getEncoderConfiguration());
+    angleEncoder.getConfigurator().apply(getEncoderConfiguration());
   }
 
   /** configures angle motor based on ctreConfigs */
   private void configAngleMotor() {
-    mAngleMotor.getConfigurator().apply(HardwareConstants.Swerve.getAngleConfiguration());
+    mAngleMotor.getConfigurator().apply(getAngleConfiguration());
     resetToAbsolute();
   }
 
   /** configures drive motor based on ctreConfigs */
   private void configDriveMotor() {
-    mDriveMotor.getConfigurator().apply(HardwareConstants.Swerve.getDriveConfiguration());
+    mDriveMotor.getConfigurator().apply(getDriveConfiguration());
     mDriveMotor.getConfigurator().setPosition(0);
   }
 
@@ -262,10 +251,7 @@ public class TalonFXSwerveModule {
   @Logged(name = "Module State", importance = Importance.DEBUG)
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        Conversions.talonToMPS(
-            mDriveMotor.getVelocity().getValue(),
-            DrivetrainConstants.wheelCircumference,
-            DrivetrainConstants.driveGearRatio),
+        talonToMPS(mDriveMotor.getVelocity().getValue(), wheelCircumference, driveGearRatio),
         getAngle());
   }
 
@@ -287,10 +273,10 @@ public class TalonFXSwerveModule {
             mDriveMotor.getPosition().refresh(), mDriveMotor.getVelocity().refresh());
 
     return new SwerveModulePosition(
-        Conversions.talonToMeters(
+        talonToMeters(
             Rotations.of(LatencyCompensatedPosition.in(Rotations)),
-            DrivetrainConstants.wheelCircumference,
-            DrivetrainConstants.driveGearRatio),
+            wheelCircumference,
+            driveGearRatio),
         getAngle());
   }
 }

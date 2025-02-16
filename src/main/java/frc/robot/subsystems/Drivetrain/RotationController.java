@@ -5,11 +5,11 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.*;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import frc.robot.Constants.DrivetrainConstants;
 
 /** Add your docs here. */
 
@@ -26,14 +26,14 @@ public class RotationController {
   public RotationController(Swerve swerve) {
     controller =
         new ProfiledPIDController(
-            DrivetrainConstants.ControllerConstants.kp,
-            0,
-            DrivetrainConstants.ControllerConstants.kd,
+            kp,
+            0, // no I term
+            kd,
             new TrapezoidProfile.Constraints(0.0, 0.0),
-            DrivetrainConstants.ControllerConstants.loopPeriodSeconds);
+            loopPeriodSeconds);
     controller.enableContinuousInput(-Math.PI, Math.PI);
 
-    controller.setTolerance(DrivetrainConstants.ControllerConstants.toleranceRadians);
+    controller.setTolerance(toleranceRadians);
     this.swerve = swerve;
 
     controller.reset(
@@ -49,8 +49,8 @@ public class RotationController {
 
     controller.setConstraints(
         new TrapezoidProfile.Constraints(
-            DrivetrainConstants.maxAngularVelocity.in(RadiansPerSecond),
-            DrivetrainConstants.maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
+            maxAngularVelocity.in(RadiansPerSecond),
+            maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
 
     this.output = -controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
   }

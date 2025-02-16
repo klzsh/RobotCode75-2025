@@ -2,7 +2,7 @@ package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.Constants.DrivetrainConstants.*;
-import static frc.robot.Constants.HardwareConstants.Swerve.*;
+import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
@@ -13,9 +13,6 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,15 +22,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
-import frc.robot.Constants.DrivetrainConstants.BackLeft;
-import frc.robot.Constants.DrivetrainConstants.BackRight;
-import frc.robot.Constants.DrivetrainConstants.FrontLeft;
-import frc.robot.Constants.DrivetrainConstants.FrontRight;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /*
@@ -72,15 +63,7 @@ public class Swerve extends SubsystemBase {
   private final TunableNumber driveKD;
   private final TunableNumber driveKS;
 
-  private final TunableNumber angleKP;
-  private final TunableNumber angleKD;
-
-  private final TunableNumber VisionSTDX;
-  private final TunableNumber VisionSTDY;
-  private final TunableNumber VisionSTDTheta;
-
   private final Slot0Configs drivePIDS;
-  private final Slot0Configs anglePIDS;
 
   // controllers for autos
   private final PIDController xController;
@@ -90,19 +73,18 @@ public class Swerve extends SubsystemBase {
   private final AprilTagCamera m_CenterCamera;
   private final AprilTagCamera m_ModuleCamera;
 
-  private Matrix<N3, N1> tempMatrix;
-
   // do this later
-  // private final TunableNumber translationKP;
-  // private final TunableNumber translationKI;
-  // private final TunableNumber translationKD;
+  // private final TunableNumber xKP;
+  // private final TunableNumber xKI;
+  // private final TunableNumber xKD;
+
+  // private final TunableNumber yKP;
+  // private final TunableNumber yKI;
+  // private final TunableNumber yKD;
 
   // private final TunableNumber rotationKP;
   // private final TunableNumber rotationKI;
   // private final TunableNumber rotationKD;
-
-  // @Logged(name = "PDH", importance = Importance.DEBUG)
-  // private final PowerDistribution m_PDH;
 
   // gryo
   private Pigeon2 m_gyro;
@@ -112,7 +94,6 @@ public class Swerve extends SubsystemBase {
 
     m_ModuleCamera = moduleCamera;
     m_CenterCamera = centerCamera;
-    // m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized
@@ -149,21 +130,12 @@ public class Swerve extends SubsystemBase {
     driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
     driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
 
-    angleKP = new TunableNumber("Swerve/AngleMotor/kP", angleTorqueKP);
-    angleKD = new TunableNumber("Swerve/AngleMotor/kD", angleTorqueKD);
-
-    VisionSTDX = new TunableNumber("Vision/STD Dev X", visionMatrix.get(0, 0));
-    VisionSTDY = new TunableNumber("Vision/STD Dev Y", visionMatrix.get(1, 0));
-    VisionSTDTheta = new TunableNumber("Vision/STD Dev Theta", visionMatrix.get(2, 0));
-    tempMatrix = visionMatrix;
-
     drivePIDS =
         new Slot0Configs()
             .withKP(driveTorqueKP)
             .withKI(0)
             .withKD(driveTorqueKD)
             .withKS(driveTorqueKS);
-    anglePIDS = new Slot0Configs().withKP(angleTorqueKP).withKI(0).withKD(angleTorqueKD);
   }
 
   /**
@@ -345,6 +317,7 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // update pose estimator with vision measurements
     if (m_CenterCamera.getEstimatedPose() != null) {
       swerveOdometry.addVisionMeasurement(
           m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
@@ -358,6 +331,7 @@ public class Swerve extends SubsystemBase {
 
     swerveOdometry.update(getRotation2D(), getModulePositions());
 
+    // set odometry to vision pose if it deviates by more than half a meter
     if (m_CenterCamera.getEstimatedPose() != null) {
       if (Math.abs(
                   m_CenterCamera.getEstimatedPose().estimatedPose.getX()
@@ -394,29 +368,6 @@ public class Swerve extends SubsystemBase {
 
       for (TalonFXSwerveModule mod : m_SwerveModules) {
         mod.setDrivePIDS(drivePIDS);
-      }
-    }
-
-    if (VisionSTDX.getNumber() != visionMatrix.get(0, 0)
-        || VisionSTDY.getNumber() != visionMatrix.get(1, 0)
-        || VisionSTDTheta.getNumber() != visionMatrix.get(2, 0)) {
-
-      tempMatrix =
-          MatBuilder.fill(
-              Nat.N3(),
-              Nat.N1(),
-              VisionSTDX.getNumber(),
-              VisionSTDY.getNumber(),
-              VisionSTDTheta.getNumber());
-      swerveOdometry.setVisionMeasurementStdDevs(tempMatrix);
-    }
-
-    if (angleKP.getNumber() != anglePIDS.kP || angleKD.getNumber() != anglePIDS.kD) {
-
-      anglePIDS.kP = angleKP.getNumber();
-      anglePIDS.kS = angleKD.getNumber();
-      for (TalonFXSwerveModule mod : m_SwerveModules) {
-        mod.setAnglePIDS(anglePIDS);
       }
     }
   }

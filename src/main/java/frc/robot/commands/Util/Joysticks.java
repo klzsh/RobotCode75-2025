@@ -1,7 +1,8 @@
 package frc.robot.commands.Util;
 
+import static frc.robot.Constants.OIConstants.*;
+
 import edu.wpi.first.math.MathUtil;
-import frc.robot.Constants.OIConstants;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -13,23 +14,19 @@ public class Joysticks {
       DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup) {
     double translationVal =
         MathUtil.applyDeadband(
-            translationSup.getAsDouble() * OIConstants.translationStickMapValue,
-            OIConstants.stickDeadband);
+            translationSup.getAsDouble() * translationStickMapValue, stickDeadband);
     double strafeVal =
-        MathUtil.applyDeadband(
-            strafeSup.getAsDouble() * OIConstants.translationStickMapValue,
-            OIConstants.stickDeadband);
-    double rotationVal =
-        MathUtil.applyDeadband(rotationSup.getAsDouble(), OIConstants.stickDeadband);
+        MathUtil.applyDeadband(strafeSup.getAsDouble() * translationStickMapValue, stickDeadband);
+    double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), stickDeadband);
 
     translationVal =
         translationVal >= 0
-            ? Math.pow(translationVal, OIConstants.translationJoystickExpo)
-            : -1 * Math.pow(-translationVal, OIConstants.translationJoystickExpo);
+            ? Math.pow(translationVal, translationJoystickExpo)
+            : -1 * Math.pow(-translationVal, translationJoystickExpo);
     strafeVal =
         strafeVal >= 0
-            ? Math.pow(strafeVal, OIConstants.translationJoystickExpo)
-            : -1 * Math.pow(-strafeVal, OIConstants.translationJoystickExpo);
+            ? Math.pow(strafeVal, translationJoystickExpo)
+            : -1 * Math.pow(-strafeVal, translationJoystickExpo);
 
     /*
      * make the translation to drive the robot

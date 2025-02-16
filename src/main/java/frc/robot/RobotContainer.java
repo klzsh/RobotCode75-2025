@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.OIConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,8 +19,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -51,13 +52,11 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "CoralCam")
-  private final AprilTagCamera CoralCam =
-      new AprilTagCamera("Center_Cam", VisionConstants.CenterCamPose);
-
   @Logged(name = "CenterCam")
-  private final AprilTagCamera CenterCam =
-      new AprilTagCamera("Coral_Cam", VisionConstants.CoralCamPose);
+  private final AprilTagCamera CenterCam = new AprilTagCamera("Center_Cam", CenterCamPose);
+
+  @Logged(name = "CoralCam")
+  private final AprilTagCamera CoralCam = new AprilTagCamera("Coral_Cam", CoralCamPose);
 
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
@@ -85,23 +84,20 @@ public class RobotContainer {
   //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   // define OI controls
-  private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
-  private final Joystick m_RightStick = new Joystick(OIConstants.rightStickPort);
-  private final CommandXboxController m_Controller =
-      new CommandXboxController(OIConstants.controllerPort);
+  private final Joystick m_LeftStick = new Joystick(leftStickPort);
+  private final Joystick m_RightStick = new Joystick(rightStickPort);
+  private final CommandXboxController m_Controller = new CommandXboxController(controllerPort);
 
   // define driver buttons
   private final JoystickButton robotRelative =
-      new JoystickButton(m_RightStick, OIConstants.robotRelativeButton);
-  private final JoystickButton resetHeading =
-      new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
-  private final JoystickButton Xstance = new JoystickButton(m_RightStick, OIConstants.xstance);
+      new JoystickButton(m_RightStick, robotRelativeButton);
+  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, resetHeadingButton);
+  private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
 
   private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
   private final JoystickButton testDrivePose = new JoystickButton(m_RightStick, 5);
 
-  private final JoystickButton holdButton =
-      new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
+  private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
@@ -153,7 +149,7 @@ public class RobotContainer {
     //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
     //         .repeatedly());
     m_Climber.setDefaultCommand(
-        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 100), m_Climber));
+        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 50), m_Climber));
   }
 
   /**

@@ -6,8 +6,8 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.EndEffectorConstants.*;
-import static frc.robot.Constants.HardwareConstants.*;
-import static frc.robot.Constants.HardwareConstants.EndEffector.*;
+import static frc.robot.Constants.EndEffectorConstants.MotorConfigs.*;
+import static frc.robot.Constants.RobotConstants.*;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -91,7 +91,7 @@ public class AlgaePivot extends SubsystemBase {
     algaePivotKs = new TunableNumber("Algae Pivot/kS", pivotKS);
 
     m_absoluteEncoder =
-        new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.getRotations());
+        new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.in(Rotations));
     Timer.delay(5);
     m_AlgaePivot.setPosition((getAbsolutePosition() + 0.01) * pivotMotorGearRatio);
   }

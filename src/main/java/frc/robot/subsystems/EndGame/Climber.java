@@ -6,8 +6,8 @@ package frc.robot.subsystems.EndGame;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ClimberConstants.*;
-import static frc.robot.Constants.HardwareConstants.*;
-import static frc.robot.Constants.HardwareConstants.Climber.*;
+import static frc.robot.Constants.ClimberConstants.MotorConfigs.*;
+import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -64,9 +64,10 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor1 = new TalonFX(climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(climberMotor2CANID, superstructureCANBusName);
 
-    climberMMCruiseVelocity = new TunableNumber("Climber/Cruise Velocity", MMcruiseVelocity);
-    climberMMKv = new TunableNumber("Climber/MM kV", MMkV);
-    climberMMKa = new TunableNumber("Climber/MM kA", MMkA);
+    climberMMCruiseVelocity =
+        new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
+    climberMMKv = new TunableNumber("Climber/MM kV", motionMagickV);
+    climberMMKa = new TunableNumber("Climber/MM kA", motionMagickA);
 
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
     m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
