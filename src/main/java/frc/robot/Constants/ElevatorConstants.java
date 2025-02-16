@@ -38,7 +38,7 @@ public class ElevatorConstants {
   public static double[] MotionMagicProfileUp = {70, 70, 1000};
   public static double[] MotionMagicProfileDown = {40, 40, 400};
 
-  public static final Angle deadband = Rotations.of(0.5);
+  public static final Angle deadband = Rotations.of(0.7);
 
   public static final class MotorConfigs {
 

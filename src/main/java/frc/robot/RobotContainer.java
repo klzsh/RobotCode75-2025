@@ -25,8 +25,13 @@ import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.DeAlgaefy;
+import frc.robot.commands.EndEffector.GroundAlgaePickup;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
+import frc.robot.commands.EndEffector.Coral.ScoreL1;
+import frc.robot.commands.EndEffector.Coral.ScoreL2;
+import frc.robot.commands.EndEffector.Coral.ScoreL3;
+import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -158,77 +163,67 @@ public class RobotContainer {
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
-    // m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    // m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    // m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    // m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    m_Controller.x().and(() -> m_Controller.getLeftTriggerAxis() <= 0.15).whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    m_Controller.y().and(() -> m_Controller.getLeftTriggerAxis() <= 0.15).whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
-    m_Controller
-        .povLeft()
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING), m_AlgaeIntake)
-                .repeatedly());
+    // m_Controller
+    //     .povLeft()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //                 () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING), m_AlgaeIntake)
+    //             .repeatedly());
     m_Controller
         .povRight()
         .whileTrue(
             new InstantCommand(
                     () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake)
                 .repeatedly());
-    m_Controller
-        .leftBumper()
-        .whileTrue(
-            new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE))
-                .repeatedly());
-    // m_Controller.leftBumper().whileTrue(new InstantCommand(() ->
-    // m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING)).repeatedly());
+    m_Controller.leftBumper().whileTrue(new GroundAlgaePickup(m_AlgaeIntake, m_AlgaePivot));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
     m_Controller
         .rightBumper()
         .whileTrue(
             new DriveToPose(m_Swerve, new Pose2d(2.94, 4.02, Rotation2d.fromDegrees(0)), false));
 
-    m_Controller
-        .a()
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
-                .repeatedly());
-    m_Controller
-        .b()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
-                .repeatedly());
-    m_Controller
-        .x()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
-                .repeatedly());
-    m_Controller
-        .y()
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
-                .repeatedly());
+    // m_Controller
+    //     .a()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
+    //             .repeatedly());
+    // m_Controller
+    //     .b()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+    //     .whileTrue(
+    //         new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
+    //             .repeatedly());
+    // m_Controller
+    //     .x()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+    //     .whileTrue(
+    //         new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
+    //             .repeatedly());
+    // m_Controller
+    //     .y()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //                 () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
+    //             .repeatedly());
 
     m_Controller
-        .b()
+        .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
     m_Controller
-        .x()
+        .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
-    m_Controller
-        .rightBumper()
-        .onTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.HASGAMEPIECE)));
   }
 
   private void configureChooser() {

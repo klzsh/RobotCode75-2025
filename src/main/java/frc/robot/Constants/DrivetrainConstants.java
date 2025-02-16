@@ -169,9 +169,9 @@ public final class DrivetrainConstants {
     public static final Current angleSupplyCurrentLimit = Amps.of(80);
     public static final Current angleLowerCurrentThreshold = Amps.of(40);
 
-    public static final Current angleStatorCurrentLimit = Amps.of(120);
-    public static final Current angleStatorCurrentLimitForward = Amps.of(120);
-    public static final Current angleStatorCurrentLimitReverse = Amps.of(-120);
+    public static final Current angleStatorCurrentLimit = Amps.of(60);
+    public static final Current angleStatorCurrentLimitForward = Amps.of(60);
+    public static final Current angleStatorCurrentLimitReverse = Amps.of(-60);
     // Seconds
     public static final Time angleCurrentThresholdTime = Seconds.of(0.50);
     public static final Time driveCurrentThresholdTime = Seconds.of(0.50);

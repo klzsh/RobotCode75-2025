@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.FieldPose;
@@ -99,12 +100,12 @@ public class VisionController {
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
       // so we don't need to set new offsets for every reef position
       // instead we just map all reef positions to REEFA
-      targetPose = new FieldPose(targetPose.side, FieldElement.RL, targetPose.offset);
+      targetPose = new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, targetPose.offset);
     }
     if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
       // so we don't need to set new offsets for both HP stations
       // instead we just map all reef positions to TOPHPSTATION
-      targetPose = new FieldPose(targetPose.side, FieldElement.HT, targetPose.offset);
+      targetPose = new FieldPose(DriverStation.getAlliance().get(), FieldElement.HT, targetPose.offset);
     }
 
     Translation2d targetOffset = fieldPoseOffsets.get(targetPose);

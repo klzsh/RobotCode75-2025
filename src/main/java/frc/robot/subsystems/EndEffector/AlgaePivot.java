@@ -93,7 +93,7 @@ public class AlgaePivot extends SubsystemBase {
     m_absoluteEncoder =
         new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.in(Rotations));
     Timer.delay(5);
-    m_AlgaePivot.setPosition((getAbsolutePosition() + 0.01) * pivotMotorGearRatio);
+    m_AlgaePivot.setPosition((getAbsolutePosition() - 0.135) * pivotMotorGearRatio);
   }
 
   public void setPivotState(PivotState state) {
