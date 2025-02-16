@@ -1,65 +1,65 @@
 package frc.lib.util;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 public class FieldPose {
 
-  public enum Side {
-    BLUE,
-    RED
+  public enum FieldElement {
+    HT,
+    HB,
+    RL,
+    RBL,
+    RBR,
+    RR,
+    RTR,
+    RTL,
+    P
   }
 
-  public enum FieldElement {
-    TOPHPSTATION,
-    BOTTOMHPSTATION,
-    REEFA,
-    REEFB,
-    REEFC,
-    REEFD,
-    REEFE,
-    REEFF,
-    REEFG,
-    PROCESSOR
+  public static FieldElement fromString(String reefPoint) {
+    switch (reefPoint.toUpperCase()) {
+      case "RL":
+        return FieldElement.RL;
+      case "RBL":
+        return FieldElement.RBL;
+      case "RBR":
+        return FieldElement.RBR;
+      case "RR":
+        return FieldElement.RR;
+      case "RTR":
+        return FieldElement.RTR;
+      case "RTL":
+        return FieldElement.RTL;
+      default:
+        return null;
+    }
   }
 
   public static boolean fieldElementIsReef(FieldElement fieldElement) {
-    return (fieldElement == FieldElement.REEFA
-        || fieldElement == FieldElement.REEFB
-        || fieldElement == FieldElement.REEFC
-        || fieldElement == FieldElement.REEFD
-        || fieldElement == FieldElement.REEFE
-        || fieldElement == FieldElement.REEFF
-        || fieldElement == FieldElement.REEFG);
+    return (fieldElement == FieldElement.RL
+        || fieldElement == FieldElement.RBL
+        || fieldElement == FieldElement.RBR
+        || fieldElement == FieldElement.RR
+        || fieldElement == FieldElement.RTR
+        || fieldElement == FieldElement.RTL);
   }
 
   public static boolean fieldElementIsHPStation(FieldElement fieldElement) {
-    return (fieldElement == FieldElement.TOPHPSTATION
-        || fieldElement == FieldElement.BOTTOMHPSTATION);
+    return (fieldElement == FieldElement.HT || fieldElement == FieldElement.HB);
   }
 
   public enum Offset {
-    NONE,
-    LEFT, // used for side loading and for coral intake
-    RIGHT, // used for side loading and for coral intake
-    SIDELOADMID, // stupid hack
-    // left 1 means one inset left from the middlemost one across all 3
-    // same thing for right
-    // used for front loading HP station
-    // 3 and 4 may not be possible depening on side, etc
-    LEFT1,
-    LEFT2,
-    LEFT3,
-    LEFT4,
-    RIGHT1,
-    RIGHT2,
-    RIGHT3,
-    RIGHT4
+    MID,
+    LEFT,
+    RIGHT
   }
 
-  public Side side;
+  public Alliance alliance;
   public FieldElement fieldElement;
   public Offset offset;
 
-  public FieldPose(Side side, FieldElement fieldElement, Offset offset) {
-    this.side = side;
+  public FieldPose(Alliance alliance, FieldElement fieldElement, Offset offset) {
+    this.alliance = alliance;
     this.fieldElement = fieldElement;
     this.offset = offset;
   }

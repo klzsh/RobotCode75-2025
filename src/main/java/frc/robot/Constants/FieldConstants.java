@@ -4,10 +4,10 @@ import static java.util.Map.entry;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.lib.util.FieldPose.Side;
 import java.util.Map;
 
 public class FieldConstants {
@@ -23,148 +23,84 @@ public class FieldConstants {
       Map.ofEntries(
           // processor
           entry(
-              new FieldPose(Side.RED, FieldElement.PROCESSOR, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.P, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           // sideload
           entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.SIDELOADMID),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.SIDELOADMID),
+              new FieldPose(Alliance.Blue, FieldElement.HB, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.HB, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.HB, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           // frontload top station
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          // frontload bottom station
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           // Reef positions
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
+              new Pose2d(5.15, 5.15, new Rotation2d(240.0))),
+          entry(
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RBL, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFB, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RBL, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFB, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RBL, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFB, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RBR, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFC, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RBR, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFC, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RBR, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFC, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RR, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFD, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RR, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFD, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RR, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFD, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RTR, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFE, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RTR, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFE, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RTR, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFE, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.MID),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFF, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFF, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFF, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFG, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFG, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFG, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.RIGHT),
               new Pose2d(0.0, 0.0, new Rotation2d(0.0)))
 
-          // TODO: Auto field flipping for blue side (or red side ig)
+          // TODO: Auto field flipping for red side
           );
 }

@@ -38,10 +38,6 @@ import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
-import frc.robot.subsystems.Drivetrain.Swerve;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -236,8 +232,8 @@ public class RobotContainer {
   }
 
   private void configureChooser() {
-    m_Selector.setupAutoTab();
-    m_Selector.clearField();
+    // m_Selector.setupAutoTab();
+    // m_Selector.clearField();
   }
 
   /**

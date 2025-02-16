@@ -12,11 +12,11 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 // import frc.robot.subsystems.Drivetrain.VisionController;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.lib.util.FieldPose.Side;
 import java.util.Map;
 
 public class VisionConstants {
@@ -28,47 +28,29 @@ public class VisionConstants {
       Map.ofEntries(
           // processor
           entry(
-              new FieldPose(Side.RED, FieldElement.PROCESSOR, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.P, Offset.MID),
               new Translation2d(0.0, 0.0)),
 
           // frontload top station AND bottom HP station
           entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT1),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.LEFT),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT2),
-              new Translation2d(0.0, 0.0)),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT3),
-              new Translation2d(0.0, 0.0)),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT4),
-              new Translation2d(0.0, 0.0)),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT1),
-              new Translation2d(0.0, 0.0)),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT2),
-              new Translation2d(0.0, 0.0)),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT3),
-              new Translation2d(0.0, 0.0)),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT4),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.RIGHT),
               new Translation2d(0.0, 0.0)),
 
           // Reef offsets (THESE SHOULD ALL BE THE SAME, THEY ARE JUST HERE FOR CONSISTENCY )
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.NONE),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
               new Translation2d(0.0, 0.0))
 
           // TODO: Auto field flipping for blue side (or red side ig)

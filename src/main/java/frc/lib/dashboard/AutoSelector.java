@@ -35,7 +35,7 @@ import java.util.Map;
  * Feedback - displays errors, shows completed path
  * Generate - checks paths for errors, displays trajectories on field, sets auto command
  * Reset - reset trajectories, string, and auto command
- * 
+ *
  * FORMAT FOR AUTO STRING
  * Separated into words by spaces - commands in the same word are executed simultaneously
  * Each word can contain one point and one action max
@@ -97,7 +97,6 @@ public class AutoSelector {
     autoStringEntry = table.getTopic("Enter Command").getGenericEntry();
     feedbackEntry = table.getTopic("Feedback").getGenericEntry();
     feedbackEntry.setString("Enter a command!");
-    // safetyEntry = table.getTopic("Ignore Safety").getGenericEntry();
 
     m_field = new Field2d();
     m_actionMap = actionMap;
@@ -157,7 +156,7 @@ public class AutoSelector {
 
   public void setupAutoTab() {
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
-    
+
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
     autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
@@ -176,13 +175,6 @@ public class AutoSelector {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTable ntTable = inst.getTable("Shuffleboard").getSubTable("Auto");
 
-    // ntTable.addListener(
-    //     "Enter Command",
-    //     EnumSet.of(Kind.kValueAll),
-    //     (table, key, event) -> {
-    //       generatePaths();
-    //     });
-
     ntTable.addListener(
         "Generate",
         EnumSet.of(Kind.kValueAll),
@@ -196,13 +188,6 @@ public class AutoSelector {
           reset();
         });
 
-    // ntTable.addListener(
-    //     "Ignore Safety",
-    //     EnumSet.of(Kind.kValueAll),
-    //     (table, key, event) -> {
-    //       generatePaths();
-    //     });
-
     if (DriverStation.getAlliance().get() == Alliance.Blue) {
       m_startPositions = AutoConstants.blueStartPositions;
     } else {
@@ -213,7 +198,6 @@ public class AutoSelector {
   public void generatePaths() {
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
-    // boolean ignoreSafety = safetyEntry.getBoolean(false);
 
     if (!m_startPositions.containsKey(words[0].toLowerCase())) {
       setFeedback("Invalid start position");

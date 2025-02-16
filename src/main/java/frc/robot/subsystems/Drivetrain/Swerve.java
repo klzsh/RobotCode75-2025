@@ -23,8 +23,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /*
@@ -192,6 +194,11 @@ public class Swerve extends SubsystemBase {
                     + sample.omega),
             getPose().getRotation());
     this.setChassisSpeeds(speeds);
+  }
+
+  /** returns a command to drive to a certain pose */
+  public Command getPoseCommand(Pose2d pose) {
+    return new DriveToPose(this, pose, false);
   }
 
   /**

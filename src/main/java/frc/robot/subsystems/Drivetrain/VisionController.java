@@ -9,8 +9,6 @@ import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.*;
 import static frc.robot.Constants.FieldConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import org.photonvision.PhotonUtils;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +19,7 @@ import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import org.photonvision.PhotonUtils;
 
 /** Add your docs here. */
 public class VisionController {
@@ -100,12 +99,12 @@ public class VisionController {
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
       // so we don't need to set new offsets for every reef position
       // instead we just map all reef positions to REEFA
-      targetPose = new FieldPose(targetPose.side, FieldElement.REEFA, targetPose.offset);
+      targetPose = new FieldPose(targetPose.side, FieldElement.RL, targetPose.offset);
     }
     if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
       // so we don't need to set new offsets for both HP stations
       // instead we just map all reef positions to TOPHPSTATION
-      targetPose = new FieldPose(targetPose.side, FieldElement.TOPHPSTATION, targetPose.offset);
+      targetPose = new FieldPose(targetPose.side, FieldElement.HT, targetPose.offset);
     }
 
     Translation2d targetOffset = fieldPoseOffsets.get(targetPose);
@@ -114,16 +113,27 @@ public class VisionController {
     boolean hasTarget = true;
     double targetYaw = 0;
     double targetMeters = 0;
+    double xDisplacement;
+    double yDisplacement;
 
     if (!primaryCamera.getTarget(targetTagID).isEmpty()) {
 
       tX = primaryCamera.getX(targetTagID).getAsDouble();
       // targetYaw = primaryCamera.getYaw(targetTagID).getAsDouble();
 
-      targetMeters = PhotonUtils.calculateDistanceToTargetMeters(0.5,
-  1.435,
-  0, // TODO FIND 
-  primaryCamera.getPitch(targetTagID).getAsDouble());
+      targetMeters =
+          PhotonUtils.calculateDistanceToTargetMeters(
+              0.5,
+              1.435,
+              0, // TODO FIND
+              primaryCamera.getPitch(targetTagID).getAsDouble());
+
+      double thetaCalc = Math.asin(tX / targetMeters);
+      double absoluteAngleToTag = thetaCalc + m_Swerve.getRotation2D().getRadians();
+      double robotToAprilTagAngle = Math.PI / 2 - absoluteAngleToTag;
+
+      xDisplacement = targetMeters * Math.cos(absoluteAngleToTag);
+      yDisplacement = targetMeters * Math.sin(absoluteAngleToTag);
 
       lastSeenAprilTagTime = Timer.getFPGATimestamp();
     } else {
@@ -134,8 +144,8 @@ public class VisionController {
       }
     }
 
-    double xVel = xController.calculate(currentX, targetX);
-    double yVel = yController.calculate(currentY, targetY);
+    double xVel = xController.calculate(xDisplacement, targetOffset.getX());
+    double yVel = yController.calculate(yDisplacement, targetOffset.getY());
 
     double radiansSetpoint = fieldPoses.get(targetPose).getRotation().getRadians();
 

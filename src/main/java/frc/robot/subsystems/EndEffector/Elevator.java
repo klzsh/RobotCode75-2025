@@ -262,7 +262,6 @@ public class Elevator extends SubsystemBase {
       m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
       m_PositionRequest.Jerk = MotionMagicProfileDown[2];
     }
-    
 
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
       m_ElevatorMotor1.setControl(
