@@ -35,7 +35,7 @@ public class EndEffectorConstants {
 
   public static final int coralBeamBreakDIO = 2;
   public static final int algaePivotEncoderPort = 4;
-  public static final int algaeLimitSwitchPort = 0;
+  public static final int algaeLimitSwitchPort = 6;
 
   public static final Angle algaePivotZeroPoint = Rotations.of(0);
   public static final Angle algaeEncoderOffset = Rotations.of(0);
