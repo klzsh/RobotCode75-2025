@@ -24,10 +24,6 @@ import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.EndEffector.Coral.ScoreL1;
-import frc.robot.commands.EndEffector.Coral.ScoreL2;
-import frc.robot.commands.EndEffector.Coral.ScoreL3;
-import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.commands.EndEffector.DeAlgaefy;
 import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.commands.EndEffector.ScoreCoral;
@@ -166,10 +162,10 @@ public class RobotContainer {
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
-    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    // m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    // m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    // m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    // m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
     m_Controller
         .povLeft()
@@ -234,6 +230,9 @@ public class RobotContainer {
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
+    m_Controller
+        .rightBumper()
+        .onTrue(new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.HASGAMEPIECE)));
   }
 
   private void configureChooser() {

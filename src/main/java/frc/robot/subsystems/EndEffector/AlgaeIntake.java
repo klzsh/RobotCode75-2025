@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 
@@ -42,6 +43,8 @@ public class AlgaeIntake extends SubsystemBase {
   private final TunableNumber algaeIntakeKd;
   private final TunableNumber algaeIntakeKs;
 
+  private final DigitalInput m_AlgaeIntakeLimit;
+
   // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
@@ -53,6 +56,8 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeMotor = new TalonFX(algaeMotorCanID, superstructureCANBusName);
     m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = AlgaeStates.NONE;
+
+    m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
 
     algaeRequest.UpdateFreqHz = 0;
     algaeRequest.UseTimesync = true;
@@ -101,9 +106,7 @@ public class AlgaeIntake extends SubsystemBase {
       m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
     }
 
-    // This method will be called once per scheduler run
-    if (m_AlgaeMotor.getStatorCurrent(true).getValue().in(Amps) >= 40
-        && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
+    if (!m_AlgaeIntakeLimit.get() && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
     }
 
@@ -112,7 +115,7 @@ public class AlgaeIntake extends SubsystemBase {
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeIntakeSpeed));
       }
       case HASGAMEPIECE -> {
-        // set the velocity control to a very low value (like 1-2 rps) to hold the algae in. The
+        // set the velocity control to a very low value (like 1-2 rps) to hold the algae in
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeHoldSpeed));
       }
       case OUTAKING -> {

@@ -25,22 +25,39 @@ public class DeAlgaefy extends SequentialCommandGroup {
   public DeAlgaefy(
       Elevator elevator, AlgaeIntake algaeIntake, AlgaePivot algaePivot, boolean isL2) {
     if (isL2) { // temporary fix until we get april tags
+      /*
+       * first move elev to position
+       *  parallel:
+       *    {
+       *    spin wheels
+       *    extend pivot
+       *      UNTIL: limit switch is pressed (button release)
+       *    }
+       *    {
+       *      HOLD ELEV POSIITON
+       *    }
+       *    THEN:
+       *     Sequence:
+       *      switch state to has game peice
+       *      retract pivot
+       *  THEN
+       *    lower elev
+       */
+      addRequirements(elevator);
       addCommands(
-          /* L2 Algae Intake */
           elevator.positionCommand(ElevatorPositions.L2, true),
-          new InstantCommand(() -> algaeIntake.setAlgaeState(AlgaeStates.INTAKING)),
           new ParallelCommandGroup(
-              new RepeatCommand(
-                      new InstantCommand(
+                  new InstantCommand(
                           () -> {
                             algaeIntake.setAlgaeState(AlgaeStates.INTAKING);
                             algaePivot.setPivotState(PivotState.DEALGAEFY);
                           },
                           algaeIntake,
-                          algaePivot))
-                  .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE)),
-          elevator.positionCommand(ElevatorPositions.L2, true),
-          Commands.runOnce(() -> algaePivot.setPivotState(PivotState.RETRACTED)));
+                          algaePivot)
+                      .repeatedly()
+                      .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+                  elevator.positionCommand(ElevatorPositions.L2, true).repeatedly())
+              .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
     } else {
       /* L3 Algae Intake */
       addCommands(

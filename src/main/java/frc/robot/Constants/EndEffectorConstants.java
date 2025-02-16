@@ -35,6 +35,7 @@ public class EndEffectorConstants {
 
   public static final int coralBeamBreakDIO = 2;
   public static final int algaePivotEncoderPort = 4;
+  public static final int algaeLimitSwitchPort = 0;
 
   public static final Angle algaePivotZeroPoint = Rotations.of(0);
   public static final Angle algaeEncoderOffset = Rotations.of(0);
@@ -50,7 +51,7 @@ public class EndEffectorConstants {
   public static final Angle pivotHomePosition = Rotations.of(9);
   // TODO: need to tune
   public static final Angle pivotGroundIntakePosition = Rotations.of(4);
-  public static final Angle pivotDeAlgifyPosition = Rotations.of(4);
+  public static final Angle pivotDeAlgifyPosition = Rotations.of(6);
 
   public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(150);
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(-20);

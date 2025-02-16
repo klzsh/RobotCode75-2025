@@ -11,6 +11,6 @@ public final class OIConstants {
   public static final int xstance = 5;
   public static final int holdHeadingButton = 2;
 
-  public static final double translationStickMapValue = 2; //1.5
-  public static final double translationJoystickExpo = 2.24; // 1.46
+  public static final double translationStickMapValue = 1.5; // 1.5
+  public static final double translationJoystickExpo = 1.46; // 1.46
 }

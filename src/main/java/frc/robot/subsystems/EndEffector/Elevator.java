@@ -59,7 +59,7 @@ public class Elevator extends SubsystemBase {
   @Logged(name = "Current Position", importance = Importance.INFO)
   private ElevatorPositions m_SetpointPosition = ElevatorPositions.HOME;
 
-  private boolean m_IsAlgae = false;
+  @Logged private boolean m_IsAlgae = false;
 
   // define motors
   @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
@@ -135,6 +135,11 @@ public class Elevator extends SubsystemBase {
   public void setPosition(ElevatorPositions position, boolean isAlgae) {
     m_SetpointPosition = position;
     m_IsAlgae = isAlgae;
+  }
+
+  @Logged()
+  public double getPositionRotations() {
+    return m_SetpointPosition.Rotations.in(Rotations);
   }
 
   /**
@@ -239,16 +244,6 @@ public class Elevator extends SubsystemBase {
       m_ElevatorMotor1.setPosition(Rotations.of(26));
       m_ElevatorMotor2.setPosition(Rotations.of(26));
     }
-
-    if (getPosition().in(Rotations) < m_SetpointPosition.Rotations.in(Rotations)) {
-      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
-      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
-      m_PositionRequest.Jerk = MotionMagicProfileUp[2];
-    } else {
-      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
-      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
-      m_PositionRequest.Jerk = MotionMagicProfileDown[2];
-    }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
     double algaeOffset =
         (m_IsAlgae
@@ -257,6 +252,18 @@ public class Elevator extends SubsystemBase {
             ? algaeRemovalOffset.in(Rotations)
             : 0;
     double targetRotations = currentPosition + algaeOffset;
+
+    if (getPosition().in(Rotations) < targetRotations) {
+      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
+      m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+    } else {
+      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
+      m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+    }
+    
+
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
       m_ElevatorMotor1.setControl(
           m_CharacterizationRequest
