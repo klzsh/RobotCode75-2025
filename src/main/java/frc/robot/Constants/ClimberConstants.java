@@ -89,7 +89,7 @@ public final class ClimberConstants {
 
   public static final int climberMotor1CANID = 46;
   public static final int climberMotor2CANID = 47;
-  public static final int limitPort = 5;
+  public static final int limitPort = 7;
 
   // if needed
   private static final double gearRatio = 39.6 / 1.0;

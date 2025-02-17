@@ -25,10 +25,16 @@ import frc.lib.dashboard.TunableNumber;
 public class AlgaePivot extends SubsystemBase {
 
   public static enum PivotState {
-    RETRACTED,
-    GROUNDINTAKE,
-    DEALGAEFY,
-    NONE
+    RETRACTED(pivotHomePosition),
+    GROUNDINTAKE(pivotGroundIntakePosition),
+    DEALGAEFY(pivotDeAlgifyPosition),
+    NONE(pivotHomePosition);
+
+    public final Angle Rotations;
+
+    private PivotState(Angle rotations) {
+      this.Rotations = rotations;
+    }
   }
 
   private PivotState m_PivotState;
@@ -135,6 +141,12 @@ public class AlgaePivot extends SubsystemBase {
     return Math.abs(absolutePosition - m_absoluteEncoder.get()) < algaePivotDeadband;
   }
 
+  public boolean isAtPosition(PivotState state) {
+    return Math.abs(
+            state.Rotations.in(Rotations) - m_AlgaePivot.getPosition().getValue().in(Rotations))
+        < algaePivotDeadband;
+  }
+
   public void resetPivotMotor(Angle rotations) {
     m_AlgaePivot.setPosition(rotations);
   }
@@ -177,21 +189,6 @@ public class AlgaePivot extends SubsystemBase {
       m_AlgaePivot.getConfigurator().apply(PivotMMConfigs);
     }
 
-    switch (m_PivotState) {
-      case RETRACTED -> {
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
-      }
-      case GROUNDINTAKE -> {
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotGroundIntakePosition));
-      }
-      case DEALGAEFY -> {
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotDeAlgifyPosition));
-      }
-      case NONE -> {
-        // just keep the pivot retracted if there is no state
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
-      }
-        // no default case because all states are accounted for
-    }
+    m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
   }
 }

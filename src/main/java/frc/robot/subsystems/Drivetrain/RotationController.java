@@ -29,7 +29,7 @@ public class RotationController {
             kp,
             0, // no I term
             kd,
-            new TrapezoidProfile.Constraints(0.0, 0.0),
+            new TrapezoidProfile.Constraints(0.5, 1),
             loopPeriodSeconds);
     controller.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -52,7 +52,7 @@ public class RotationController {
             maxAngularVelocity.in(RadiansPerSecond),
             maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
 
-    this.output = -controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
+    this.output = controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
   }
 
   public void update(Rotation2d setpoint, double p, double d) {

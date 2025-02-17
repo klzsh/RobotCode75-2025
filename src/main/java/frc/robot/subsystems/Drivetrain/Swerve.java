@@ -23,9 +23,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import frc.robot.Constants.DrivetrainConstants.BackLeft;
+import frc.robot.Constants.DrivetrainConstants.BackRight;
+import frc.robot.Constants.DrivetrainConstants.FrontLeft;
+import frc.robot.Constants.DrivetrainConstants.FrontRight;
 import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
@@ -76,24 +81,29 @@ public class Swerve extends SubsystemBase {
   private final AprilTagCamera m_ModuleCamera;
 
   // do this later
-  // private final TunableNumber xKP;
-  // private final TunableNumber xKI;
-  // private final TunableNumber xKD;
+  private final TunableNumber xKP;
+  private final TunableNumber xKI;
+  private final TunableNumber xKD;
 
-  // private final TunableNumber yKP;
-  // private final TunableNumber yKI;
-  // private final TunableNumber yKD;
+  private final TunableNumber yKP;
+  private final TunableNumber yKI;
+  private final TunableNumber yKD;
 
-  // private final TunableNumber rotationKP;
-  // private final TunableNumber rotationKI;
-  // private final TunableNumber rotationKD;
+  private final TunableNumber rotationKP;
+  private final TunableNumber rotationKI;
+  private final TunableNumber rotationKD;
 
-  // gryo
+  private double lastUpdatedTime = 0;
+
+  @Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
+  private SwerveSample sample;
+
+  // gyro
   private Pigeon2 m_gyro;
 
   /** define swerve modules, Gyro, odometry */
   public Swerve(AprilTagCamera moduleCamera, AprilTagCamera centerCamera) {
-
+    sample = null;
     m_ModuleCamera = moduleCamera;
     m_CenterCamera = centerCamera;
 
@@ -118,6 +128,7 @@ public class Swerve extends SubsystemBase {
     xController = new PIDController(2.65, 0, 0);
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
+    rController.enableContinuousInput(-Math.PI, Math.PI);
     swerveOdometry =
         new SwerveDrivePoseEstimator(
             swerveKinematics,
@@ -131,6 +142,17 @@ public class Swerve extends SubsystemBase {
     driveKI = new TunableNumber("Swerve/DriveMotor/kI", driveTorqueKI);
     driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
     driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
+
+    xKP = new TunableNumber("Autos/X-KP", 2.65);
+    xKI = new TunableNumber("Autos/X-KI", 0);
+    xKD = new TunableNumber("Autos/X-KD", 0);
+
+    yKP = new TunableNumber("Autos/Y-KP", 3.9);
+    yKI = new TunableNumber("Autos/Y-KI", 0);
+    yKD = new TunableNumber("Autos/Y-KD", 0);
+    rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
+    rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
+    rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
 
     drivePIDS =
         new Slot0Configs()
@@ -173,6 +195,14 @@ public class Swerve extends SubsystemBase {
     setModuleStates(swerveModuleStates, false);
   }
 
+  public void setFieldRelative(ChassisSpeeds speeds) {
+    setpointSpeeds = speeds;
+    var states =
+        swerveKinematics.toSwerveModuleStates(
+            ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation2D()));
+    setModuleStates(states, false);
+  }
+
   /**
    * getter for chassis speeds
    *
@@ -184,16 +214,15 @@ public class Swerve extends SubsystemBase {
 
   /** follows an autonomous path provided by choreo */
   public void followSwerveSample(SwerveSample sample) {
-    // TODO: some fancy optimization stuff
+    this.sample = sample;
+    Pose2d pose = getPose();
+
     ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(
-                xController.calculate(getPose().getX(), sample.x) + sample.vx,
-                yController.calculate(getPose().getY(), sample.y) + sample.vy,
-                rController.calculate(getPose().getRotation().getRadians(), sample.heading)
-                    + sample.omega),
-            getPose().getRotation());
-    this.setChassisSpeeds(speeds);
+        new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + rController.calculate(pose.getRotation().getRadians(), sample.heading));
+    this.setFieldRelative(speeds);
   }
 
   /** returns a command to drive to a certain pose */
@@ -208,7 +237,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, 1); // TODO: change this back to controller constants
+        desiredStates, 4.79); // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -261,6 +290,20 @@ public class Swerve extends SubsystemBase {
           getRotation2D(),
           getModulePositions(),
           camera.getEstimatedPose().estimatedPose.toPose2d());
+    }
+  }
+
+  public void updatePoseByVision(AprilTagCamera camera) {
+    double timestamp = Timer.getFPGATimestamp();
+    if (timestamp - lastUpdatedTime < 1) {
+      return;
+    }
+
+    lastUpdatedTime = timestamp;
+    if (camera.getEstimatedPose() != null) {
+      swerveOdometry.addVisionMeasurement(
+          camera.getEstimatedPose().estimatedPose.toPose2d(),
+          camera.getEstimatedPose().timestampSeconds);
     }
   }
 
@@ -325,32 +368,17 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {
     // update pose estimator with vision measurements
-    if (m_CenterCamera.getEstimatedPose() != null) {
-      swerveOdometry.addVisionMeasurement(
-          m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
-          m_CenterCamera.getEstimatedPose().timestampSeconds);
-    }
-    if (m_ModuleCamera.getEstimatedPose() != null) {
-      swerveOdometry.addVisionMeasurement(
-          m_ModuleCamera.getEstimatedPose().estimatedPose.toPose2d(),
-          m_ModuleCamera.getEstimatedPose().timestampSeconds);
-    }
+    // if (m_CenterCamera.getEstimatedPose() != null) {
+    //   swerveOdometry.addVisionMeasurement(
+    //       m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
+    //       m_CenterCamera.getEstimatedPose().timestampSeconds);
+    // }
+    updatePoseByVision(m_ModuleCamera);
 
     swerveOdometry.update(getRotation2D(), getModulePositions());
 
     // set odometry to vision pose if it deviates by more than half a meter
-    if (m_CenterCamera.getEstimatedPose() != null) {
-      if (Math.abs(
-                  m_CenterCamera.getEstimatedPose().estimatedPose.getX()
-                      - swerveOdometry.getEstimatedPosition().getX())
-              > .5
-          || Math.abs(
-                  m_CenterCamera.getEstimatedPose().estimatedPose.getY()
-                      - swerveOdometry.getEstimatedPosition().getY())
-              > .5) {
-        setPoseByVision(m_CenterCamera);
-      }
-    }
+
     if (m_ModuleCamera.getEstimatedPose() != null) {
       if (Math.abs(
                   m_ModuleCamera.getEstimatedPose().estimatedPose.getX()
@@ -376,6 +404,27 @@ public class Swerve extends SubsystemBase {
       for (TalonFXSwerveModule mod : m_SwerveModules) {
         mod.setDrivePIDS(drivePIDS);
       }
+    }
+    if (xKP.getNumber() != xController.getP()
+        || xKI.getNumber() != xController.getI()
+        || xKD.getNumber() != xController.getD()) {
+      xController.setP(xKP.getNumber());
+      xController.setI(xKI.getNumber());
+      xController.setD(xKD.getNumber());
+    }
+    if (yKP.getNumber() != yController.getP()
+        || yKI.getNumber() != yController.getI()
+        || yKD.getNumber() != yController.getD()) {
+      yController.setP(yKP.getNumber());
+      yController.setI(yKI.getNumber());
+      yController.setD(yKD.getNumber());
+    }
+    if (rotationKP.getNumber() != rController.getP()
+        || rotationKI.getNumber() != rController.getI()
+        || rotationKD.getNumber() != rController.getD()) {
+      rController.setP(rotationKP.getNumber());
+      rController.setI(rotationKI.getNumber());
+      rController.setD(rotationKD.getNumber());
     }
   }
 }

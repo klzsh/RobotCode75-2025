@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -40,8 +41,37 @@ public final class DrivetrainConstants {
     public static final double maxVelocityMultiplier = 0.8;
     public static final double maxAccelerationMultiplier = 0.8;
     public static final double loopPeriodSeconds = 0.02;
-    public static final double toleranceRadians = .15;
-    public static final double toleranceTranslation = .05;
+
+    public static final double toleranceRadians = Units.degreesToRadians(5);
+    public static final double toleranceTranslation = .07;
+
+    public static final class OdometryAlign {
+      public static final double xP = 6.0;
+      public static final double xI = 0.0;
+      public static final double xD = 0.0;
+
+      public static final double yP = 6.0;
+      public static final double yI = 0.0;
+      public static final double yD = 0.0;
+
+      public static final double tP = 0.3;
+      public static final double tI = 0.0;
+      public static final double tD = 0.0;
+    }
+
+    public static final class VisionAlign {
+      public static final double xP = 0.0;
+      public static final double xI = 0.0;
+      public static final double xD = 0.0;
+
+      public static final double yP = 0.0;
+      public static final double yI = 0.0;
+      public static final double yD = 0.0;
+
+      public static final double tP = 0.0;
+      public static final double tI = 0.0;
+      public static final double tD = 0.0;
+    }
 
     public static final LinearVelocity maxVelocity = MetersPerSecond.of(3);
     public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);

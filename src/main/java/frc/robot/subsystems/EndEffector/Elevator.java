@@ -193,7 +193,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command positionCommand(ElevatorPositions position, boolean algae) {
-    return Commands.runOnce(() -> setPosition(position, algae), this)
+    return Commands.run(() -> setPosition(position, algae), this)
         .until(() -> isAtPosition(position, algae));
   }
 

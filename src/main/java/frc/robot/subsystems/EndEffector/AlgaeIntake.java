@@ -85,8 +85,9 @@ public class AlgaeIntake extends SubsystemBase {
       m_AlgaeIntakeState = state;
     }
   }
+
   @Logged
-  public boolean getLimit(){
+  public boolean getLimit() {
     return m_AlgaeIntakeLimit.get();
   }
 

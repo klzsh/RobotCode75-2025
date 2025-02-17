@@ -153,12 +153,12 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  public OptionalDouble getYaw(int id) {
+  public OptionalDouble getSkew(int id) {
     if (getTarget(id).isEmpty()) {
       return OptionalDouble.empty();
     } else {
       PhotonTrackedTarget target = getTarget(id).get();
-      return OptionalDouble.of(target.getYaw());
+      return OptionalDouble.of(target.getSkew());
     }
   }
 
@@ -168,6 +168,33 @@ public class AprilTagCamera extends SubsystemBase {
     } else {
       PhotonTrackedTarget target = getTarget(id).get();
       return OptionalDouble.of(target.getPitch());
+    }
+  }
+
+  @Logged
+  public double getPrimaryTagX() {
+    if (m_result.getTargets().size() >= 1) {
+      return m_result.getBestTarget().getYaw();
+    } else {
+      return -1;
+    }
+  }
+
+  @Logged
+  public double getPrimaryTagY() {
+    if (m_result.getTargets().size() >= 1) {
+      return m_result.getBestTarget().getPitch();
+    } else {
+      return -1;
+    }
+  }
+
+  @Logged
+  public double getPrimaryTagTheta() {
+    if (m_result.getTargets().size() >= 1) {
+      return m_result.getBestTarget().getSkew();
+    } else {
+      return -1;
     }
   }
 

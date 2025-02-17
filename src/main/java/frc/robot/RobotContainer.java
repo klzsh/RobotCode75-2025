@@ -7,6 +7,7 @@ package frc.robot;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,30 +20,35 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.dashboard.AutoSelector;
+import frc.robot.commands.Autonomous.TuningPath;
 import frc.robot.commands.Drivetrain.DriveToPose;
+import frc.robot.commands.Drivetrain.LidarAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.EndEffector.DeAlgaefy;
-import frc.robot.commands.EndEffector.GroundAlgaePickup;
-import frc.robot.commands.EndEffector.IntakeCoral;
-import frc.robot.commands.EndEffector.ScoreCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
+import frc.robot.commands.EndEffector.DeAlgaefy;
+import frc.robot.commands.EndEffector.GroundAlgaePickup;
+import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
-import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
+import frc.robot.subsystems.Util.LidarDistance;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -77,6 +83,8 @@ public class RobotContainer {
   @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
+  @Logged private final LidarDistance distanceSensor = new LidarDistance();
+
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
   // define OI controls
@@ -92,30 +100,33 @@ public class RobotContainer {
 
   private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
   private final JoystickButton testDrivePose = new JoystickButton(m_RightStick, 5);
+  private final JoystickButton lidarAlignLeft = new JoystickButton(m_LeftStick, 4);
+  private final JoystickButton lidarAlignRight = new JoystickButton(m_RightStick, 4);
 
   private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton);
 
   private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
-  //   private final Map<Integer, Command> m_AutoMap = Map.of(
-  //     1, new ScoreL1(m_Elevator, m_CoralIntake),
-  //     3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
-  //     4, new ScoreL4(m_Elevator, m_CoralIntake),
-  //     6, new IntakeCoral(m_CoralIntake) //TODO add left/middle/right distinction
-  //   );
-  //   private final AutoSelector m_Selector =
-  //       new AutoSelector(
-  //           m_AutoMap,
-  //           m_Swerve,
-  //           new ArrayList<Command>(),
-  //           new ArrayList<Command>());
+  private final AutoFactory m_Factory =
+      new AutoFactory(
+          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+
+  private final Map<Integer, Command> m_AutoMap =
+      Map.of(
+          1, new ScoreL1(m_Elevator, m_CoralIntake),
+          3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
+          4, new ScoreL4(m_Elevator, m_CoralIntake),
+          6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
+          );
+  private final AutoSelector m_Selector =
+      new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDefaultCommands();
     configureBindings();
-    // configureChooser();
+    configureChooser();
   }
 
   private void configureDefaultCommands() {
@@ -145,7 +156,7 @@ public class RobotContainer {
     //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
     //         .repeatedly());
     m_Climber.setDefaultCommand(
-        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 50), m_Climber));
+        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 100), m_Climber));
   }
 
   /**
@@ -163,10 +174,24 @@ public class RobotContainer {
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
-    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    m_Controller.x().and(() -> m_Controller.getLeftTriggerAxis() <= 0.15).whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    m_Controller.y().and(() -> m_Controller.getLeftTriggerAxis() <= 0.15).whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    m_Controller
+        .a()
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    m_Controller
+        .x()
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    m_Controller
+        .y()
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    m_Controller
+        .b()
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
 
     // m_Controller
     //     .povLeft()
@@ -187,48 +212,56 @@ public class RobotContainer {
     m_Controller
         .rightBumper()
         .whileTrue(
-            new DriveToPose(m_Swerve, new Pose2d(2.94, 4.02, Rotation2d.fromDegrees(0)), false));
-
-    // m_Controller
-    //     .a()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .b()
-    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .x()
-    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .y()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
-    //             .repeatedly());
+            new VisionAlign(m_Swerve, CoralCam, 18));
+    // lidarAlignRight.whileTrue(new LidarAlign(m_Swerve, distanceSensor, false));
+    // lidarAlignLeft.whileTrue(new LidarAlign(m_Swerve, distanceSensor, true));
+    // manual elevator overrides
+    m_Controller
+        .a()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .x()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .y()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .b()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
+                .repeatedly());
 
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .and(()-> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .and(()-> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
   }
 
   private void configureChooser() {
-    // m_Selector.setupAutoTab();
-    // m_Selector.clearField();
+    m_Selector.setupAutoTab();
+    m_Selector.clearField();
   }
 
   /**
@@ -238,6 +271,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return null;
+    return new TuningPath(m_Factory);
+    // return null;
   }
 }

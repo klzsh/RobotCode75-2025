@@ -29,12 +29,13 @@ public class DriveToPose extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_controller.reset();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
     ChassisSpeeds speeds = m_controller.update(m_swerve.getPose(), targetPose);
     m_swerve.setChassisSpeeds(speeds);
   }
