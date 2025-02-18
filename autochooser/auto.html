@@ -389,7 +389,6 @@
                 'rbr': true,
                 'rbl': true
             }
-    
             l4Filled = {
                 'rtl': {
                     'l': false,
@@ -419,36 +418,33 @@
             startPose = null;
             lastPose = null;
             currentDot = '';
-            const xOffset = 461.16876;
-            const yOffset = 188.64792;
             numArrow = 0;
             hasCoral = true;
             hasAlgae = false;
             gamePoints = 0;
             leave = false;
-            const things = string.split(' ');
+            const segments = string.split(' ');
             string = '';
-            for (let i = 0; i < things.length - 1; i++) {
+            for (let i = 0; i < segments.length - 1; i++) {
                 if (i === 0) {
-                    const start = document.getElementById(things[i]);
+                    const start = document.getElementById(segments[i]);
                     setStart({
 						x: parseInt(start.getAttribute('cx')),
 						y: parseInt(start.getAttribute('cy')),
-						heading: headings[things[i]],
-						name: things[i]
+						heading: headings[segments[i]],
+						name: segments[i]
 					});
                     continue;
                 }
-                if (things[i] >= '0' && things[i] <= '9') {
-                    doAction(actions[parseInt(things[i]) - 1]);
+                if (segments[i] >= '0' && segments[i] <= '9') {
+                    doAction(actions[parseInt(segments[i]) - 1]);
                 } else {
-                    console.log(things[i]);
-                    const pose = document.getElementById(things[i]);
+                    const pose = document.getElementById(segments[i]);
                     setPose({
                         x: parseInt(pose.getAttribute('cx')),
 						y: parseInt(pose.getAttribute('cy')),
-						heading: headings[things[i]],
-						name: things[i]
+						heading: headings[segments[i]],
+						name: segments[i]
                     });
                 }
             }
