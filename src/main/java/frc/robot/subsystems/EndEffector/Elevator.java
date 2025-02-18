@@ -10,12 +10,9 @@ import static frc.robot.Constants.ElevatorConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -25,10 +22,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -77,14 +71,6 @@ public class Elevator extends SubsystemBase {
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
 
-  private Slot0Configs PIDConfig = new Slot0Configs();
-  private final TunableNumber elevatorKp;
-  private final TunableNumber elevatorKd;
-  private final TunableNumber elevatorKg;
-  private final TunableNumber elevatorKs;
-  private final TunableNumber elevatorKa;
-  private final TunableNumber elevatorKv;
-
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
     m_ElevatorMotor1 = new TalonFX(elevatorMotor1CANID, superstructureCANBusName);
@@ -104,22 +90,6 @@ public class Elevator extends SubsystemBase {
     m_ElevatorMotor1.setPosition(ElevatorPositions.HOME.Rotations);
     m_ElevatorMotor2.setPosition(ElevatorPositions.HOME.Rotations);
 
-    PIDConfig.withKA(kA)
-        .withKS(kS)
-        .withKV(kV)
-        .withKG(kG)
-        .withKP(kP)
-        .withKD(kD)
-        .withGravityType(GravityTypeValue.Elevator_Static)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
-
-    elevatorKp = new TunableNumber("Elevator/kP", kP);
-    elevatorKd = new TunableNumber("Elevator/kD", kD);
-    elevatorKg = new TunableNumber("Elevator/kG", kG);
-    elevatorKs = new TunableNumber("Elevator/kS", kS);
-    elevatorKa = new TunableNumber("Elevator/kA", kA);
-    elevatorKv = new TunableNumber("Elevator/kV", kV);
-
     m_CharacterizationRequest.UpdateFreqHz = 0;
     m_CharacterizationRequest.UseTimesync = true;
 
@@ -135,11 +105,6 @@ public class Elevator extends SubsystemBase {
   public void setPosition(ElevatorPositions position, boolean isAlgae) {
     m_SetpointPosition = position;
     m_IsAlgae = isAlgae;
-  }
-
-  @Logged()
-  public double getPositionRotations() {
-    return m_SetpointPosition.Rotations.in(Rotations);
   }
 
   /**
@@ -192,17 +157,6 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
-  public Command positionCommand(ElevatorPositions position, boolean algae) {
-    return Commands.run(() -> setPosition(position, algae), this)
-        .until(() -> isAtPosition(position, algae));
-  }
-
-  public void stopMotors() {
-    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(0));
-    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(0));
-  }
-
-  // end temp methods
   public boolean getUpperLimit() {
     return !m_upperLimitSwitch.get();
   }
@@ -215,26 +169,6 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Upper Limit", getUpperLimit());
     SmartDashboard.putBoolean("Lower Limit", getLowerLimit());
-
-    // only apply if one of the numbers have changed because setting the config is a
-    // blocking operation
-    if (elevatorKp.getNumber() != PIDConfig.kP
-        || elevatorKd.getNumber() != PIDConfig.kD
-        || elevatorKs.getNumber() != PIDConfig.kS
-        || elevatorKg.getNumber() != PIDConfig.kG
-        || elevatorKa.getNumber() != PIDConfig.kA
-        || elevatorKv.getNumber() != PIDConfig.kV) {
-      PIDConfig.kP = elevatorKp.getNumber();
-      PIDConfig.kD = elevatorKd.getNumber();
-      PIDConfig.kS = elevatorKs.getNumber();
-      PIDConfig.kG = elevatorKg.getNumber();
-      PIDConfig.kA = elevatorKa.getNumber();
-      PIDConfig.kV = elevatorKv.getNumber();
-
-      m_ElevatorMotor1.getConfigurator().apply(PIDConfig);
-      m_ElevatorMotor2.getConfigurator().apply(PIDConfig);
-      System.out.println("fff");
-    }
 
     if (getLowerLimit()) {
       m_ElevatorMotor1.setPosition(Rotations.of(0));

@@ -17,9 +17,9 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import frc.robot.subsystems.Util.LidarDistance;
 
 @Logged(name = "Algae Intake", strategy = Strategy.OPT_IN)
 public class AlgaeIntake extends SubsystemBase {
@@ -30,7 +30,6 @@ public class AlgaeIntake extends SubsystemBase {
     OUTAKING
   }
 
-  // 50 over 26 + 25:1 5.0*5.0*50.0/26.0
   // TODO: add tunable numbers for PIDS, velocity, Position, CURRENT LIMITS
   @Logged(name = "Intake State")
   private AlgaeStates m_AlgaeIntakeState;
@@ -43,7 +42,8 @@ public class AlgaeIntake extends SubsystemBase {
   private final TunableNumber algaeIntakeKd;
   private final TunableNumber algaeIntakeKs;
 
-  private final DigitalInput m_AlgaeIntakeLimit;
+  // private final DigitalInput m_AlgaeIntakeLimit;
+  private final LidarDistance m_AlgaeDetector;
 
   // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =
@@ -56,8 +56,9 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeMotor = new TalonFX(algaeMotorCanID, superstructureCANBusName);
     m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = AlgaeStates.NONE;
+    m_AlgaeDetector = new LidarDistance(Inches.of(7));
 
-    m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
+    // m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
 
     algaeRequest.UpdateFreqHz = 0;
     algaeRequest.UseTimesync = true;
@@ -67,8 +68,6 @@ public class AlgaeIntake extends SubsystemBase {
 
     IntakePIDConfig.withKA(0)
         .withKS(algaeKS)
-        .withKV(0)
-        .withKG(0)
         .withKP(algaeKP)
         .withKD(algaeKD)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
@@ -87,8 +86,9 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   @Logged
-  public boolean getLimit() {
-    return m_AlgaeIntakeLimit.get();
+  public boolean algaeInIntake() {
+    return m_AlgaeDetector.belowThreshold();
+    // return !m_AlgaeIntakeLimit.get();
   }
 
   public AlgaeStates getAlgaeState() {
@@ -111,7 +111,7 @@ public class AlgaeIntake extends SubsystemBase {
       m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
     }
 
-    if (!m_AlgaeIntakeLimit.get() && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
+    if (algaeInIntake() && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
     }
 

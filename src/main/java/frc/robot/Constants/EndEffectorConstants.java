@@ -29,13 +29,14 @@ public class EndEffectorConstants {
 
   /* CANIDS */
   // TODO: find these
-  public static final int coralMotorCanID = 43;
-  public static final int pivotCanID = 44;
-  public static final int algaeMotorCanID = 45;
+  public static final int coralMotorCanID = 43; // TalonFXS into minion
+  public static final int pivotCanID = 44; // Kraken X60
+  public static final int algaeMotorCanID = 45; // Kraken X44
 
-  public static final int coralBeamBreakDIO = 2;
-  public static final int algaePivotEncoderPort = 4;
-  public static final int algaeLimitSwitchPort = 6;
+  public static final int coralBeamBreakPort = 2; // Banner BeamBreak
+  public static final int algaePivotEncoderPort = 4; // REV Through Bore
+  public static final int algaeLidarSensorPort = 5; // Pololu LIDAR sensor
+  // public static final int algaeLimitSwitchPort = 6;
 
   public static final Angle algaePivotZeroPoint = Rotations.of(0);
   public static final Angle algaeEncoderOffset = Rotations.of(0);
@@ -49,7 +50,6 @@ public class EndEffectorConstants {
   public static final Angle coralRotationsAfterIntake = Rotations.of(0.5);
 
   public static final Angle pivotHomePosition = Rotations.of(11.5);
-  // TODO: need to tune
   public static final Angle pivotGroundIntakePosition = Rotations.of(4);
   public static final Angle pivotDeAlgifyPosition = Rotations.of(6);
 
@@ -91,9 +91,9 @@ public class EndEffectorConstants {
     public static final Current algaeSupplyCurrentLimit = Amps.of(40);
     public static final Current algaeLowerCurrentThreshold = Amps.of(15);
 
-    public static final Current algaeStatorCurrentLimit = Amps.of(35);
-    public static final Current algaeStatorCurrentLimitForward = Amps.of(35);
-    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-35);
+    public static final Current algaeStatorCurrentLimit = Amps.of(30);
+    public static final Current algaeStatorCurrentLimitForward = Amps.of(30);
+    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-30);
 
     public static final Time algaeCurrentThresholdTime = Seconds.of(1);
 

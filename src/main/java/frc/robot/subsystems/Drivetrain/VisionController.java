@@ -121,8 +121,7 @@ public class VisionController {
 
     // double radiansSetpoint = fieldPoses.get(targetPose).getRotation().getRadians();
 
-    double thetaVel =
-        -thetaController.calculate(m_Swerve.getRotation2D().getRadians(), 0);
+    double thetaVel = -thetaController.calculate(m_Swerve.getRotation2D().getRadians(), 0);
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, thetaVel, currentPose.getRotation());
   }

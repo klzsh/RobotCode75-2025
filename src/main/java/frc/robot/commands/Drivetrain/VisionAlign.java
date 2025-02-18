@@ -6,7 +6,6 @@ package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Drivetrain.AutoAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionController;
 import frc.robot.subsystems.Vision.AprilTagCamera;

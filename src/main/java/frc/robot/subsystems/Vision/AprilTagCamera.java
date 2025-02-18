@@ -171,6 +171,15 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
+  public OptionalDouble getArea(int id) {
+    if (getTarget(id).isEmpty()) {
+      return OptionalDouble.empty();
+    } else {
+      PhotonTrackedTarget target = getTarget(id).get();
+      return OptionalDouble.of(target.getArea());
+    }
+  }
+
   @Logged
   public double getPrimaryTagX() {
     if (m_result.getTargets().size() >= 1) {

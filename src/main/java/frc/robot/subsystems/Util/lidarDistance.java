@@ -1,18 +1,24 @@
 package frc.robot.subsystems.Util;
 
+import static edu.wpi.first.units.Units.Inches;
+import static frc.robot.Constants.EndEffectorConstants.algaeLidarSensorPort;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 
-@Logged(name = "Lidar sensor KP SUCKS", strategy = Strategy.OPT_IN)
+@Logged(name = "Lidar sensor", strategy = Strategy.OPT_IN)
 public class LidarDistance {
 
-  private double coralL1ThresholdIN = 36;
+  private double threshold = 0;
   DutyCycle sensorCycle;
 
-  public LidarDistance() {
-    sensorCycle = new DutyCycle(new DigitalInput(5));
+  public LidarDistance(Distance threshold) {
+    sensorCycle = new DutyCycle(new DigitalInput(algaeLidarSensorPort));
+    this.threshold = threshold.in(Inches);
   }
 
   private double getTimeNanoSeconds() {
@@ -20,15 +26,16 @@ public class LidarDistance {
   }
 
   private double getDistanceMM() {
+    // magic numbers to get the distance
     return 4 * (getTimeNanoSeconds() - 1e6) / 1000;
   }
 
   @Logged(name = "distance inches")
   public double getDistanceIN() {
-    return getDistanceMM() * 0.0393701;
+    return Units.metersToInches(getDistanceMM() / 1000.0);
   }
 
-  public boolean isAligned() {
-    return getDistanceIN() <= coralL1ThresholdIN;
+  public boolean belowThreshold() {
+    return getDistanceIN() <= threshold;
   }
 }

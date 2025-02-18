@@ -4,14 +4,13 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,24 +21,22 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.AutoSelector;
 import frc.robot.commands.Autonomous.TuningPath;
-import frc.robot.commands.Drivetrain.DriveToPose;
-import frc.robot.commands.Drivetrain.LidarAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.Drivetrain.XStance;
+import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
+import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
-import frc.robot.commands.EndEffector.DeAlgaefy;
-import frc.robot.commands.EndEffector.GroundAlgaePickup;
-import frc.robot.commands.EndEffector.IntakeCoral;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
+import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -83,7 +80,8 @@ public class RobotContainer {
   @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
-  @Logged private final LidarDistance distanceSensor = new LidarDistance();
+  @Logged(name = "Algae Lidar Sensor")
+  private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -99,7 +97,6 @@ public class RobotContainer {
   private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
 
   private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
-  private final JoystickButton testDrivePose = new JoystickButton(m_RightStick, 5);
   private final JoystickButton lidarAlignLeft = new JoystickButton(m_LeftStick, 4);
   private final JoystickButton lidarAlignRight = new JoystickButton(m_RightStick, 4);
 
@@ -173,7 +170,7 @@ public class RobotContainer {
     Xstance.whileTrue(new XStance(m_Swerve));
     holdButton.whileTrue(
         new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
-
+    // Score L* commands
     m_Controller
         .a()
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
@@ -192,27 +189,29 @@ public class RobotContainer {
         .b()
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
-
-    // m_Controller
-    //     .povLeft()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING), m_AlgaeIntake)
-    //             .repeatedly());
+    // algae ground pickup & scoring
     m_Controller
         .povRight()
         .whileTrue(
             new InstantCommand(
                     () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake)
                 .repeatedly());
-    m_Controller.leftBumper().whileTrue(new GroundAlgaePickup(m_AlgaeIntake, m_AlgaePivot));
+    m_Controller
+        .leftBumper()
+        .whileTrue(
+            new InstantCommand(
+                    () -> {
+                      m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
+                      m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
+                    },
+                    m_AlgaeIntake,
+                    m_AlgaePivot)
+                .repeatedly()
+                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
 
-    m_Controller
-        .rightBumper()
-        .whileTrue(
-            new VisionAlign(m_Swerve, CoralCam, 18));
+    m_Controller.rightBumper().whileTrue(new VisionAlign(m_Swerve, CoralCam, 18));
     // lidarAlignRight.whileTrue(new LidarAlign(m_Swerve, distanceSensor, false));
     // lidarAlignLeft.whileTrue(new LidarAlign(m_Swerve, distanceSensor, true));
     // manual elevator overrides
@@ -246,16 +245,16 @@ public class RobotContainer {
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
                 .repeatedly());
-
+    // dealgaefy commands
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(()-> m_Controller.getRightTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(()-> m_Controller.getRightTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
   }
 

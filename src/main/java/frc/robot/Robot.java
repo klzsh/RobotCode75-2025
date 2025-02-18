@@ -10,8 +10,10 @@ import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -60,7 +62,8 @@ public class Robot extends TimedRobot {
           // ! NO FMS
           //   // log INFO and CRITICAL data to NT, NOT DISK
           //   config.minimumImportance = Logged.Importance.INFO;
-          //   config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+
+          config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
           //   DataLogManager.stop();
           // ! FMS ATTACHED
           //   // only disk log during comp
@@ -68,11 +71,12 @@ public class Robot extends TimedRobot {
           //   config.minimumImportance = Logged.Importance.CRITICAL;
           //   DriverStation.startDataLog(DataLogManager.getLog(), false);
           //   config.backend = new FileBackend(DataLogManager.getLog());
-          // }
+          // at home
           config.minimumImportance = Importance.DEBUG;
         });
     Epilogue.bind(this);
     PortForwarder.add(5800, "photon-frontcams.local", 5800);
+    PortForwarder.add(5800, "photon-rearcams.local", 5800);
   }
 
   /**

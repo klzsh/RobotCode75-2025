@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import frc.robot.Constants.ClimberConstants;
 
 @Logged(name = "Climber", strategy = Strategy.OPT_IN)
 public class Climber extends SubsystemBase {
@@ -61,8 +62,8 @@ public class Climber extends SubsystemBase {
   private final DigitalInput m_LimitSwitch;
 
   public Climber() {
-    m_ClimberMotor1 = new TalonFX(climberMotor1CANID, superstructureCANBusName);
-    m_ClimberMotor2 = new TalonFX(climberMotor2CANID, superstructureCANBusName);
+    m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
+    m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
 
     climberMMCruiseVelocity =
         new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
@@ -91,7 +92,7 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor1.getConfigurator().apply(getClimberMotorConfig());
     m_ClimberMotor2.getConfigurator().apply(getClimberMotorConfig());
 
-    m_LimitSwitch = new DigitalInput(limitPort);
+    m_LimitSwitch = new DigitalInput(ClimberConstants.limitPort);
   }
 
   public void setState(ClimberPositions state) {
@@ -118,7 +119,7 @@ public class Climber extends SubsystemBase {
   }
 
   public boolean atPosition() {
-    return Math.abs(getPosition().in(Rotations) - climbPosition.in(Rotations)) < climbDeadband;
+    return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations)) < ClimberConstants.climbDeadband;
   }
 
   @Logged(name = "Climber Limit", importance = Importance.DEBUG)

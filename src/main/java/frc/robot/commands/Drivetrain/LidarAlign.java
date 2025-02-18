@@ -40,6 +40,6 @@ public class LidarAlign extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_LidarDistance.isAligned();
+    return m_LidarDistance.belowThreshold();
   }
 }

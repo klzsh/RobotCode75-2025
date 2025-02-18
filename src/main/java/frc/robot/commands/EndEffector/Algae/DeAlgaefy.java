@@ -2,13 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.EndEffector;
+package frc.robot.commands.EndEffector.Algae;
 
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -45,7 +44,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
        */
       addRequirements(elevator);
       addCommands(
-          elevator.positionCommand(ElevatorPositions.L2, true),
+          new SetElevatorPosition(elevator, ElevatorPositions.L2, true),
           new ParallelCommandGroup(
                   new InstantCommand(
                           () -> {
@@ -56,7 +55,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                           algaePivot)
                       .repeatedly()
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-                  elevator.positionCommand(ElevatorPositions.L2, true).repeatedly())
+                  new SetElevatorPosition(elevator, ElevatorPositions.L2, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
               .repeatedly()
@@ -64,20 +63,22 @@ public class DeAlgaefy extends SequentialCommandGroup {
     } else {
       /* L3 Algae Intake */
       addCommands(
-          elevator.positionCommand(ElevatorPositions.L3, true),
-          new InstantCommand(() -> algaeIntake.setAlgaeState(AlgaeStates.INTAKING)),
+          new SetElevatorPosition(elevator, ElevatorPositions.L3, true),
           new ParallelCommandGroup(
-              new RepeatCommand(
-                      new InstantCommand(
+                  new InstantCommand(
                           () -> {
                             algaeIntake.setAlgaeState(AlgaeStates.INTAKING);
                             algaePivot.setPivotState(PivotState.DEALGAEFY);
                           },
                           algaeIntake,
-                          algaePivot))
-                  .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE)),
-          elevator.positionCommand(ElevatorPositions.L3, true),
-          Commands.runOnce(() -> algaePivot.setPivotState(PivotState.RETRACTED)));
+                          algaePivot)
+                      .repeatedly()
+                      .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+                  new SetElevatorPosition(elevator, ElevatorPositions.L3, true))
+              .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+          new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
+              .repeatedly()
+              .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));
     }
   }
 }
