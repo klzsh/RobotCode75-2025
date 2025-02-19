@@ -36,6 +36,6 @@ public class LidarDistance {
   }
 
   public boolean belowThreshold() {
-    return getDistanceIN() <= threshold;
+    return getDistanceIN() <= threshold && getDistanceIN() >= 0;
   }
 }

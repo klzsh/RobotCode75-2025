@@ -91,9 +91,9 @@ public class EndEffectorConstants {
     public static final Current algaeSupplyCurrentLimit = Amps.of(40);
     public static final Current algaeLowerCurrentThreshold = Amps.of(15);
 
-    public static final Current algaeStatorCurrentLimit = Amps.of(30);
-    public static final Current algaeStatorCurrentLimitForward = Amps.of(30);
-    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-30);
+    public static final Current algaeStatorCurrentLimit = Amps.of(40);
+    public static final Current algaeStatorCurrentLimitForward = Amps.of(40);
+    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-40);
 
     public static final Time algaeCurrentThresholdTime = Seconds.of(1);
 

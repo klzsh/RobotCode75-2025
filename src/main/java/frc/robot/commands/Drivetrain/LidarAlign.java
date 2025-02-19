@@ -3,17 +3,18 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Util.LidarDistance;
 
 public class LidarAlign extends Command {
   private Swerve m_Swerve;
-  private LidarDistance m_LidarDistance;
+  private CANRangeWrapper m_Wrapper;
   private boolean left;
   private ChassisSpeeds speeds = new ChassisSpeeds();
 
-  public LidarAlign(Swerve swerve, LidarDistance lidarDistance, boolean alignLeft) {
+  public LidarAlign(Swerve swerve, CANRangeWrapper lidarDistance, boolean alignLeft) {
     m_Swerve = swerve;
-    m_LidarDistance = lidarDistance;
+    m_Wrapper = lidarDistance;
     left = alignLeft;
 
     addRequirements(swerve);
@@ -40,6 +41,6 @@ public class LidarAlign extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_LidarDistance.belowThreshold();
+    return m_Wrapper.isAligned();
   }
 }

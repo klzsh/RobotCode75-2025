@@ -12,6 +12,7 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,7 +20,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TuningPath;
+import frc.robot.commands.Drivetrain.LidarAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -44,6 +49,7 @@ import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
+import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Util.LidarDistance;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
@@ -79,9 +85,10 @@ public class RobotContainer {
 
   @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
+  private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37));
 
-  @Logged(name = "Algae Lidar Sensor")
-  private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
+//   @Logged(name = "Algae Lidar Sensor")
+//   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -221,10 +228,10 @@ public class RobotContainer {
     m_Controller
         .rightBumper()
         .whileTrue(
-            new VisionAlign(m_Swerve, CoralCam, 18, m_VisionController, m_RotationController));
+            new VisionAlign(m_Swerve, CoralCam, 18, new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID), m_VisionController, m_RotationController));
 
-    // lidarAlignRight.whileTrue(new LidarAlign(m_Swerve, distanceSensor, false));
-    // lidarAlignLeft.whileTrue(new LidarAlign(m_Swerve, distanceSensor, true));
+    lidarAlignRight.whileTrue(new LidarAlign(m_Swerve, m_CANRange, false));
+    lidarAlignLeft.whileTrue(new LidarAlign(m_Swerve, m_CANRange, true));
     // manual elevator overrides
     m_Controller
         .a()
