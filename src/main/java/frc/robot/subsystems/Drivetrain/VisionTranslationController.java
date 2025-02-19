@@ -14,23 +14,18 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /** Add your docs here. */
-public class VisionController {
+public class VisionTranslationController {
 
   private ProfiledPIDController xController;
   private ProfiledPIDController yController;
-  private ProfiledPIDController thetaController;
 
   private final Swerve m_Swerve;
 
-  private double lastSeenAprilTagTime;
-
   private Pose2d currentPose;
-  private Pose2d targetPose;
 
   private TunableNumber[] xPID = {
     new TunableNumber("VisionController/Px", xP),
@@ -44,22 +39,12 @@ public class VisionController {
     new TunableNumber("VisionController/Dy", yD)
   };
 
-  private TunableNumber[] thetaPID = {
-    new TunableNumber("VisionController/Pt", tP),
-    new TunableNumber("VisionController/It", tI),
-    new TunableNumber("VisionController/Dt", tD)
-  };
-
-  public VisionController(Swerve swerve) {
+  public VisionTranslationController(Swerve swerve) {
     xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
     yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
-    thetaController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     xController.setTolerance(toleranceTranslation);
     yController.setTolerance(toleranceTranslation);
-    thetaController.setTolerance(toleranceRadians);
 
     xController.setConstraints(
         new TrapezoidProfile.Constraints(
@@ -69,10 +54,6 @@ public class VisionController {
         new TrapezoidProfile.Constraints(
             maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
             maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
-    thetaController.setConstraints(
-        new TrapezoidProfile.Constraints(
-            maxAngularVelocity.in(RadiansPerSecond),
-            maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
 
     currentPose = new Pose2d();
 
@@ -83,16 +64,12 @@ public class VisionController {
   public void reset() {
     xController.reset(m_Swerve.getPose().getX(), m_Swerve.getChassisSpeeds().vxMetersPerSecond);
     yController.reset(m_Swerve.getPose().getY(), m_Swerve.getChassisSpeeds().vyMetersPerSecond);
-    thetaController.reset(
-        m_Swerve.getRotation2D().getRadians(), m_Swerve.getChassisSpeeds().omegaRadiansPerSecond);
   }
 
   public ChassisSpeeds update(AprilTagCamera primaryCamera, int targetTagID) {
     /* Update PID Controllers */
     xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
     yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
-    thetaController.setPID(
-        thetaPID[0].getNumber(), thetaPID[1].getNumber(), thetaPID[2].getNumber());
 
     currentPose = m_Swerve.getPose();
 
@@ -108,25 +85,17 @@ public class VisionController {
 
       double thetaCalc = Math.asin(tX / targetMeters);
       double absoluteAngleToTag = thetaCalc + m_Swerve.getRotation2D().getRadians();
-      double robotToAprilTagAngle = Math.PI / 2 - absoluteAngleToTag;
 
       xDisplacement = targetMeters * Math.cos(absoluteAngleToTag);
       yDisplacement = targetMeters * Math.sin(absoluteAngleToTag);
-
-      lastSeenAprilTagTime = Timer.getFPGATimestamp();
     }
-
     double xVel = xController.calculate(xDisplacement, 0);
     double yVel = yController.calculate(yDisplacement, 0);
 
-    // double radiansSetpoint = fieldPoses.get(targetPose).getRotation().getRadians();
-
-    double thetaVel = -thetaController.calculate(m_Swerve.getRotation2D().getRadians(), 0);
-
-    return ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, thetaVel, currentPose.getRotation());
+    return ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, 0, currentPose.getRotation());
   }
 
   public boolean atGoal() {
-    return xController.atGoal() && yController.atGoal() && thetaController.atGoal();
+    return xController.atGoal() && yController.atGoal();
   }
 }

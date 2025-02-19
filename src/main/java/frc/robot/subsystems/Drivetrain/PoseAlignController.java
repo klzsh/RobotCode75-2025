@@ -16,7 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.lib.dashboard.TunableNumber;
 
 /** Add your docs here. */
-public class AutoAlignController {
+public class PoseAlignController {
 
   private ProfiledPIDController xController;
   private ProfiledPIDController yController;
@@ -43,7 +43,7 @@ public class AutoAlignController {
     new TunableNumber("AutoAlign/Dt", tD)
   };
 
-  public AutoAlignController(Swerve swerve) {
+  public PoseAlignController(Swerve swerve) {
     xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
     yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
     thetaController = new RotationController(swerve);

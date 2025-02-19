@@ -119,7 +119,8 @@ public class Climber extends SubsystemBase {
   }
 
   public boolean atPosition() {
-    return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations)) < ClimberConstants.climbDeadband;
+    return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations))
+        < ClimberConstants.climbDeadband;
   }
 
   @Logged(name = "Climber Limit", importance = Importance.DEBUG)

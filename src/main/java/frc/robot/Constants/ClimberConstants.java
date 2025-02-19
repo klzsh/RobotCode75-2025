@@ -20,6 +20,7 @@ public final class ClimberConstants {
   public static final int limitPort = 7;
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
+
   public static final class MotorConfigs {
     public static final Time closedLoopRamp = Seconds.of(0.25);
 
@@ -92,5 +93,5 @@ public final class ClimberConstants {
 
       return m_ClimberMotorConfig;
     }
-  }  
+  }
 }

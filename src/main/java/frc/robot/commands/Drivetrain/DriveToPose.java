@@ -7,13 +7,13 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Drivetrain.AutoAlignController;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DriveToPose extends Command {
   private Swerve m_swerve;
-  private AutoAlignController m_controller;
+  private PoseAlignController m_controller;
   private Pose2d targetPose;
   private boolean holdPose;
 
@@ -22,9 +22,9 @@ public class DriveToPose extends Command {
     m_swerve = swerve;
     targetPose = pose;
     holdPose = hold;
-    m_controller = new AutoAlignController(m_swerve);
+    m_controller = new PoseAlignController(m_swerve);
     // Use addRequirements() here to declare subsystem dependencies.
-    // addRequirements(m_swerve);
+    addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.

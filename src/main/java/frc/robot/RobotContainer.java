@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.lib.dashboard.AutoSelector;
 import frc.robot.commands.Autonomous.TuningPath;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -32,7 +31,10 @@ import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -44,8 +46,6 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.LidarDistance;
 import frc.robot.subsystems.Vision.AprilTagCamera;
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -85,6 +85,12 @@ public class RobotContainer {
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
+  // define drivetrain controllers
+  private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
+  private final RotationController m_RotationController = new RotationController(m_Swerve);
+  private final VisionTranslationController m_VisionController =
+      new VisionTranslationController(m_Swerve);
+
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
   private final Joystick m_RightStick = new Joystick(rightStickPort);
@@ -108,15 +114,16 @@ public class RobotContainer {
       new AutoFactory(
           m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
-  private final Map<Integer, Command> m_AutoMap =
-      Map.of(
-          1, new ScoreL1(m_Elevator, m_CoralIntake),
-          3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
-          4, new ScoreL4(m_Elevator, m_CoralIntake),
-          6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
-          );
-  private final AutoSelector m_Selector =
-      new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
+  //   private final Map<Integer, Command> m_AutoMap =
+  //       Map.of(
+  //           1, new ScoreL1(m_Elevator, m_CoralIntake),
+  //           3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
+  //           4, new ScoreL4(m_Elevator, m_CoralIntake),
+  //           6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
+  //           );
+  //   private final AutoSelector m_Selector =
+  //       new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new
+  // ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -211,7 +218,11 @@ public class RobotContainer {
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
 
-    m_Controller.rightBumper().whileTrue(new VisionAlign(m_Swerve, CoralCam, 18));
+    m_Controller
+        .rightBumper()
+        .whileTrue(
+            new VisionAlign(m_Swerve, CoralCam, 18, m_VisionController, m_RotationController));
+
     // lidarAlignRight.whileTrue(new LidarAlign(m_Swerve, distanceSensor, false));
     // lidarAlignLeft.whileTrue(new LidarAlign(m_Swerve, distanceSensor, true));
     // manual elevator overrides
@@ -259,8 +270,8 @@ public class RobotContainer {
   }
 
   private void configureChooser() {
-    m_Selector.setupAutoTab();
-    m_Selector.clearField();
+    // m_Selector.setupAutoTab();
+    // m_Selector.clearField();
   }
 
   /**

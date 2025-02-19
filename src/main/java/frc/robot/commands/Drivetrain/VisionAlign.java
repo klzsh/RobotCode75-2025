@@ -4,48 +4,58 @@
 
 package frc.robot.commands.Drivetrain;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionController;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class VisionAlign extends Command {
-  private final Swerve m_Swerve;
-  private final AprilTagCamera m_Camera;
-  private final int targetId;
-  private final VisionController m_VisionController;
+public class VisionAlign extends SequentialCommandGroup {
 
-  public VisionAlign(Swerve swerve, AprilTagCamera camera, int target) {
-    m_Swerve = swerve;
-    m_Camera = camera;
-    targetId = target;
-    m_VisionController = new VisionController(m_Swerve);
-
+  public VisionAlign(
+      Swerve swerve,
+      AprilTagCamera camera,
+      int target,
+      VisionTranslationController visionController,
+      RotationController rotationController) {
+    /**
+     * first snap rotation to april tag based on bounding box then calculate translation using
+     * visioncontroller and rotation to preset heading using rotationcontroller modify chassisspeeds
+     * from visioncontroller using rotationcontroller output set chassisspeeds
+     */
+    Rotation2d placeholder = Rotation2d.fromDegrees(0); // from bounding box
+    Pose2d tagPose =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
+            .getTagPose(target)
+            .get()
+            .toPose2d();
+    Pose2d currentPose = swerve.getPose();
+    Rotation2d toTag =
+        Rotation2d.fromRadians(
+            Math.atan2(tagPose.getY() - currentPose.getY(), tagPose.getX() - currentPose.getX()));
+    addCommands(
+        Commands.runOnce(
+            () -> {
+              visionController.reset();
+            }),
+        new SnapHoldRotation(swerve, toTag, () -> 0, () -> 0),
+        new InstantCommand(
+                () -> {
+                  ChassisSpeeds speeds = visionController.update(camera, target);
+                  rotationController.update(placeholder);
+                  speeds.omegaRadiansPerSecond = rotationController.getOutput();
+                  swerve.setChassisSpeeds(speeds);
+                })
+            .repeatedly()
+            .until(() -> visionController.atGoal() && rotationController.atGoal()));
     addRequirements(swerve);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_VisionController.reset();
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    ChassisSpeeds speeds = m_VisionController.update(m_Camera, targetId);
-    m_Swerve.setChassisSpeeds(speeds);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
   }
 }
