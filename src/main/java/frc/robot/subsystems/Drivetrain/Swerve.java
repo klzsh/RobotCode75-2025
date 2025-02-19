@@ -94,6 +94,7 @@ public class Swerve extends SubsystemBase {
   private final TunableNumber rotationKD;
 
   private double lastUpdatedTime = 0;
+  private boolean m_FieldRelative = true;
 
   @Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
   private SwerveSample sample;
@@ -169,10 +170,10 @@ public class Swerve extends SubsystemBase {
    * @param openLoop - Use feedback and PID (if false)
    */
   public void drive(
-      Translation2d translation, double rotation, boolean isOpenLoop, boolean fieldRelative) {
+      Translation2d translation, double rotation) {
     SwerveModuleState[] swerveModuleStates =
         swerveKinematics.toSwerveModuleStates(
-            fieldRelative
+            m_FieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getRotation2D())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
@@ -180,10 +181,15 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
 
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, false);
+      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, false);
     }
   }
-
+  public void toggleRobotRelative(){
+    m_FieldRelative = false;
+  }
+  public void toggleFieldRelative(){
+    m_FieldRelative = true;
+  }
   /**
    * intermediary function to convert between chassis speeds and swerve module states
    *

@@ -16,23 +16,17 @@ public class TeleopSwerve extends Command {
   private DoubleSupplier translationSup;
   private DoubleSupplier strafeSup;
   private DoubleSupplier rotationSup;
-  private boolean isOpenLoop;
-  private boolean fieldRelative;
 
   public TeleopSwerve(
       Swerve m_Swerve,
       DoubleSupplier translationSup,
       DoubleSupplier strafeSup,
-      DoubleSupplier rotationSup,
-      boolean isOpenLoop,
-      boolean fieldRelative) {
+      DoubleSupplier rotationSup) {
     this.m_Swerve = m_Swerve;
     // get all values to drive the robot (x,y,z)
     this.translationSup = translationSup;
     this.strafeSup = strafeSup;
     this.rotationSup = rotationSup;
-    this.isOpenLoop = isOpenLoop;
-    this.fieldRelative = fieldRelative;
 
     addRequirements(m_Swerve);
   }
@@ -49,8 +43,6 @@ public class TeleopSwerve extends Command {
 
     m_Swerve.drive(
         translation2d,
-        DriverInput[2] * maxAngularVelocity.in(RadiansPerSecond),
-        isOpenLoop,
-        fieldRelative);
+        DriverInput[2] * maxAngularVelocity.in(RadiansPerSecond));
   }
 }

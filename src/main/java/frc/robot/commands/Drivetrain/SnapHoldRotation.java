@@ -78,7 +78,7 @@ public class SnapHoldRotation extends Command {
       rotationOutput = MathUtil.applyDeadband(rotationOutput, 0.05);
     }
     m_Swerve.drive(
-        translation2d, rotationOutput * maxAngularVelocity.in(RadiansPerSecond), false, true);
+        translation2d, rotationOutput * maxAngularVelocity.in(RadiansPerSecond));
   }
 
   // Called once the command ends or is interrupted.

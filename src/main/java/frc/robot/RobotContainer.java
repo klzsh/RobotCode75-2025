@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -149,9 +150,7 @@ public class RobotContainer {
             // this decision, we have to negate the stick values.
             () -> -m_LeftStick.getY(),
             () -> -m_LeftStick.getX(),
-            () -> -m_RightStick.getX(),
-            false,
-            !robotRelative.getAsBoolean()));
+            () -> -m_RightStick.getX()));
     // m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
     m_Elevator.setDefaultCommand(
         new InstantCommand(() -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
@@ -274,6 +273,7 @@ public class RobotContainer {
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
+    robotRelative.onTrue(new InstantCommand(()-> m_Swerve.toggleRobotRelative())).onFalse(new InstantCommand(()-> m_Swerve.toggleFieldRelative()));
   }
 
   private void configureChooser() {
