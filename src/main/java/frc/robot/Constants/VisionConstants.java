@@ -23,6 +23,7 @@ public class VisionConstants {
   public static final Matrix<N3, N1> moduleMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 2, 2, .1);
   public static final Matrix<N3, N1> visionMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
+  // TODO figure out offsets
   public static final Map<FieldPose, Translation2d> fieldPoseOffsets =
       // vision can't handle sideloading due to camera placement
       Map.ofEntries(

@@ -12,6 +12,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
@@ -24,6 +25,7 @@ public class VisionAlign extends SequentialCommandGroup {
       Swerve swerve,
       AprilTagCamera camera,
       int target,
+      FieldPose targetPose,
       VisionTranslationController visionController,
       RotationController rotationController) {
     /**
@@ -49,7 +51,7 @@ public class VisionAlign extends SequentialCommandGroup {
         new SnapHoldRotation(swerve, toTag, () -> 0, () -> 0),
         new InstantCommand(
                 () -> {
-                  ChassisSpeeds speeds = visionController.update(camera, target);
+                  ChassisSpeeds speeds = visionController.update(camera, target, targetPose);
                   rotationController.update(placeholder);
                   speeds.omegaRadiansPerSecond = rotationController.getOutput();
                   swerve.setChassisSpeeds(speeds);

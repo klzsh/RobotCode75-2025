@@ -12,9 +12,11 @@ import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /** Add your docs here. */
@@ -66,7 +68,7 @@ public class VisionTranslationController {
     yController.reset(m_Swerve.getPose().getY(), m_Swerve.getChassisSpeeds().vyMetersPerSecond);
   }
 
-  public ChassisSpeeds update(AprilTagCamera primaryCamera, int targetTagID) {
+  public ChassisSpeeds update(AprilTagCamera primaryCamera, int targetTagID, FieldPose targetPose) {
     /* Update PID Controllers */
     xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
     yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
@@ -89,8 +91,9 @@ public class VisionTranslationController {
       xDisplacement = targetMeters * Math.cos(absoluteAngleToTag);
       yDisplacement = targetMeters * Math.sin(absoluteAngleToTag);
     }
-    double xVel = xController.calculate(xDisplacement, 0);
-    double yVel = yController.calculate(yDisplacement, 0);
+    Translation2d target = fieldPoseOffsets.get(targetPose);
+    double xVel = xController.calculate(xDisplacement, target.getX());
+    double yVel = yController.calculate(yDisplacement, target.getY());
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, 0, currentPose.getRotation());
   }
