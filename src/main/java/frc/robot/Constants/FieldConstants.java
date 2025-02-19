@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
+
 import java.util.Map;
 
 public class FieldConstants {
@@ -18,7 +20,22 @@ public class FieldConstants {
   // total
   // Processor --> red/blue, 1 position --> 2 total
 
-  // TODO: change to entries bc im a dumdum
+  public static final Map<String, ElevatorPositions> algaeHeights = 
+      Map.ofEntries(
+          entry("rl", ElevatorPositions.L3),
+          entry("rbl", ElevatorPositions.L2),
+          entry("rbr", ElevatorPositions.L3),
+          entry("rr", ElevatorPositions.L2),
+          entry("rtr", ElevatorPositions.L3),
+          entry("rtl", ElevatorPositions.L2),
+          entry("RL", ElevatorPositions.L3),
+          entry("RBL", ElevatorPositions.L2),
+          entry("RBR", ElevatorPositions.L3),
+          entry("RR", ElevatorPositions.L2),
+          entry("RTR", ElevatorPositions.L3),
+          entry("RTL", ElevatorPositions.L2)
+      );
+
   public static final Map<FieldPose, Pose2d> fieldPoses =
       Map.ofEntries(
           // processor

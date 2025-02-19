@@ -4,6 +4,8 @@
 
 package frc.robot.commands.Autonomous;
 
+import static frc.robot.Constants.FieldConstants.algaeHeights;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -44,10 +46,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
         DriverStation.getAlliance().get() == Alliance.Blue
             ? 1
             : 2; // TODO make string to tag id maps
-    ElevatorPositions elevatorHeight =
-        reefPoint == "rl"
-            ? ElevatorPositions.L2
-            : ElevatorPositions.L3; // TODO make string to algae height maps
+    ElevatorPositions elevatorHeight = algaeHeights.get(reefPoint);
     addCommands(
         new ParallelCommandGroup(
             new VisionAlign(
