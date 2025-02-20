@@ -13,6 +13,7 @@ import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.DriveToPose;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -21,11 +22,12 @@ import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScoreProcessor extends SequentialCommandGroup {
-  public AutoScoreProcessor(Swerve swerve, AlgaeIntake intake, AlgaePivot pivot) {
+  public AutoScoreProcessor(Swerve swerve, PoseAlignController poseController, AlgaeIntake intake, AlgaePivot pivot) {
     addRequirements(intake, pivot);
     addCommands(
         new DriveToPose(
             swerve,
+            poseController,
             fieldPoses.get(
                 new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID)),
             false),

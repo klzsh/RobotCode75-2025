@@ -36,18 +36,18 @@ public class FieldConstants {
           entry("RTL", ElevatorPositions.L2));
 
   public static final Map<Integer, Double> tagToHeadingMap = Map.ofEntries(
-    entry(7, 0),
-    entry(8, 60),
-    entry(9, 120),
-    entry(10, 180),
-    entry(11, 240),
-    entry(6, 300),
-    entry(18, 0),
-    entry(17, 60),
-    entry(22, 120),
-    entry(21, 180),
-    entry(20, 240),
-    entry(19, 300),
+    entry(7, 0.0),
+    entry(8, 60.0),
+    entry(9, 120.0),
+    entry(10, 180.0),
+    entry(11, 240.0),
+    entry(6, 300.0),
+    entry(18, 0.0),
+    entry(17, 60.0),
+    entry(22, 120.0),
+    entry(21, 180.0),
+    entry(20, 240.0),
+    entry(19, 300.0)
   );
 
   public static final Map<FieldPose, Pose2d> fieldPoses =

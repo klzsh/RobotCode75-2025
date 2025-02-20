@@ -241,11 +241,6 @@ public class Swerve extends SubsystemBase {
     this.setFieldRelative(speeds);
   }
 
-  /** returns a command to drive to a certain pose */
-  public Command getPoseCommand(Pose2d pose) {
-    return new DriveToPose(this, pose, false);
-  }
-
   /**
    * Set the module states (used in autos)
    *

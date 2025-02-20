@@ -11,6 +11,7 @@ import frc.robot.commands.Drivetrain.TranslateToBranch;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.Vision.AprilTagCamera;
@@ -19,7 +20,7 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 public class TestAuto extends SequentialCommandGroup {
   /** Creates a new TestAuto. */
   private final AutoFactory m_Factory;
-  public TestAuto(AutoFactory factory, CoralIntake CoralIntake, Swerve swerve, AprilTagCamera coralCam, Elevator elevator) {
+  public TestAuto(AutoFactory factory, CoralIntake CoralIntake, Swerve swerve, AprilTagCamera coralCam, Elevator elevator, VisionTranslationController2 visionController) {
     m_Factory = factory;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
@@ -28,7 +29,7 @@ public class TestAuto extends SequentialCommandGroup {
       m_Factory.trajectoryCmd("TESTPATH1"),
       new IntakeCoral(CoralIntake),
       m_Factory.trajectoryCmd("TESTPATH2"),
-      new TranslateToBranch(swerve, coralCam, true),
+      new TranslateToBranch(swerve, true, visionController),
       new ScoreL4(elevator, CoralIntake)
     ));
         }

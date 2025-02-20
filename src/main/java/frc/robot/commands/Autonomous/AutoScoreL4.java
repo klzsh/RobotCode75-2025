@@ -14,9 +14,9 @@ import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
-import frc.robot.subsystems.Drivetrain.RotationController;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
@@ -30,8 +30,8 @@ public class AutoScoreL4 extends SequentialCommandGroup {
       CoralIntake coralIntake,
       AprilTagCamera leftCamera,
       AprilTagCamera centerCamera,
-      VisionTranslationController visionController,
-      RotationController rotationController,
+      VisionTranslationController2 visionController,
+      PoseAlignController poseController,
       boolean isLeft) {
     addRequirements(swerve, elevator, coralIntake);
     int tagID =
@@ -48,8 +48,8 @@ public class AutoScoreL4 extends SequentialCommandGroup {
                     DriverStation.getAlliance().get(),
                     FieldElement.RL,
                     isLeft ? Offset.LEFT : Offset.RIGHT),
-                visionController,
-                rotationController),
+                poseController,
+                visionController),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, true)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake),

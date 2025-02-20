@@ -7,7 +7,11 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,8 +43,8 @@ public class TranslateToBranch extends Command {
 
   @Override
   public void initialize() {
-    visionController.reset(alignLeft);
-    }
+    visionController.reset(new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, alignLeft ? Offset.LEFT : Offset.RIGHT));
+  }
 
     // tagIDToFocus is the tagID which relates to the nearest heading and the alliance
 
@@ -48,23 +52,19 @@ public class TranslateToBranch extends Command {
 
   @Override
   public void execute() {
-    ChassisSpeeds speeds = m_controller.update(m_swerve.getPose(), targetPose);
-    m_swerve.setChassisSpeeds(speeds);
-    
+    ChassisSpeeds speeds = visionController.update();
+    m_Swerve.setChassisSpeeds(speeds);
   }
 
 
 
   @Override
-  public void end(boolean interrupted) {
-    
-  }
+  public void end(boolean interrupted) {}
 
 
 
   @Override
   public boolean isFinished() {
-    // return false;
-    return m_controller.atGoal();
+    return visionController.atGoal();
   }
 }

@@ -41,7 +41,7 @@ import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -97,8 +97,8 @@ public class RobotContainer {
   // define drivetrain controllers
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
   private final RotationController m_RotationController = new RotationController(m_Swerve);
-  private final VisionTranslationController m_VisionController =
-      new VisionTranslationController(m_Swerve);
+  private final VisionTranslationController2 m_VisionController =
+      new VisionTranslationController2(m_Swerve, CoralCam, CenterCam);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -233,11 +233,11 @@ public class RobotContainer {
                 CoralCam,
                 18,
                 new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
-                m_VisionController,
-                m_RotationController));
+                m_PoseAlignController,
+                m_VisionController));
 
-    AlignLeft.whileTrue(new AutoAlignByAngle(m_Swerve, CoralCam, true));
-    AlignRight.whileTrue(new AutoAlignByAngle(m_Swerve, CenterCam, false));
+    AlignLeft.whileTrue(new AutoAlignByAngle(m_Swerve, CoralCam, m_VisionController, true));
+    AlignRight.whileTrue(new AutoAlignByAngle(m_Swerve, CenterCam, m_VisionController, false));
     // manual elevator overrides
     m_Controller
         .a()
@@ -297,7 +297,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, CoralCam, m_Elevator);
+    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, CoralCam, m_Elevator, m_VisionController);
     // return null;
   }
 }

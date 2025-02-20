@@ -1,12 +1,13 @@
-package frc.robot.commands.Drivetrain;
+package frc.robot.subsystems.Drivetrain;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.Collections;
@@ -19,10 +20,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
-public class VisionTrnaslationController2 {
+public class VisionTranslationController2 {
 
-  private PIDController xController;
-  private PIDController yController;
+  private ProfiledPIDController xController;
+  private ProfiledPIDController yController;
 
   private final AprilTagCamera m_CoralCamera;
   private final AprilTagCamera m_CenterCamera;
@@ -57,21 +58,22 @@ public class VisionTrnaslationController2 {
   private Set<Integer> correspondingTagIDs;
   private int tagIDToFocus;
 
-  public VisionTrnaslationController2(Swerve swerve, AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
+  public VisionTranslationController2(Swerve swerve, AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
     m_Swerve = swerve;
     m_CoralCamera = coralCamera;
     m_CenterCamera = centerCamera;
   }
 
 
-  public void reset(boolean alignLeft) {
-    this.alignLeft = alignLeft
+  public void reset(FieldPose targetPose) {
+    // this.alignLeft = alignLeft;
+    // TODO add fieldpose to offsets map
     if (alignLeft) {
-      xController.setSetpoint(targetPitchLeft);
-      yController.setSetpoint(targetYawLeft);
+      xController.setGoal(targetPitchLeft);
+      yController.setGoal(targetYawLeft);
     } else {
-      xController.setSetpoint(targetPitchRight);
-      yController.setSetpoint(targetPitchLeft);
+      xController.setGoal(targetPitchRight);
+      yController.setGoal(targetPitchLeft);
     }
     xController.setTolerance(5);
     yController.setTolerance(5);
@@ -96,11 +98,11 @@ public class VisionTrnaslationController2 {
   }
 
 
-  public void update() {
+  public ChassisSpeeds update() {
     xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
     yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
 
-    AprilTagCamera camera = m_CoralCamera ? alignleft : m_CenterCamera;
+    AprilTagCamera camera = alignLeft ? m_CoralCamera : m_CenterCamera;
     
     if (camera.getTarget(tagIDToFocus).isPresent()) { // ensure tag to focus in view
       currentPitch = camera.getY(tagIDToFocus); // Y is Pitch

@@ -16,9 +16,9 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
-import frc.robot.subsystems.Drivetrain.RotationController;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -39,8 +39,8 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       AlgaePivot pivot,
       AprilTagCamera centerCamera,
       String reefPoint,
-      VisionTranslationController visionController,
-      RotationController rotationController) {
+      VisionTranslationController2 visionController,
+      PoseAlignController poseController) {
     addRequirements(swerve, elevator, intake, pivot);
     int tagID =
         DriverStation.getAlliance().get() == Alliance.Blue
@@ -54,8 +54,8 @@ public class AutoDealgaefy extends SequentialCommandGroup {
                 centerCamera,
                 tagID,
                 new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
-                visionController,
-                rotationController),
+                poseController,
+                visionController),
             new SetElevatorPosition(elevator, elevatorHeight, true)),
         new ParallelCommandGroup(
                 new InstantCommand(
