@@ -19,13 +19,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
-@Logged(name = "TranslateToBranch", strategy = Strategy.OPT_IN)
-public class TranslateToBranch extends SubsystemBase {
+public class VisionTrnaslationController2 {
 
   private PIDController xController;
   private PIDController yController;
 
-  private final AprilTagCamera m_AprilTagCamera;
+  private final AprilTagCamera m_CoralCamera;
+  private final AprilTagCamera m_CenterCamera;
   private final Swerve m_Swerve;
   private boolean alignLeft;
 
@@ -57,9 +57,10 @@ public class TranslateToBranch extends SubsystemBase {
   private Set<Integer> correspondingTagIDs;
   private int tagIDToFocus;
 
-  public TranslateToBranch(Swerve swerve, AprilTagCamera camera) {
+  public VisionTrnaslationController2(Swerve swerve, AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
     m_Swerve = swerve;
-    m_AprilTagCamera = camera;
+    m_CoralCamera = coralCamera;
+    m_CenterCamera = centerCamera;
   }
 
 
@@ -104,11 +105,12 @@ public class TranslateToBranch extends SubsystemBase {
   public void update() {
     xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
     yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
+
+    AprilTagCamera camera = m_CoralCamera ? alignleft : m_CenterCamera;
     
-    
-    if (m_AprilTagCamera.getTarget(tagIDToFocus).isPresent()) { // ensure tag to focus in view
-      currentPitch = m_AprilTagCamera.getY(tagIDToFocus); // Y is Pitch
-      currentYaw = m_AprilTagCamera.getX(tagIDToFocus); // X is Yaw
+    if (camera.getTarget(tagIDToFocus).isPresent()) { // ensure tag to focus in view
+      currentPitch = camera.getY(tagIDToFocus); // Y is Pitch
+      currentYaw = camera.getX(tagIDToFocus); // X is Yaw
       if (alignLeft) {
         xCommand = xController.calculate(currentPitch.getAsDouble(), targetPitchLeft);
         yCommand = yController.calculate(currentYaw.getAsDouble(), targetYawLeft);
