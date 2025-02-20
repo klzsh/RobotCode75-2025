@@ -112,10 +112,12 @@ public class VisionTrnaslationController2 {
         xCommand = xController.calculate(currentPitch.getAsDouble(), targetPitchRight);
         yCommand = yController.calculate(currentYaw.getAsDouble(), targetYawRight);
       }
-
-      // m_Swerve.drive(new Translation2d(xCommand, yCommand), 0); // needs to be robot relative
-      m_Swerve.setRobotRelative(new ChassisSpeeds(xCommand, yCommand, 0));
     }
+    return new ChassisSpeeds(xCommand, yCommand, 0);
+  }
+
+  public boolean atGoal() {
+    return xController.atGoal() && yController.atGoal();
   }
 
 }
