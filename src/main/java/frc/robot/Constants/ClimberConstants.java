@@ -13,13 +13,19 @@ import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 
 public final class ClimberConstants {
-  private static final double gearRatio = 39.6 / 1.0;
+  public static final double gearRatio = 39.6 / 1.0;
   // TODO: tune
   public static final Angle climbPosition = Rotations.of(0);
   public static final double climbDeadband = 0.5;
   public static final int limitPort = 7;
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
+
+  public static final int climberEncoderPort = -1; //TODO set this
+  public static final Angle climberEncoderOffset = Rotations.of(0); //TODO tune
+  public static final Angle climberZeroPoint = Rotations.of(0); //TODO tune
+  public static final Angle climbPositionAbsolute = Rotations.of(0); //TODO tune
+  public static final double climbDeadbandAbsolute = 0.25;
 
   public static final class MotorConfigs {
     public static final Time closedLoopRamp = Seconds.of(0.25);
