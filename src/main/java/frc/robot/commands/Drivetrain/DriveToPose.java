@@ -18,11 +18,11 @@ public class DriveToPose extends Command {
   private boolean holdPose;
 
   /** Creates a new DriveToPose. */
-  public DriveToPose(Swerve swerve, Pose2d pose, boolean hold) {
+  public DriveToPose(Swerve swerve, PoseAlignController controller, Pose2d pose, boolean hold) {
     m_swerve = swerve;
     targetPose = pose;
     holdPose = hold;
-    m_controller = new PoseAlignController(m_swerve);
+    m_controller = controller;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_swerve);
   }
