@@ -4,10 +4,13 @@
 
 package frc.robot.commands.Drivetrain;
 
+import static frc.robot.Constants.FieldConstants.*;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -15,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
@@ -26,6 +30,7 @@ public class VisionAlign extends SequentialCommandGroup {
       AprilTagCamera camera,
       int target,
       FieldPose targetPose,
+      PoseAlignController poseController,
       VisionTranslationController visionController,
       RotationController rotationController) {
     /**
@@ -39,6 +44,9 @@ public class VisionAlign extends SequentialCommandGroup {
             .getTagPose(target)
             .get()
             .toPose2d();
+    double targetHeading = tagToHeadingMap.get(target);
+    double targetHeadingRad = targetHeading / 180 * Math.PI;
+    Pose2d targetPose = tagPose.transformBy(new Transform2d(Inches.of(17.5 * Math.cos(targetHeadingRad)), Inches.of(17.5 * Math.sin(targetHeadingRad)), Rotation2d.fromDegrees(180)));
     Pose2d currentPose = swerve.getPose();
     Rotation2d toTag =
         Rotation2d.fromRadians(
@@ -47,17 +55,11 @@ public class VisionAlign extends SequentialCommandGroup {
         Commands.runOnce(
             () -> {
               visionController.reset();
+              poseController.reset();
             }),
-        new SnapHoldRotation(swerve, toTag, () -> 0, () -> 0),
-        new InstantCommand(
-                () -> {
-                  ChassisSpeeds speeds = visionController.update(camera, target, targetPose);
-                  rotationController.update(placeholder);
-                  speeds.omegaRadiansPerSecond = rotationController.getOutput();
-                  swerve.setChassisSpeeds(speeds);
-                })
-            .repeatedly()
-            .until(() -> visionController.atGoal() && rotationController.atGoal()));
+        new DriveToPose(swerve, poseController, targetpose, false)
+        // TODO redo shitty tx only vision controller
+    );
     addRequirements(swerve);
   }
 }
