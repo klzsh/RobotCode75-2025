@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -24,11 +23,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
+import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Autonomous.TuningPath;
-import frc.robot.commands.Drivetrain.LidarAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.commands.Drivetrain.TranslateToBranch;
 import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
@@ -51,7 +51,6 @@ import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.CANRangeWrapper;
-import frc.robot.subsystems.Util.LidarDistance;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /**
@@ -86,10 +85,11 @@ public class RobotContainer {
 
   @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
+
   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37));
 
-//   @Logged(name = "Algae Lidar Sensor")
-//   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
+  //   @Logged(name = "Algae Lidar Sensor")
+  //   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
@@ -111,8 +111,8 @@ public class RobotContainer {
   private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
 
   private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
-  private final JoystickButton lidarAlignLeft = new JoystickButton(m_LeftStick, 4);
-  private final JoystickButton lidarAlignRight = new JoystickButton(m_RightStick, 4);
+  private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 4);
+  private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 4);
 
   private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton);
 
@@ -227,10 +227,16 @@ public class RobotContainer {
     m_Controller
         .rightBumper()
         .whileTrue(
-            new VisionAlign(m_Swerve, CoralCam, 18, new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID), m_VisionController, m_RotationController));
+            new VisionAlign(
+                m_Swerve,
+                CoralCam,
+                18,
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
+                m_VisionController,
+                m_RotationController));
 
-    lidarAlignRight.whileTrue(new LidarAlign(m_Swerve, m_CANRange, false));
-    lidarAlignLeft.whileTrue(new LidarAlign(m_Swerve, m_CANRange, true));
+    AlignLeft.whileTrue(new TranslateToBranch(m_Swerve, CoralCam, true));
+    AlignRight.whileTrue(new TranslateToBranch(m_Swerve, CenterCam, false));
     // manual elevator overrides
     m_Controller
         .a()
@@ -273,7 +279,9 @@ public class RobotContainer {
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
-    robotRelative.onTrue(new InstantCommand(()-> m_Swerve.toggleRobotRelative())).onFalse(new InstantCommand(()-> m_Swerve.toggleFieldRelative()));
+    robotRelative
+        .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
+        .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
   }
 
   private void configureChooser() {
@@ -288,7 +296,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return new TuningPath(m_Factory);
+    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, CoralCam, m_Elevator);
     // return null;
   }
 }

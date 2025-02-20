@@ -169,8 +169,7 @@ public class Swerve extends SubsystemBase {
    * @param rotation - Yaw/angle of the robot (Counter Clockwise is positive)
    * @param openLoop - Use feedback and PID (if false)
    */
-  public void drive(
-      Translation2d translation, double rotation) {
+  public void drive(Translation2d translation, double rotation) {
     SwerveModuleState[] swerveModuleStates =
         swerveKinematics.toSwerveModuleStates(
             m_FieldRelative
@@ -184,12 +183,15 @@ public class Swerve extends SubsystemBase {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, false);
     }
   }
-  public void toggleRobotRelative(){
+
+  public void toggleRobotRelative() {
     m_FieldRelative = false;
   }
-  public void toggleFieldRelative(){
+
+  public void toggleFieldRelative() {
     m_FieldRelative = true;
   }
+
   /**
    * intermediary function to convert between chassis speeds and swerve module states
    *
@@ -206,6 +208,14 @@ public class Swerve extends SubsystemBase {
     var states =
         swerveKinematics.toSwerveModuleStates(
             ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation2D()));
+    setModuleStates(states, false);
+  }
+
+  public void setRobotRelative(ChassisSpeeds speeds) {
+    setpointSpeeds = speeds;
+    var states =
+        swerveKinematics.toSwerveModuleStates(
+            ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getRotation2D()));
     setModuleStates(states, false);
   }
 
@@ -243,7 +253,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, 4.79); // TODO: change this back to controller constants
+        desiredStates, 4.7); // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }

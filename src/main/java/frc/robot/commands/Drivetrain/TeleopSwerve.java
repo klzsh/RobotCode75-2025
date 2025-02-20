@@ -41,8 +41,6 @@ public class TeleopSwerve extends Command {
     Translation2d translation2d =
         new Translation2d(DriverInput[0], DriverInput[1]).times(maxSpeed.in(MetersPerSecond));
 
-    m_Swerve.drive(
-        translation2d,
-        DriverInput[2] * maxAngularVelocity.in(RadiansPerSecond));
+    m_Swerve.drive(translation2d, DriverInput[2] * maxAngularVelocity.in(RadiansPerSecond));
   }
 }

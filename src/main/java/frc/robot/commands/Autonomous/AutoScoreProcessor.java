@@ -7,7 +7,6 @@ package frc.robot.commands.Autonomous;
 import static frc.robot.Constants.FieldConstants.fieldPoses;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.util.FieldPose;
@@ -25,14 +24,21 @@ public class AutoScoreProcessor extends SequentialCommandGroup {
   public AutoScoreProcessor(Swerve swerve, AlgaeIntake intake, AlgaePivot pivot) {
     addRequirements(intake, pivot);
     addCommands(
-      new DriveToPose(swerve, fieldPoses.get(new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID)), false), 
-      new InstantCommand(() -> {
-        intake.setAlgaeState(AlgaeStates.OUTAKING);
-        pivot.setPivotState(PivotState.RETRACTED);
-      }).repeatedly().until(() -> !intake.algaeInIntake()),
-      new InstantCommand(() -> {
-        intake.setAlgaeState(AlgaeStates.NONE);
-      })
-    );
+        new DriveToPose(
+            swerve,
+            fieldPoses.get(
+                new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID)),
+            false),
+        new InstantCommand(
+                () -> {
+                  intake.setAlgaeState(AlgaeStates.OUTAKING);
+                  pivot.setPivotState(PivotState.RETRACTED);
+                })
+            .repeatedly()
+            .until(() -> !intake.algaeInIntake()),
+        new InstantCommand(
+            () -> {
+              intake.setAlgaeState(AlgaeStates.NONE);
+            }));
   }
 }

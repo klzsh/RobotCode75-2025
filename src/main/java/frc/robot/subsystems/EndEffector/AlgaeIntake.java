@@ -43,8 +43,7 @@ public class AlgaeIntake extends SubsystemBase {
   private final TunableNumber algaeIntakeKs;
 
   // private final DigitalInput m_AlgaeIntakeLimit;
-  @Logged
-  private final LidarDistance m_AlgaeDetector;
+  @Logged private final LidarDistance m_AlgaeDetector;
 
   // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =

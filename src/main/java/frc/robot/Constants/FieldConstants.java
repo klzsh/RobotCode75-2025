@@ -9,7 +9,6 @@ import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
-
 import java.util.Map;
 
 public class FieldConstants {
@@ -20,7 +19,7 @@ public class FieldConstants {
   // total
   // Processor --> red/blue, 1 position --> 2 total
 
-  public static final Map<String, ElevatorPositions> algaeHeights = 
+  public static final Map<String, ElevatorPositions> algaeHeights =
       Map.ofEntries(
           entry("rl", ElevatorPositions.L3),
           entry("rbl", ElevatorPositions.L2),
@@ -33,8 +32,7 @@ public class FieldConstants {
           entry("RBR", ElevatorPositions.L3),
           entry("RR", ElevatorPositions.L2),
           entry("RTR", ElevatorPositions.L3),
-          entry("RTL", ElevatorPositions.L2)
-      );
+          entry("RTL", ElevatorPositions.L2));
 
   public static final Map<FieldPose, Pose2d> fieldPoses =
       Map.ofEntries(
