@@ -25,6 +25,7 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Autonomous.TuningPath;
+import frc.robot.commands.Drivetrain.AutoAlignByAngle;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -235,8 +236,8 @@ public class RobotContainer {
                 m_VisionController,
                 m_RotationController));
 
-    AlignLeft.whileTrue(new TranslateToBranch(m_Swerve, CoralCam, true));
-    AlignRight.whileTrue(new TranslateToBranch(m_Swerve, CenterCam, false));
+    AlignLeft.whileTrue(new AutoAlignByAngle(m_Swerve, CoralCam, true));
+    AlignRight.whileTrue(new AutoAlignByAngle(m_Swerve, CenterCam, false));
     // manual elevator overrides
     m_Controller
         .a()

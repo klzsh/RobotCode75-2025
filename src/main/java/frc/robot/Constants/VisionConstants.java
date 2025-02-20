@@ -61,13 +61,13 @@ public class VisionConstants {
   public static final Transform3d CenterCamPose =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(8.088), // X 9.325
-              Units.inchesToMeters(7.762), // Y .3505
-              Units.inchesToMeters(8.251)), // Z 5.85
+              Units.inchesToMeters(9.398), // X 9.325
+              Units.inchesToMeters(7.551), // Y .3505
+              Units.inchesToMeters(8.25)), // Z 5.85
           new Rotation3d(
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
-              Units.degreesToRadians(45))); // 0 0 0
+              Units.degreesToRadians(20))); // 0 0 0
   public static final Transform3d CoralCamPose =
       new Transform3d(
           new Translation3d(

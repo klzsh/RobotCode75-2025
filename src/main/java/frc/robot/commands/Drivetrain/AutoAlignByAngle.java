@@ -6,7 +6,7 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 
 public class AutoAlignByAngle extends SequentialCommandGroup {
   public AutoAlignByAngle(Swerve swerve, AprilTagCamera camera, boolean alignLeft) {
-    addCommands(new TranslateToBranch(swerve, camera, alignLeft), new RotateToReef(swerve, camera));
+    addCommands(new SnapToNearestHeading(swerve), new TranslateToBranch(swerve, camera, alignLeft));
     addRequirements(swerve);
   }
 }
