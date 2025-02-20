@@ -1,6 +1,7 @@
 package frc.robot.Constants;
 
 import static java.util.Map.entry;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,6 +34,21 @@ public class FieldConstants {
           entry("RR", ElevatorPositions.L2),
           entry("RTR", ElevatorPositions.L3),
           entry("RTL", ElevatorPositions.L2));
+
+  public static final Map<Integer, RobotHeading> tagToHeadingMap = Map.ofEntries(
+    entry(7, 0),
+    entry(8, 60),
+    entry(9, 120),
+    entry(10, 180),
+    entry(11, 240),
+    entry(6, 300),
+    entry(18, 0),
+    entry(17, 60),
+    entry(22, 120),
+    entry(21, 180),
+    entry(20, 240),
+    entry(19, 300),
+  );
 
   public static final Map<FieldPose, Pose2d> fieldPoses =
       Map.ofEntries(
