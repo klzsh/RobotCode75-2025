@@ -76,12 +76,6 @@ public class VisionTrnaslationController2 {
     xController.setTolerance(5);
     yController.setTolerance(5);
 
-    double heading = m_Swerve.getPose().getRotation().getRadians();
-    // TODO CHANGE TO FIELD CONSTANTS
-    double nearestHeading = Collections.min(headingToTagIDs.keySet(), 
-    Comparator.comparingDouble(h -> Math.abs(h - heading)));
-    correspondingTagIDs = headingToTagIDs.get(nearestHeading); // get the set of 2 tagIDs that correspond to the nearest heading
-
     // Determine the tagIDToFocus based on the alliance
     Alliance alliance = DriverStation.getAlliance().get();
     if (alliance == Alliance.Red) {
