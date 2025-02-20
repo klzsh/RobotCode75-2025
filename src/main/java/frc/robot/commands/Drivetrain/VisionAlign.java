@@ -28,37 +28,38 @@ public class VisionAlign extends SequentialCommandGroup {
   public VisionAlign(
       Swerve swerve,
       AprilTagCamera camera,
-      int target,
+      // int target,
       FieldPose targetPose,
       PoseAlignController poseController,
-      VisionTranslationController visionController,
-      RotationController rotationController) {
+      boolean leftAlign,
+      VisionTranslationController2 visionController) {
     /**
      * first snap rotation to april tag based on bounding box then calculate translation using
      * visioncontroller and rotation to preset heading using rotationcontroller modify chassisspeeds
      * from visioncontroller using rotationcontroller output set chassisspeeds
      */
-    Rotation2d placeholder = Rotation2d.fromDegrees(0); // from bounding box
-    Pose2d tagPose =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-            .getTagPose(target)
-            .get()
-            .toPose2d();
-    double targetHeading = tagToHeadingMap.get(target);
-    double targetHeadingRad = targetHeading / 180 * Math.PI;
-    Pose2d targetPose = tagPose.transformBy(new Transform2d(Inches.of(17.5 * Math.cos(targetHeadingRad)), Inches.of(17.5 * Math.sin(targetHeadingRad)), Rotation2d.fromDegrees(180)));
-    Pose2d currentPose = swerve.getPose();
-    Rotation2d toTag =
-        Rotation2d.fromRadians(
-            Math.atan2(tagPose.getY() - currentPose.getY(), tagPose.getX() - currentPose.getX()));
+    // Rotation2d placeholder = Rotation2d.fromDegrees(0); // from bounding box
+    // Pose2d tagPose =
+    //     AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
+    //         .getTagPose(target)
+    //         .get()
+    //         .toPose2d();
+    // double targetHeading = tagToHeadingMap.get(target);
+    // double targetHeadingRad = targetHeading / 180 * Math.PI;
+    // Pose2d targetPose = tagPose.transformBy(new Transform2d(Inches.of(17.5 * Math.cos(targetHeadingRad)), Inches.of(17.5 * Math.sin(targetHeadingRad)), Rotation2d.fromDegrees(180)));
+    // Pose2d currentPose = swerve.getPose();
+    // Rotation2d toTag =
+    //     Rotation2d.fromRadians(
+    //         Math.atan2(tagPose.getY() - currentPose.getY(), tagPose.getX() - currentPose.getX()));
     addCommands(
         Commands.runOnce(
             () -> {
               visionController.reset();
               poseController.reset();
+              visionController.reset();
             }),
-        new DriveToPose(swerve, poseController, targetpose, false)
-        // TODO redo shitty tx only vision controller
+        new DriveToPose(swerve, poseController, targetpose, false),
+        new TranslateToBranch(swerve, camera, leftAlign)
     );
     addRequirements(swerve);
   }
