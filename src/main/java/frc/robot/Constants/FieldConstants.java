@@ -35,7 +35,7 @@ public class FieldConstants {
           entry("RTR", ElevatorPositions.L3),
           entry("RTL", ElevatorPositions.L2));
 
-  public static final Map<Integer, RobotHeading> tagToHeadingMap = Map.ofEntries(
+  public static final Map<Integer, Double> tagToHeadingMap = Map.ofEntries(
     entry(7, 0),
     entry(8, 60),
     entry(9, 120),
