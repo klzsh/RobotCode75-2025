@@ -22,6 +22,8 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
@@ -40,6 +42,8 @@ public class Climber extends SubsystemBase {
   @Logged(name = "Climber Motor 2", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor2;
 
+  private final DutyCycleEncoder m_ClimberEncoder;
+
   @Logged(name = "Climber State", importance = Importance.CRITICAL)
   private ClimberPositions m_ClimberState = ClimberPositions.DEFAULT;
 
@@ -56,6 +60,8 @@ public class Climber extends SubsystemBase {
   private final TunableNumber climberMMKv;
   private final TunableNumber climberMMKa;
 
+  private final TunableNumber absoluteEncoderOffset;
+
   private final MotionMagicExpoTorqueCurrentFOC m_PositionRequest;
 
   private final TorqueCurrentFOC m_TestRequest;
@@ -64,6 +70,8 @@ public class Climber extends SubsystemBase {
   public Climber() {
     m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
+
+    m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, climberZeroPoint.in(Rotations));
 
     climberMMCruiseVelocity =
         new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
@@ -93,6 +101,12 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor2.getConfigurator().apply(getClimberMotorConfig());
 
     m_LimitSwitch = new DigitalInput(ClimberConstants.limitPort);
+
+    absoluteEncoderOffset =
+        new TunableNumber("Climber Encoder/Offset", climberEncoderOffset.in(Rotations));
+    Timer.delay(5);
+    m_ClimberMotor1.setPosition((getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
+    m_ClimberMotor2.setPosition((getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
   }
 
   public void setState(ClimberPositions state) {
@@ -110,6 +124,11 @@ public class Climber extends SubsystemBase {
         m_PositionRequest.withPosition(position).withLimitForwardMotion(getLimitSwitch()));
   }
 
+  @Logged
+  public double getAbsolutePosition() {
+    return m_ClimberEncoder.get();
+  }
+
   @Logged(name = "Climber Position", importance = Importance.CRITICAL)
   public Angle getPosition() {
     return Rotations.of(
@@ -121,6 +140,10 @@ public class Climber extends SubsystemBase {
   public boolean atPosition() {
     return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations))
         < ClimberConstants.climbDeadband;
+  }
+
+  public boolean isAtPositionAbsolute() {
+    return Math.abs(climbPositionAbsolute.in(Rotations) - m_ClimberEncoder.get()) < climbDeadbandAbsolute;
   }
 
   @Logged(name = "Climber Limit", importance = Importance.DEBUG)
