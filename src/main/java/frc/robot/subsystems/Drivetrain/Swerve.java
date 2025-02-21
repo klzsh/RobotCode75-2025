@@ -402,6 +402,14 @@ public class Swerve extends SubsystemBase {
                 Inches.of(17.5 * -tagHeading.getCos()),
                 Inches.of(17.5 * -tagHeading.getSin()),
                 Rotation2d.fromDegrees(180)));
+    tagHeading = tagHeading.rotateBy(Rotation2d.kCCW_90deg);
+    poseToDrive = poseToDrive.transformBy(
+            new Transform2d(
+                reefLeftPoseOffset.times(-tagHeading.getCos()),
+                reefLeftPoseOffset.times(-tagHeading.getSin()),
+              Rotation2d.fromDegrees(0)
+    ));
+    
     m_ModuleCamera.updateHeading(getRotation2D());
     updatePoseByVision(m_ModuleCamera);
 
