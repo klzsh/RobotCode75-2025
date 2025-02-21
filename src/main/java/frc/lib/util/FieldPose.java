@@ -30,6 +30,12 @@ public class FieldPose {
         return FieldElement.RTR;
       case "RTL":
         return FieldElement.RTL;
+      case "HT":
+        return FieldElement.HT;
+      case "HB":
+        return FieldElement.HB;
+      case "P":
+        return FieldElement.P;
       default:
         return null;
     }
