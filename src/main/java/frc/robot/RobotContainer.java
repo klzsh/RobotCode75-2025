@@ -228,7 +228,7 @@ public class RobotContainer {
             new DriveVisionAlign(
                 m_Swerve,
                 18,
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
                 m_PoseAlignController,
                 m_VisionController));
 
@@ -291,8 +291,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return new TestAuto(
-        m_Factory, m_CoralIntake, m_Swerve, CoralCam, m_Elevator, m_VisionController);
+    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController);
     // return null;
   }
 }

@@ -21,10 +21,10 @@ public final class ClimberConstants {
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
 
-  public static final int climberEncoderPort = -1; //TODO set this
-  public static final Angle climberEncoderOffset = Rotations.of(0); //TODO tune
-  public static final Angle climberZeroPoint = Rotations.of(0); //TODO tune
-  public static final Angle climbPositionAbsolute = Rotations.of(0); //TODO tune
+  public static final int climberEncoderPort = 6;
+  public static final Angle climberEncoderOffset = Rotations.of(0); // TODO tune
+  public static final Angle climberZeroPoint = Rotations.of(0); // TODO tune
+  public static final Angle climbPositionAbsolute = Rotations.of(0); // TODO tune
   public static final double climbDeadbandAbsolute = 0.25;
 
   public static final class MotorConfigs {

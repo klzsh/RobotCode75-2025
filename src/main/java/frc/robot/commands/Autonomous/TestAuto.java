@@ -6,14 +6,12 @@ package frc.robot.commands.Autonomous;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TestAuto extends SequentialCommandGroup {
@@ -24,7 +22,6 @@ public class TestAuto extends SequentialCommandGroup {
       AutoFactory factory,
       CoralIntake CoralIntake,
       Swerve swerve,
-      AprilTagCamera coralCam,
       Elevator elevator,
       VisionTranslationController visionController) {
     m_Factory = factory;
@@ -36,7 +33,7 @@ public class TestAuto extends SequentialCommandGroup {
             m_Factory.trajectoryCmd("TESTPATH1"),
             new IntakeCoral(CoralIntake),
             m_Factory.trajectoryCmd("TESTPATH2"),
-            new VisionAlign(swerve, true, visionController),
+            // new VisionAlign(swerve, new FieldPose, visionController),
             new ScoreL4(elevator, CoralIntake)));
   }
 }

@@ -105,8 +105,10 @@ public class Climber extends SubsystemBase {
     absoluteEncoderOffset =
         new TunableNumber("Climber Encoder/Offset", climberEncoderOffset.in(Rotations));
     Timer.delay(5);
-    m_ClimberMotor1.setPosition((getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
-    m_ClimberMotor2.setPosition((getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
+    m_ClimberMotor1.setPosition(
+        (getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
+    m_ClimberMotor2.setPosition(
+        (getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
   }
 
   public void setState(ClimberPositions state) {
@@ -143,7 +145,8 @@ public class Climber extends SubsystemBase {
   }
 
   public boolean isAtPositionAbsolute() {
-    return Math.abs(climbPositionAbsolute.in(Rotations) - m_ClimberEncoder.get()) < climbDeadbandAbsolute;
+    return Math.abs(climbPositionAbsolute.in(Rotations) - m_ClimberEncoder.get())
+        < climbDeadbandAbsolute;
   }
 
   @Logged(name = "Climber Limit", importance = Importance.DEBUG)

@@ -11,9 +11,11 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,8 +47,8 @@ public class AprilTagCamera extends SubsystemBase {
     m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
     m_poseEstimator =
-        new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
-    m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        new PhotonPoseEstimator(m_tagLayout, PoseStrategy.CONSTRAINED_SOLVEPNP, cameraPose);
+    m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
   }
 
   public boolean hasTarget() {
@@ -273,6 +275,10 @@ public class AprilTagCamera extends SubsystemBase {
     } else {
       return null;
     }
+  }
+
+  public void updateHeading(Rotation2d heading) {
+    m_poseEstimator.addHeadingData(Timer.getFPGATimestamp(), heading);
   }
 
   // public double getLatency() {  // This dont exist in 2025 either ig

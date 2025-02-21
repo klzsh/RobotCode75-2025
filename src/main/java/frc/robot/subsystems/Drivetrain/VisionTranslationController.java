@@ -2,7 +2,7 @@ package frc.robot.subsystems.Drivetrain;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
@@ -12,8 +12,8 @@ import java.util.OptionalDouble;
 
 public class VisionTranslationController {
 
-  private ProfiledPIDController xController;
-  private ProfiledPIDController yController;
+  private final PIDController xController;
+  private final PIDController yController;
 
   private final AprilTagCamera m_CoralCamera;
   private final AprilTagCamera m_CenterCamera;
@@ -32,18 +32,21 @@ public class VisionTranslationController {
   private double yCommand;
 
   private TunableNumber[] xPID = {
-    new TunableNumber("TranslateToBranch/xP", 0.005),
-    new TunableNumber("TranslateToBranch/xI", 0),
-    new TunableNumber("TranslateToBranch/xD", 0.0001)
+    new TunableNumber("VisionController/xP", 0.005),
+    new TunableNumber("VisionController/xI", 0),
+    new TunableNumber("VisionController/xD", 0.0001)
   };
 
   private TunableNumber[] yPID = {
-    new TunableNumber("TranslateToBranch/yP", 0.001),
-    new TunableNumber("TranslateToBranch/yI", 0),
-    new TunableNumber("TranslateToBranch/yD", 0.0001)
+    new TunableNumber("VisionController/yP", 0.001),
+    new TunableNumber("VisionController/yI", 0),
+    new TunableNumber("VisionController/yD", 0.0001)
   };
 
   public VisionTranslationController(AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
+    xController = new PIDController(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
+    yController = new PIDController(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
+
     m_CoralCamera = coralCamera;
     m_CenterCamera = centerCamera;
 
@@ -57,8 +60,13 @@ public class VisionTranslationController {
     xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
     yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
 
-    xController.setGoal(target.getY());
-    yController.setGoal(target.getX());
+    if (target == null) {
+      System.out.println("Warning: No target");
+      return new ChassisSpeeds(0, 0, 0);
+    }
+
+    xController.setSetpoint(target.getY());
+    yController.setSetpoint(target.getX());
 
     AprilTagCamera camera = alignLeft ? m_CoralCamera : m_CenterCamera;
 
@@ -81,6 +89,6 @@ public class VisionTranslationController {
   }
 
   public boolean atGoal() {
-    return xController.atGoal() && yController.atGoal();
+    return xController.atSetpoint() && yController.atSetpoint();
   }
 }

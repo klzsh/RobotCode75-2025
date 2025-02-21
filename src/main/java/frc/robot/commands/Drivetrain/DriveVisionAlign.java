@@ -19,8 +19,6 @@ import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
-import frc.robot.subsystems.Vision.AprilTagCamera;
-
 public class DriveVisionAlign extends SequentialCommandGroup {
 
   public DriveVisionAlign(
@@ -39,8 +37,8 @@ public class DriveVisionAlign extends SequentialCommandGroup {
     Pose2d poseToDrive =
         tagPose.transformBy(
             new Transform2d(
-                Inches.of(17.5 * tagHeading.getCos()),
-                Inches.of(17.5 * tagHeading.getSin()),
+                Inches.of(18 * -tagHeading.getCos()),
+                Inches.of(18 * -tagHeading.getSin()),
                 Rotation2d.fromDegrees(180)));
 
     addCommands(

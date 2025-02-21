@@ -26,7 +26,6 @@ public class VisionAlign extends Command {
     }
     if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
       targetPose.fieldElement = FieldElement.HT;
-      ;
     }
 
     Translation2d offset = fieldPoseToCameraAngleOffset.get(targetPose);

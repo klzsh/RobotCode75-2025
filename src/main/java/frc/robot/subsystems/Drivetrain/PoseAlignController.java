@@ -44,8 +44,8 @@ public class PoseAlignController {
   };
 
   public PoseAlignController(Swerve swerve) {
-    xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
-    yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
+    xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
+    yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     thetaController = new RotationController(swerve);
     // thetaController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
 

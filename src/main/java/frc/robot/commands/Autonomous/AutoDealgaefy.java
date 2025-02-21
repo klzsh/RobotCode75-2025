@@ -25,7 +25,6 @@ import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -37,7 +36,6 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       Elevator elevator,
       AlgaeIntake intake,
       AlgaePivot pivot,
-      AprilTagCamera centerCamera,
       String reefPoint,
       VisionTranslationController visionController,
       PoseAlignController poseController) {
@@ -51,7 +49,6 @@ public class AutoDealgaefy extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new DriveVisionAlign(
                 swerve,
-                centerCamera,
                 tagID,
                 new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
                 poseController,

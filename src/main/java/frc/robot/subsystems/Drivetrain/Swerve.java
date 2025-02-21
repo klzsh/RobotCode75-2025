@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
@@ -10,6 +11,9 @@ import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.Pigeon2;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -17,6 +21,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -374,6 +379,9 @@ public class Swerve extends SubsystemBase {
     return Rotation2d.fromDegrees(m_gyro.getYaw().getValue().in(Degrees));
   }
 
+  @Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
+  private Pose2d poseToDrive;
+
   @Override
   public void periodic() {
     // update pose estimator with vision measurements
@@ -382,6 +390,20 @@ public class Swerve extends SubsystemBase {
     //       m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
     //       m_CenterCamera.getEstimatedPose().timestampSeconds);
     // }
+
+    Pose2d tagPose =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
+            .getTagPose(18)
+            .get()
+            .toPose2d();
+    Rotation2d tagHeading = tagPose.getRotation();
+    poseToDrive =
+        tagPose.transformBy(
+            new Transform2d(
+                Inches.of(17.5 * -tagHeading.getCos()),
+                Inches.of(17.5 * -tagHeading.getSin()),
+                Rotation2d.fromDegrees(180)));
+    m_ModuleCamera.updateHeading(getRotation2D());
     updatePoseByVision(m_ModuleCamera);
 
     swerveOdometry.update(getRotation2D(), getModulePositions());

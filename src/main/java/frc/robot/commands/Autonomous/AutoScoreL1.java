@@ -20,7 +20,6 @@ import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScoreL1 extends SequentialCommandGroup {
@@ -28,7 +27,6 @@ public class AutoScoreL1 extends SequentialCommandGroup {
       Swerve swerve,
       Elevator elevator,
       CoralIntake coralIntake,
-      AprilTagCamera centerCamera,
       VisionTranslationController visionController,
       PoseAlignController poseController) {
     addRequirements(swerve, elevator, coralIntake);
@@ -40,7 +38,6 @@ public class AutoScoreL1 extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new DriveVisionAlign(
                 swerve,
-                centerCamera,
                 tagID,
                 new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
                 poseController,
