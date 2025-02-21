@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
@@ -41,6 +43,16 @@ public class DriveVisionAlign extends SequentialCommandGroup {
                 Inches.of(18 * -tagHeading.getCos()),
                 Inches.of(18 * -tagHeading.getSin()),
                 Rotation2d.fromDegrees(180)));
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.LEFT) {
+      tagHeading = tagHeading.rotateBy(Rotation2d.kCCW_90deg);
+      poseToDrive = poseToDrive.transformBy(
+              new Transform2d(
+                  reefLeftPoseOffset.times(-tagHeading.getCos()),
+                  reefLeftPoseOffset.times(-tagHeading.getSin()),
+                Rotation2d.fromDegrees(0)
+      ));
+    }
+    
 
     addCommands(
         Commands.runOnce(
