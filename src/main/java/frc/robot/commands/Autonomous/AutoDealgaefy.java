@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.VisionAlign;
+import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -39,7 +39,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       AlgaePivot pivot,
       AprilTagCamera centerCamera,
       String reefPoint,
-      VisionTranslationController2 visionController,
+      VisionTranslationController visionController,
       PoseAlignController poseController) {
     addRequirements(swerve, elevator, intake, pivot);
     int tagID =
@@ -49,7 +49,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
     ElevatorPositions elevatorHeight = algaeHeights.get(reefPoint);
     addCommands(
         new ParallelCommandGroup(
-            new VisionAlign(
+            new DriveVisionAlign(
                 swerve,
                 centerCamera,
                 tagID,

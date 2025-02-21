@@ -1,101 +1,83 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.Drivetrain;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.*;
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.VisionAlign.*;
-import static frc.robot.Constants.FieldConstants.*;
-import static frc.robot.Constants.VisionConstants.*;
-
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Timer;
 import frc.lib.dashboard.TunableNumber;
-import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import java.util.OptionalDouble;
 
-/** Add your docs here. */
 public class VisionTranslationController {
 
   private ProfiledPIDController xController;
   private ProfiledPIDController yController;
 
-  private final Swerve m_Swerve;
+  private final AprilTagCamera m_CoralCamera;
+  private final AprilTagCamera m_CenterCamera;
 
-  private Pose2d currentPose;
+  private boolean alignLeft;
+
+  private double lastSeenTagTime = 0.0;
+
+  private OptionalDouble currentPitch;
+  private OptionalDouble currentYaw;
+
+  @Logged(name = "TranslateToBranch/XCommand", importance = Importance.CRITICAL)
+  private double xCommand;
+
+  @Logged(name = "TranslateToBranch/YCommand", importance = Importance.CRITICAL)
+  private double yCommand;
 
   private TunableNumber[] xPID = {
-    new TunableNumber("VisionController/Px", xP),
-    new TunableNumber("VisionController/Ix", xI),
-    new TunableNumber("VisionController/Dx", xD)
+    new TunableNumber("TranslateToBranch/xP", 0.005),
+    new TunableNumber("TranslateToBranch/xI", 0),
+    new TunableNumber("TranslateToBranch/xD", 0.0001)
   };
 
   private TunableNumber[] yPID = {
-    new TunableNumber("VisionController/Py", yP),
-    new TunableNumber("VisionController/Iy", yI),
-    new TunableNumber("VisionController/Dy", yD)
+    new TunableNumber("TranslateToBranch/yP", 0.001),
+    new TunableNumber("TranslateToBranch/yI", 0),
+    new TunableNumber("TranslateToBranch/yD", 0.0001)
   };
 
-  public VisionTranslationController(Swerve swerve) {
-    xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
-    yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
+  public VisionTranslationController(AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
+    m_CoralCamera = coralCamera;
+    m_CenterCamera = centerCamera;
 
-    xController.setTolerance(toleranceTranslation);
-    yController.setTolerance(toleranceTranslation);
-
-    xController.setConstraints(
-        new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
-    yController.setConstraints(
-        new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
-
-    currentPose = new Pose2d();
-
-    m_Swerve = swerve;
-    reset();
+    xController.setTolerance(2);
+    yController.setTolerance(2);
   }
 
-  public void reset() {
-    xController.reset(m_Swerve.getPose().getX(), m_Swerve.getChassisSpeeds().vxMetersPerSecond);
-    yController.reset(m_Swerve.getPose().getY(), m_Swerve.getChassisSpeeds().vyMetersPerSecond);
-  }
+  // target: x is yaw, y is pitch
+  public ChassisSpeeds update(Translation2d target) {
 
-  public ChassisSpeeds update(AprilTagCamera primaryCamera, int targetTagID, FieldPose targetPose) {
-    /* Update PID Controllers */
     xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
     yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
 
-    currentPose = m_Swerve.getPose();
+    xController.setGoal(target.getY());
+    yController.setGoal(target.getX());
 
-    double tX = 0;
-    boolean hasTarget = true;
-    double targetYaw = 0;
-    double targetMeters = 0;
-    double xDisplacement = 0;
-    double yDisplacement = 0;
+    AprilTagCamera camera = alignLeft ? m_CoralCamera : m_CenterCamera;
 
-    if (primaryCamera.getTarget(targetTagID).isPresent()) {
-      tX = primaryCamera.getX(targetTagID).getAsDouble();
-
-      double thetaCalc = Math.asin(tX / targetMeters);
-      double absoluteAngleToTag = thetaCalc + m_Swerve.getRotation2D().getRadians();
-
-      xDisplacement = targetMeters * Math.cos(absoluteAngleToTag);
-      yDisplacement = targetMeters * Math.sin(absoluteAngleToTag);
+    if (!camera.hasTarget()) {
+      return new ChassisSpeeds(xCommand, yCommand, 0);
     }
-    Translation2d target = fieldPoseOffsets.get(targetPose);
-    double xVel = xController.calculate(xDisplacement, target.getX());
-    double yVel = yController.calculate(yDisplacement, target.getY());
 
-    return ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, 0, currentPose.getRotation());
+    lastSeenTagTime = Timer.getFPGATimestamp();
+
+    int tagID = camera.getPrimaryTagID().getAsInt();
+
+    if (camera.getTarget(tagID).isPresent()) { // ensure tag to focus in view
+      currentPitch = camera.getY(tagID); // Y is Pitch
+      currentYaw = camera.getX(tagID); // X is Yaw
+
+      yCommand = yController.calculate(currentYaw.getAsDouble(), target.getX());
+      xCommand = xController.calculate(currentPitch.getAsDouble(), target.getY());
+    }
+    return new ChassisSpeeds(xCommand, yCommand, 0);
   }
 
   public boolean atGoal() {

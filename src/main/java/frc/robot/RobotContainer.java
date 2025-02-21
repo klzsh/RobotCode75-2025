@@ -24,13 +24,10 @@ import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
-import frc.robot.commands.Autonomous.TuningPath;
-import frc.robot.commands.Drivetrain.AutoAlignByAngle;
+import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
-import frc.robot.commands.Drivetrain.TranslateToBranch;
-import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
@@ -41,7 +38,7 @@ import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -97,8 +94,8 @@ public class RobotContainer {
   // define drivetrain controllers
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
   private final RotationController m_RotationController = new RotationController(m_Swerve);
-  private final VisionTranslationController2 m_VisionController =
-      new VisionTranslationController2(m_Swerve, CoralCam, CenterCam);
+  private final VisionTranslationController m_VisionController =
+      new VisionTranslationController(CoralCam, CenterCam);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -228,16 +225,13 @@ public class RobotContainer {
     m_Controller
         .rightBumper()
         .whileTrue(
-            new VisionAlign(
+            new DriveVisionAlign(
                 m_Swerve,
-                CoralCam,
                 18,
                 new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
                 m_PoseAlignController,
                 m_VisionController));
 
-    AlignLeft.whileTrue(new AutoAlignByAngle(m_Swerve, CoralCam, m_VisionController, true));
-    AlignRight.whileTrue(new AutoAlignByAngle(m_Swerve, CenterCam, m_VisionController, false));
     // manual elevator overrides
     m_Controller
         .a()
@@ -297,7 +291,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, CoralCam, m_Elevator, m_VisionController);
+    return new TestAuto(
+        m_Factory, m_CoralIntake, m_Swerve, CoralCam, m_Elevator, m_VisionController);
     // return null;
   }
 }

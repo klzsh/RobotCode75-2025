@@ -11,12 +11,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.VisionAlign;
+import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
@@ -30,7 +30,7 @@ public class AutoScoreL4 extends SequentialCommandGroup {
       CoralIntake coralIntake,
       AprilTagCamera leftCamera,
       AprilTagCamera centerCamera,
-      VisionTranslationController2 visionController,
+      VisionTranslationController visionController,
       PoseAlignController poseController,
       boolean isLeft) {
     addRequirements(swerve, elevator, coralIntake);
@@ -40,7 +40,7 @@ public class AutoScoreL4 extends SequentialCommandGroup {
             : 2; // TODO make string to tag id maps
     addCommands(
         new ParallelCommandGroup(
-            new VisionAlign(
+            new DriveVisionAlign(
                 swerve,
                 isLeft ? centerCamera : leftCamera,
                 tagID,

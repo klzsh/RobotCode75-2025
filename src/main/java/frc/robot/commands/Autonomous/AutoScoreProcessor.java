@@ -22,7 +22,8 @@ import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScoreProcessor extends SequentialCommandGroup {
-  public AutoScoreProcessor(Swerve swerve, PoseAlignController poseController, AlgaeIntake intake, AlgaePivot pivot) {
+  public AutoScoreProcessor(
+      Swerve swerve, PoseAlignController poseController, AlgaeIntake intake, AlgaePivot pivot) {
     addRequirements(intake, pivot);
     addCommands(
         new DriveToPose(

@@ -1,67 +1,54 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands.Drivetrain;
 
-import static frc.robot.Constants.FieldConstants.*;
-import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.VisionConstants.*;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.FieldPose;
-import frc.robot.subsystems.Drivetrain.RotationController;
-import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController2;
-import frc.robot.subsystems.Vision.AprilTagCamera;
-import frc.robot.commands.Drivetrain.TranslateToBranch;
+import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class VisionAlign extends SequentialCommandGroup {
+public class VisionAlign extends Command {
 
-  public VisionAlign(
-      Swerve swerve,
-      AprilTagCamera camera,
-      int target,
-      FieldPose targetPose,
-      PoseAlignController poseController,
-      VisionTranslationController2 visionController) {
-    /**
-     * first snap rotation to april tag based on bounding box then calculate translation using
-     * visioncontroller and rotation to preset heading using rotationcontroller modify chassisspeeds
-     * from visioncontroller using rotationcontroller output set chassisspeeds
-     */
-    // Rotation2d placeholder = Rotation2d.fromDegrees(0); // from bounding box
-    Pose2d tagPose =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-            .getTagPose(target)
-            .get()
-            .toPose2d();
-    double targetHeading = tagToHeadingMap.get(target);
-    double targetHeadingRad = targetHeading / 180 * Math.PI;
-    Pose2d poseToDrive = tagPose.transformBy(new Transform2d(Inches.of(17.5 * Math.cos(targetHeadingRad)), Inches.of(17.5 * Math.sin(targetHeadingRad)), Rotation2d.fromDegrees(180)));
-    // Rotation2d toTag =
-    //     Rotation2d.fromRadians(
-    //         Math.atan2(tagPose.getY() - currentPose.getY(), tagPose.getX() - currentPose.getX()));
-    addCommands(
-        Commands.runOnce(
-            () -> {
-              visionController.reset(targetPose);
-              poseController.reset();
-            }),
-        new DriveToPose(swerve, poseController, poseToDrive, false),
-        new InstantCommand(() -> {
-          
-        })
-    );
-    addRequirements(swerve);
+  private final Swerve m_Swerve;
+  private Translation2d offset;
+  private VisionTranslationController visionController;
+  private PoseAlignController fallBackController;
+
+  public VisionAlign(Swerve swerve, FieldPose targetPose, VisionTranslationController controller) {
+    m_Swerve = swerve;
+
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
+      targetPose.fieldElement = FieldElement.RL;
+    }
+    if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+      targetPose.fieldElement = FieldElement.HT;
+      ;
+    }
+
+    Translation2d offset = fieldPoseToCameraAngleOffset.get(targetPose);
+
+    this.offset = offset;
+
+    visionController = controller;
+
+    addRequirements(m_Swerve);
+  }
+
+  @Override
+  public void execute() {
+    ChassisSpeeds speeds = visionController.update(this.offset);
+    m_Swerve.setChassisSpeeds(speeds);
+  }
+
+  @Override
+  public void end(boolean interrupted) {}
+
+  @Override
+  public boolean isFinished() {
+    return visionController.atGoal();
   }
 }

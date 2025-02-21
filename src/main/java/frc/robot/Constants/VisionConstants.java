@@ -24,14 +24,15 @@ public class VisionConstants {
   public static final Matrix<N3, N1> visionMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
   // TODO figure out offsets
-  public static final Map<FieldPose, Translation2d> fieldPoseOffsets =
+  public static final Map<FieldPose, Translation2d> fieldPoseToCameraAngleOffset =
       // vision can't handle sideloading due to camera placement
+
+      // DOUBLES ARE [YAW, PITCH]
       Map.ofEntries(
           // processor
           entry(
               new FieldPose(Alliance.Blue, FieldElement.P, Offset.MID),
               new Translation2d(0.0, 0.0)),
-
           // frontload top station AND bottom HP station
           entry(
               new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID),
@@ -49,10 +50,10 @@ public class VisionConstants {
               new Translation2d(0.0, 0.0)),
           entry(
               new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
-              new Translation2d(0.0, 0.0)),
+              new Translation2d(13, -5)),
           entry(
               new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
-              new Translation2d(0.0, 0.0))
+              new Translation2d(0, 0.5))
 
           // TODO: Auto field flipping for blue side (or red side ig)
           );
