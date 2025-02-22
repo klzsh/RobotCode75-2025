@@ -51,10 +51,10 @@ public class VisionConstants {
           entry(
               new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT).toString(),
               //   new Translation2d(11.87, -4.75)),
-              new Translation2d(13, -5)),
+              new Translation2d(14, -6)),
           entry(
               new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT).toString(),
-              new Translation2d(0, 0.5))
+              new Translation2d(-8, -4))
 
           // TODO: Auto field flipping for blue side (or red side ig)
           );
@@ -88,24 +88,24 @@ public class VisionConstants {
 
   public static final double maxTimeUntilFallbackToOdometry = 1.0;
   public static final Transform3d CenterCamPose =
-      // new Transform3d(
-      //     new Translation3d(
-      //         Units.inchesToMeters(9.398), // X 9.325
-      //         Units.inchesToMeters(7.551), // Y .3505
-      //         Units.inchesToMeters(8.25)), // Z 5.85
-      //     new Rotation3d(
-      //         Units.degreesToRadians(0),
-      //         Units.degreesToRadians(-20),
-      //         Units.degreesToRadians(20))); // 0 0 0
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(10.382), // X 9.325
-              Units.inchesToMeters(-11.941), // Y .3505
-              Units.inchesToMeters(8.419)), // Z 5.85
+              Units.inchesToMeters(9.398), // X 9.325
+              Units.inchesToMeters(7.551), // Y .3505
+              Units.inchesToMeters(8.25)), // Z 5.85
           new Rotation3d(
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
               Units.degreesToRadians(30))); // 0 0 0
+  //   new Transform3d(
+  //       new Translation3d(
+  //           Units.inchesToMeters(10.382), // X 9.325
+  //           Units.inchesToMeters(-11.941), // Y .3505
+  //           Units.inchesToMeters(8.419)), // Z 5.85
+  //       new Rotation3d(
+  //           Units.degreesToRadians(0),
+  //           Units.degreesToRadians(-20),
+  //           Units.degreesToRadians(30))); // 0 0 0
   public static final Transform3d CoralCamPose =
       new Transform3d(
           new Translation3d(

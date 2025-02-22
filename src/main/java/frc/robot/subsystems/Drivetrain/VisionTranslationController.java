@@ -39,37 +39,49 @@ public class VisionTranslationController {
   @Logged(name = "TranslateToBranch/YCommand", importance = Importance.CRITICAL)
   private double yCommand;
 
-  private TunableNumber[] xPID = {
-    new TunableNumber("VisionController/xP", 0.05),
-    new TunableNumber("VisionController/xI", 0),
-    new TunableNumber("VisionController/xD", 0.0001)
+  private TunableNumber[] xPID_Coral = {
+    new TunableNumber("VisionController/CoralCamera/xP", 0.05),
+    new TunableNumber("VisionController/CoralCamera/xI", 0),
+    new TunableNumber("VisionController/CoralCamera/xD", 0.0001)
   };
 
-  private TunableNumber[] yPID = {
-    new TunableNumber("VisionController/yP", 0.03),
-    new TunableNumber("VisionController/yI", 0),
-    new TunableNumber("VisionController/yD", 0.0001)
+  private TunableNumber[] yPID_Coral = {
+    new TunableNumber("VisionController/CoralCamera/yP", 0.03),
+    new TunableNumber("VisionController/CoralCamera/yI", 0),
+    new TunableNumber("VisionController/CoralCamera/yD", 0.0001)
+  };
+
+  private TunableNumber[] xPID_Center = {
+    new TunableNumber("VisionController/CenterCamera/xP", 0.0045),
+    new TunableNumber("VisionController/CenterCamera/xI", 0),
+    new TunableNumber("VisionController/CenterCamera/xD", 0)
+  };
+
+  private TunableNumber[] yPID_Center = {
+    new TunableNumber("VisionController/CenterCamera/yP", 0.014),
+    new TunableNumber("VisionController/CenterCamera/yI", 0),
+    new TunableNumber("VisionController/CenterCamera/yD", 0.0001)
   };
 
   public VisionTranslationController(
       Swerve swerve, AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
     m_Swerve = swerve;
 
-    xController = new PIDController(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
-    yController = new PIDController(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
+    xController = new PIDController(0, 0, 0);
+    yController = new PIDController(0, 0, 0);
 
     m_CoralCamera = coralCamera;
     m_CenterCamera = centerCamera;
 
     xController.setTolerance(2);
     yController.setTolerance(2);
+
+    xController.enableContinuousInput(-90, 90);
+    yController.enableContinuousInput(-90, 90);
   }
 
   // target: x is yaw, y is pitch
   public ChassisSpeeds update(Translation2d target, boolean alignLeft) {
-
-    xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
-    yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
 
     if (target == null) {
       System.out.println("Warning: No target");
@@ -83,6 +95,22 @@ public class VisionTranslationController {
 
     if (!camera.hasTarget()) {
       return new ChassisSpeeds(xCommand, yCommand, 0);
+    }
+
+    if (alignLeft) {
+      xController.setTolerance(1);
+      yController.setTolerance(1);
+      xController.setPID(
+          xPID_Coral[0].getNumber(), xPID_Coral[1].getNumber(), xPID_Coral[2].getNumber());
+      yController.setPID(
+          yPID_Coral[0].getNumber(), yPID_Coral[1].getNumber(), yPID_Coral[2].getNumber());
+    } else {
+      xController.setTolerance(1);
+      yController.setTolerance(5);
+      xController.setPID(
+          xPID_Center[0].getNumber(), xPID_Center[1].getNumber(), xPID_Center[2].getNumber());
+      yController.setPID(
+          yPID_Center[0].getNumber(), yPID_Center[1].getNumber(), yPID_Center[2].getNumber());
     }
 
     lastSeenTagTime = Timer.getFPGATimestamp();
@@ -117,9 +145,9 @@ public class VisionTranslationController {
             Math.sqrt(
                 Math.pow(robotPose.getX() - projx, 2) + Math.pow(robotPose.getY() - projy, 2)));
 
-    int xCommandMultiplier = 1;
-    if (dist.in(Inches) < 6) {
-      xCommandMultiplier = 0;
+    double xCommandMultiplier = 1;
+    if (dist.in(Inches) < 19) {
+      xCommandMultiplier = 0.2;
     }
 
     if (camera.getTarget(tagID).isPresent()) { // ensure tag to focus in view
@@ -129,6 +157,9 @@ public class VisionTranslationController {
       System.out.println(currentPitch + " " + currentYaw);
 
       yCommand = yController.calculate(currentYaw.getAsDouble(), target.getX());
+      // if (currentYaw.getAsDouble() < 0) {
+      //   yCommand *= -1;
+      // }
       xCommand =
           xController.calculate(currentPitch.getAsDouble(), target.getY()) * xCommandMultiplier;
     }

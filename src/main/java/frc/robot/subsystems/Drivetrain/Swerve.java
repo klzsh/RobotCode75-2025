@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
-import static frc.robot.Constants.FieldConstants.reefLeftPoseOffset;
+import static frc.robot.Constants.FieldConstants.reefRightPoseOffset;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
@@ -400,15 +400,15 @@ public class Swerve extends SubsystemBase {
     poseToDrive =
         tagPose.transformBy(
             new Transform2d(
-                Inches.of(24 * -tagHeading.getCos()),
-                Inches.of(24 * -tagHeading.getSin()),
+                Inches.of(21 * -tagHeading.getCos()),
+                Inches.of(21 * -tagHeading.getSin()),
                 Rotation2d.fromDegrees(180)));
     tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
     poseToDrive =
         poseToDrive.transformBy(
             new Transform2d(
-                reefLeftPoseOffset.times(-tagHeading.getCos()),
-                reefLeftPoseOffset.times(-tagHeading.getSin()),
+                reefRightPoseOffset.times(-tagHeading.getCos()),
+                reefRightPoseOffset.times(-tagHeading.getSin()),
                 Rotation2d.fromDegrees(0)));
 
     m_ModuleCamera.updateHeading(getRotation2D());

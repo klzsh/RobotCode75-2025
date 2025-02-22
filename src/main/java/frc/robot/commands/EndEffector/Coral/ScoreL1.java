@@ -4,8 +4,11 @@
 
 package frc.robot.commands.EndEffector.Coral;
 
+import static frc.robot.Constants.EndEffectorConstants.coralScoreDelay;
+
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -23,6 +26,9 @@ public class ScoreL1 extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake),
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
+        new ParallelCommandGroup(
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
+            new WaitCommand(coralScoreDelay)),
         new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
   }
 }

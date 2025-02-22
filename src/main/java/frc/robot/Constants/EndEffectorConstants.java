@@ -45,9 +45,10 @@ public class EndEffectorConstants {
   public static final double algaeMotorGearRatio = 25.0;
   public static final double pivotMotorGearRatio = (25.0 * 50.0) / 26.0; // ~48.076
 
-  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(125);
+  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(1000);
   public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(100);
   public static final Angle coralRotationsAfterIntake = Rotations.of(0.5);
+  public static final double coralScoreDelay = 0.3;
 
   public static final Angle pivotHomePosition = Rotations.of(11.675);
   public static final Angle pivotGroundIntakePosition = Rotations.of(4);
@@ -112,12 +113,12 @@ public class EndEffectorConstants {
 
     /* Torque PID */
     public static final double openLoopRamp = 0.1;
-    public static final double closedLoopRamp = 0.1;
+    public static final double closedLoopRamp = 0.0;
 
-    public static final double coralVelocityKP = 2;
+    public static final double coralVelocityKP = 3;
     public static final double coralVelocityKI = 0.0;
     public static final double coralVelocityKD = 0.0;
-    public static final double coralVelocityKS = 10;
+    public static final double coralVelocityKS = 15;
 
     public static final double coralPositionKP = 0.75;
     public static final double coralPositionKI = 0.0;

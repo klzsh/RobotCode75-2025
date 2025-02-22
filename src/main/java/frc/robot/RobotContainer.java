@@ -5,6 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Inches;
+import static frc.robot.Constants.ClimberConstants.*;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -24,6 +25,7 @@ import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -31,6 +33,7 @@ import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
+import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
@@ -67,7 +70,7 @@ public class RobotContainer {
   private final AprilTagCamera CoralCam = new AprilTagCamera("Coral_Cam", CoralCamPose);
 
   @Logged(name = "Swerve")
-  private final Swerve m_Swerve = new Swerve(CenterCam, CoralCam); // TODO: reverse parameters
+  private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
 
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
@@ -93,7 +96,6 @@ public class RobotContainer {
 
   // define drivetrain controllers
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
-  private final RotationController m_RotationController = new RotationController(m_Swerve);
   private final VisionTranslationController m_VisionController =
       new VisionTranslationController(m_Swerve, CoralCam, CenterCam);
 
@@ -108,9 +110,8 @@ public class RobotContainer {
   private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, resetHeadingButton);
   private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
 
-  private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
-  private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 4);
-  private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 4);
+  private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 1);
+  private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 1);
 
   private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton);
 
@@ -164,7 +165,17 @@ public class RobotContainer {
     //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
     //         .repeatedly());
     m_Climber.setDefaultCommand(
-        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 100), m_Climber));
+        new InstantCommand(() -> m_Climber.runPosition(-m_Controller.getLeftY() * 75), m_Climber));
+
+    // m_Climber.setDefaultCommand(
+    //     new InstantCommand(() -> {
+    //         if (m_Controller.getLeftY() < -0.1) {
+    //             m_Climber.setPositionRequest(climbPositionAbsoluteStart);
+    //         } else if (m_Controller.getLeftY() > 0.1) {
+    //             m_Climber.setPositionRequest(climbPositionAbsoluteFinish);
+    //         }
+    //     }, m_Climber)
+    // );
   }
 
   /**
@@ -221,25 +232,64 @@ public class RobotContainer {
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
+    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
-    m_Controller
-        .rightBumper()
+    // m_Controller
+    //     .povDown()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               m_Climber.resetPosition();
+    //
+    // m_Climber.setPositionRequest(climbPositionAbsoluteStart.times(climberGearRatio));
+    //             },
+    //             m_Climber));
+    // m_Controller
+    //     .povLeft()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               m_Climber.resetPosition();
+    //
+    // m_Climber.setPositionRequest(climbPositionAbsoluteFinish.times(climberGearRatio));
+    //             },
+    //             m_Climber));
+
+    AlignLeft.and(() -> !AlignRight.getAsBoolean())
         .whileTrue(
             new DriveVisionAlign(
                 m_Swerve,
-                18,
                 new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
-                // new FieldPose(DriverStation.getAlliance().get(),
-                // CheckBounds.nearestElement(m_Swerve.getPose()), Offset.LEFT),
                 m_PoseAlignController,
                 m_VisionController));
+    AlignRight.and(() -> !AlignLeft.getAsBoolean())
+        .whileTrue(
+            new DriveToPose(
+                m_Swerve, 
+                m_PoseAlignController, 
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT), 
+                false)
+            // new DriveVisionAlign(
+            //     m_Swerve,
+            //     new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
+            //     m_PoseAlignController,
+            //     m_VisionController));
+        );
+    AlignRight.and(() -> AlignLeft.getAsBoolean())
+        .whileTrue(
+            new DriveToPose(
+                m_Swerve,
+                m_PoseAlignController,
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
+                false));
 
     // m_Controller
     //     .rightBumper()
     //     .whileTrue(
-    //         new VisionAlign(
+    //         new DriveVisionAlign(
     //             m_Swerve,
     //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+    //             m_PoseAlignController,
     //             m_VisionController));
 
     // manual elevator overrides

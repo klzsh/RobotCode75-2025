@@ -7,7 +7,6 @@ package frc.robot.commands.Autonomous;
 import static frc.robot.Constants.FieldConstants.algaeHeights;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -40,16 +39,11 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       VisionTranslationController visionController,
       PoseAlignController poseController) {
     addRequirements(swerve, elevator, intake, pivot);
-    int tagID =
-        DriverStation.getAlliance().get() == Alliance.Blue
-            ? 1
-            : 2; // TODO make string to tag id maps
     ElevatorPositions elevatorHeight = algaeHeights.get(reefPoint);
     addCommands(
         new ParallelCommandGroup(
             new DriveVisionAlign(
                 swerve,
-                tagID,
                 new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
                 poseController,
                 visionController),

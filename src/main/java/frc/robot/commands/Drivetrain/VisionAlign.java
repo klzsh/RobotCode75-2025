@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
@@ -21,12 +22,12 @@ public class VisionAlign extends Command {
   public VisionAlign(Swerve swerve, FieldPose targetPose, VisionTranslationController controller) {
     m_Swerve = swerve;
 
-    // if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
-    //   targetPose.fieldElement = FieldElement.RL;
-    // }
-    // if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
-    //   targetPose.fieldElement = FieldElement.HT;
-    // }
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
+      targetPose.fieldElement = FieldElement.RL;
+    }
+    if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+      targetPose.fieldElement = FieldElement.HT;
+    }
 
     this.offset = fieldPoseToCameraAngleOffset.get(targetPose.toString());
     isLeft = targetPose.offset == FieldPose.Offset.LEFT;
@@ -42,7 +43,9 @@ public class VisionAlign extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    System.out.println("brick");
+  }
 
   @Override
   public boolean isFinished() {

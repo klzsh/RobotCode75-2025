@@ -21,7 +21,6 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -60,18 +59,18 @@ public class Climber extends SubsystemBase {
   private final TunableNumber climberMMKv;
   private final TunableNumber climberMMKa;
 
-  private final TunableNumber absoluteEncoderOffset;
+  private final TunableNumber zeroPoint;
 
   private final MotionMagicExpoTorqueCurrentFOC m_PositionRequest;
 
   private final TorqueCurrentFOC m_TestRequest;
-  private final DigitalInput m_LimitSwitch;
 
   public Climber() {
     m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
 
-    m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, climberZeroPoint.in(Rotations));
+    m_ClimberEncoder =
+        new DutyCycleEncoder(climberEncoderPort, 1, climberStartPosition.in(Rotations));
 
     climberMMCruiseVelocity =
         new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
@@ -100,15 +99,9 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor1.getConfigurator().apply(getClimberMotorConfig());
     m_ClimberMotor2.getConfigurator().apply(getClimberMotorConfig());
 
-    m_LimitSwitch = new DigitalInput(ClimberConstants.limitPort);
-
-    absoluteEncoderOffset =
-        new TunableNumber("Climber Encoder/Offset", climberEncoderOffset.in(Rotations));
+    zeroPoint = new TunableNumber("Climber Encoder/Offset", climberStartPosition.in(Rotations));
     Timer.delay(5);
-    m_ClimberMotor1.setPosition(
-        (getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
-    m_ClimberMotor2.setPosition(
-        (getAbsolutePosition() - absoluteEncoderOffset.getNumber()) * gearRatio);
+    resetPosition();
   }
 
   public void setState(ClimberPositions state) {
@@ -119,14 +112,14 @@ public class Climber extends SubsystemBase {
     return m_ClimberState;
   }
 
-  private void setPositionRequest(Angle position) {
+  public void setPositionRequest(Angle position) {
     m_ClimberMotor1.setControl(
-        m_PositionRequest.withPosition(position).withLimitForwardMotion(getLimitSwitch()));
+        m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
     m_ClimberMotor2.setControl(
-        m_PositionRequest.withPosition(position).withLimitForwardMotion(getLimitSwitch()));
+        m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
   }
 
-  @Logged
+  @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
   public double getAbsolutePosition() {
     return m_ClimberEncoder.get();
   }
@@ -144,20 +137,19 @@ public class Climber extends SubsystemBase {
         < ClimberConstants.climbDeadband;
   }
 
-  public boolean isAtPositionAbsolute() {
-    return Math.abs(climbPositionAbsolute.in(Rotations) - m_ClimberEncoder.get())
-        < climbDeadbandAbsolute;
-  }
-
-  @Logged(name = "Climber Limit", importance = Importance.DEBUG)
-  public boolean getLimitSwitch() {
-    return !m_LimitSwitch.get();
+  public boolean isAtPositionAbsolute(Angle position) {
+    return Math.abs(position.in(Rotations) - m_ClimberEncoder.get()) < climbDeadbandAbsolute;
   }
 
   public void runPosition(double current) {
     current = MathUtil.applyDeadband(current, 5);
     m_ClimberMotor1.setControl(m_TestRequest.withOutput(current));
     m_ClimberMotor2.setControl(m_TestRequest.withOutput(current));
+  }
+
+  public void resetPosition() {
+    m_ClimberMotor1.setPosition((getAbsolutePosition() - zeroPoint.getNumber()) * climberGearRatio);
+    m_ClimberMotor2.setPosition((getAbsolutePosition() - zeroPoint.getNumber()) * climberGearRatio);
   }
 
   @Override

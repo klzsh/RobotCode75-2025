@@ -56,7 +56,7 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeMotor = new TalonFX(algaeMotorCanID, superstructureCANBusName);
     m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = AlgaeStates.NONE;
-    m_AlgaeDetector = new LidarDistance(Inches.of(7));
+    m_AlgaeDetector = new LidarDistance(Inches.of(4));
 
     // m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
 
