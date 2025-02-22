@@ -67,7 +67,7 @@ public class RobotContainer {
   private final AprilTagCamera CoralCam = new AprilTagCamera("Coral_Cam", CoralCamPose);
 
   @Logged(name = "Swerve")
-  private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
+  private final Swerve m_Swerve = new Swerve(CenterCam, CoralCam); // TODO: reverse parameters
 
   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
@@ -95,7 +95,7 @@ public class RobotContainer {
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
   private final RotationController m_RotationController = new RotationController(m_Swerve);
   private final VisionTranslationController m_VisionController =
-      new VisionTranslationController(CoralCam, CenterCam);
+      new VisionTranslationController(m_Swerve, CoralCam, CenterCam);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -229,10 +229,21 @@ public class RobotContainer {
                 m_Swerve,
                 18,
                 new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+                // new FieldPose(DriverStation.getAlliance().get(),
+                // CheckBounds.nearestElement(m_Swerve.getPose()), Offset.LEFT),
                 m_PoseAlignController,
                 m_VisionController));
 
+    // m_Controller
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new VisionAlign(
+    //             m_Swerve,
+    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+    //             m_VisionController));
+
     // manual elevator overrides
+
     m_Controller
         .a()
         .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)

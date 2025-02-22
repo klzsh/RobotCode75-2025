@@ -35,8 +35,8 @@ public final class DrivetrainConstants {
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
-    public static final double toleranceRadians = Units.degreesToRadians(5);
-    public static final double toleranceTranslation = .1;
+    public static final double toleranceRadians = Units.degreesToRadians(2);
+    public static final double toleranceTranslation = .07;
 
     public static final class RotationAlign {
 
@@ -49,7 +49,7 @@ public final class DrivetrainConstants {
     }
 
     public static final class OdometryAlign {
-      public static final double xP = 1.85;
+      public static final double xP = 1.65;
       public static final double xI = 0.0;
       public static final double xD = 0.0;
 

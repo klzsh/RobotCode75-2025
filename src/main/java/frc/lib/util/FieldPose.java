@@ -13,7 +13,10 @@ public class FieldPose {
     RR,
     RTR,
     RTL,
-    P
+    P,
+    // only placeholders, not  used for alignment
+    BT,
+    BB
   }
 
   public static FieldElement fromString(String reefPoint) {
@@ -36,6 +39,10 @@ public class FieldPose {
         return FieldElement.HB;
       case "P":
         return FieldElement.P;
+      case "BT":
+        return FieldElement.BT;
+      case "BB":
+        return FieldElement.BB;
       default:
         return null;
     }
@@ -55,8 +62,8 @@ public class FieldPose {
   }
 
   public enum Offset {
-    MID,
     LEFT,
+    MID,
     RIGHT
   }
 
@@ -68,5 +75,27 @@ public class FieldPose {
     this.alliance = alliance;
     this.fieldElement = fieldElement;
     this.offset = offset;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof FieldPose) {
+      FieldPose other = (FieldPose) obj;
+      return this.alliance == other.alliance
+          && this.fieldElement == other.fieldElement
+          && this.offset == other.offset;
+    }
+    return false;
+  }
+
+  @Override
+  public String toString() {
+    return "FieldPose [alliance="
+        + alliance
+        + ", fieldElement="
+        + fieldElement
+        + ", offset="
+        + offset
+        + "]";
   }
 }

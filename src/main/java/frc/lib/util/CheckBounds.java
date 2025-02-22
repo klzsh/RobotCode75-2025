@@ -1,60 +1,28 @@
 package frc.lib.util;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import static frc.robot.Constants.VisionConstants.tagIDToFieldElement;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.lib.util.FieldPose.FieldElement;
+import java.util.List;
 
 public class CheckBounds {
-  public static class Bound {
-    public Translation2d point1;
-    public Translation2d point2;
-    public FieldPose.FieldElement element;
-    public Alliance alliance;
+  public static FieldElement nearestElement(Pose2d pose) {
+    List<AprilTag> tags =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags();
+    FieldElement nearestElement = null;
+    double nearestDistance = Double.MAX_VALUE;
 
-    public boolean isWithin(Translation2d pose) {
-      double minX = Math.min(point1.getX(), point2.getX());
-      double maxX = Math.max(point1.getX(), point2.getX());
-
-      double minY = Math.min(point1.getY(), point2.getY());
-      double maxY = Math.max(point1.getY(), point2.getY());
-
-      return (pose.getX() < maxX && pose.getX() > minX && pose.getY() < maxY && pose.getY() > minY);
+    for (AprilTag tag : tags) {
+      if (tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation())
+          < nearestDistance) {
+        nearestDistance = tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation());
+        nearestElement = tagIDToFieldElement.get(tag.ID);
+      }
     }
-
-    public Bound(
-        double x1,
-        double y1,
-        double x2,
-        double y2,
-        FieldPose.FieldElement element,
-        Alliance alliance) {
-      point1 = new Translation2d(x1, y1);
-      point2 = new Translation2d(x2, y2);
-      this.element = element;
-      this.alliance = alliance;
-    }
-
-    public Bound(
-        Translation2d p1, Translation2d p2, FieldPose.FieldElement element, Alliance alliance) {
-      point1 = p1;
-      point2 = p2;
-      this.element = element;
-      this.alliance = alliance;
-    }
+    return nearestElement;
   }
-
-  public static Bound[] bounds = {
-    new Bound(0, 0, 0, 0, FieldElement.RBL, Alliance.Blue),
-    new Bound(0, 0, 0, 0, FieldElement.RL, Alliance.Blue),
-    new Bound(0, 0, 0, 0, FieldElement.RTL, Alliance.Blue),
-    new Bound(0, 0, 0, 0, FieldElement.RBR, Alliance.Blue),
-    new Bound(0, 0, 0, 0, FieldElement.RR, Alliance.Blue),
-    new Bound(0, 0, 0, 0, FieldElement.RTR, Alliance.Blue),
-    new Bound(0, 0, 0, 0, FieldElement.RBL, Alliance.Red),
-    new Bound(0, 0, 0, 0, FieldElement.RL, Alliance.Red),
-    new Bound(0, 0, 0, 0, FieldElement.RTL, Alliance.Red),
-    new Bound(0, 0, 0, 0, FieldElement.RBR, Alliance.Red),
-    new Bound(0, 0, 0, 0, FieldElement.RR, Alliance.Red),
-    new Bound(0, 0, 0, 0, FieldElement.RTR, Alliance.Red),
-  };
 }

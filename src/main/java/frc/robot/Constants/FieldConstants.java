@@ -30,5 +30,6 @@ public class FieldConstants {
           entry("RTR", ElevatorPositions.L3),
           entry("RTL", ElevatorPositions.L2));
 
-  public static final Distance reefLeftPoseOffset = Inches.of(4.5);
+  public static final Distance reefLeftPoseOffset = Inches.of(9);
+  public static final Distance reefRightPoseOffset = Inches.of(17.875);
 }

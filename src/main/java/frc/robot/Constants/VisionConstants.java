@@ -24,51 +24,88 @@ public class VisionConstants {
   public static final Matrix<N3, N1> visionMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
   // TODO figure out offsets
-  public static final Map<FieldPose, Translation2d> fieldPoseToCameraAngleOffset =
+  public static final Map<String, Translation2d> fieldPoseToCameraAngleOffset =
       // vision can't handle sideloading due to camera placement
 
       // DOUBLES ARE [YAW, PITCH]
       Map.ofEntries(
           // processor
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.P, Offset.MID),
+              new FieldPose(Alliance.Blue, FieldElement.P, Offset.MID).toString(),
               new Translation2d(0.0, 0.0)),
           // frontload top station AND bottom HP station
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID).toString(),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.LEFT).toString(),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.RIGHT).toString(),
               new Translation2d(0.0, 0.0)),
 
           // Reef offsets (THESE SHOULD ALL BE THE SAME, THEY ARE JUST HERE FOR CONSISTENCY )
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID).toString(),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT).toString(),
+              //   new Translation2d(11.87, -4.75)),
               new Translation2d(13, -5)),
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
+              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT).toString(),
               new Translation2d(0, 0.5))
 
           // TODO: Auto field flipping for blue side (or red side ig)
           );
 
+  public static final Map<Integer, FieldElement> tagIDToFieldElement =
+      Map.ofEntries(
+          // blue
+          entry(18, FieldElement.RL),
+          entry(17, FieldElement.RBL),
+          entry(22, FieldElement.RBR),
+          entry(21, FieldElement.RR),
+          entry(20, FieldElement.RTR),
+          entry(19, FieldElement.RTL),
+          entry(13, FieldElement.HT),
+          entry(12, FieldElement.HB),
+          entry(16, FieldElement.P),
+          entry(14, FieldElement.BT),
+          entry(15, FieldElement.BB),
+          // red
+          entry(7, FieldElement.RL),
+          entry(8, FieldElement.RBL),
+          entry(9, FieldElement.RBR),
+          entry(10, FieldElement.RR),
+          entry(11, FieldElement.RTR),
+          entry(6, FieldElement.RTL),
+          entry(1, FieldElement.HT),
+          entry(2, FieldElement.HB),
+          entry(3, FieldElement.P),
+          entry(5, FieldElement.BT),
+          entry(4, FieldElement.BB));
+
   public static final double maxTimeUntilFallbackToOdometry = 1.0;
   public static final Transform3d CenterCamPose =
+      // new Transform3d(
+      //     new Translation3d(
+      //         Units.inchesToMeters(9.398), // X 9.325
+      //         Units.inchesToMeters(7.551), // Y .3505
+      //         Units.inchesToMeters(8.25)), // Z 5.85
+      //     new Rotation3d(
+      //         Units.degreesToRadians(0),
+      //         Units.degreesToRadians(-20),
+      //         Units.degreesToRadians(20))); // 0 0 0
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(9.398), // X 9.325
-              Units.inchesToMeters(7.551), // Y .3505
-              Units.inchesToMeters(8.25)), // Z 5.85
+              Units.inchesToMeters(10.382), // X 9.325
+              Units.inchesToMeters(-11.941), // Y .3505
+              Units.inchesToMeters(8.419)), // Z 5.85
           new Rotation3d(
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
-              Units.degreesToRadians(20))); // 0 0 0
+              Units.degreesToRadians(30))); // 0 0 0
   public static final Transform3d CoralCamPose =
       new Transform3d(
           new Translation3d(

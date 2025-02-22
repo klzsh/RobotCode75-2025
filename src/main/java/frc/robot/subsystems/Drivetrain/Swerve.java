@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
+import static frc.robot.Constants.FieldConstants.reefLeftPoseOffset;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
@@ -308,7 +309,7 @@ public class Swerve extends SubsystemBase {
 
   public void updatePoseByVision(AprilTagCamera camera) {
     double timestamp = Timer.getFPGATimestamp();
-    if (timestamp - lastUpdatedTime < 1) {
+    if (timestamp - lastUpdatedTime < 0.2) {
       return;
     }
 
@@ -399,17 +400,17 @@ public class Swerve extends SubsystemBase {
     poseToDrive =
         tagPose.transformBy(
             new Transform2d(
-                Inches.of(17.5 * -tagHeading.getCos()),
-                Inches.of(17.5 * -tagHeading.getSin()),
+                Inches.of(24 * -tagHeading.getCos()),
+                Inches.of(24 * -tagHeading.getSin()),
                 Rotation2d.fromDegrees(180)));
-    tagHeading = tagHeading.rotateBy(Rotation2d.kCCW_90deg);
-    poseToDrive = poseToDrive.transformBy(
+    tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+    poseToDrive =
+        poseToDrive.transformBy(
             new Transform2d(
                 reefLeftPoseOffset.times(-tagHeading.getCos()),
                 reefLeftPoseOffset.times(-tagHeading.getSin()),
-              Rotation2d.fromDegrees(0)
-    ));
-    
+                Rotation2d.fromDegrees(0)));
+
     m_ModuleCamera.updateHeading(getRotation2D());
     updatePoseByVision(m_ModuleCamera);
 

@@ -5,9 +5,13 @@
 package frc.robot.commands.Autonomous;
 
 import choreo.auto.AutoFactory;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
+import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
-import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
@@ -30,10 +34,14 @@ public class TestAuto extends SequentialCommandGroup {
     // Went way faster than Choreo velocity constraint
     addCommands(
         new SequentialCommandGroup(
-            m_Factory.trajectoryCmd("TESTPATH1"),
+            m_Factory.trajectoryCmd("rl-ht"),
             new IntakeCoral(CoralIntake),
-            m_Factory.trajectoryCmd("TESTPATH2"),
-            // new VisionAlign(swerve, new FieldPose, visionController),
-            new ScoreL4(elevator, CoralIntake)));
+            m_Factory.trajectoryCmd("ht-rl"),
+            new VisionAlign(
+                swerve,
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+                visionController)
+            // new ScoreL4(elevator, CoralIntake)
+            ));
   }
 }
