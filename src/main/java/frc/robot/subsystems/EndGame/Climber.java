@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
 
@@ -113,7 +114,7 @@ public class Climber extends SubsystemBase {
     return m_ClimberState;
   }
 
-  public void setPositionRequestWithController(XboxController controller) {
+  public void setPositionRequestWithController(CommandXboxController controller) {
     double leftY = controller.getLeftY();
     double rightY = controller.getRightY();
     if (Math.abs(leftY) > 0.2) {
