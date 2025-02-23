@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
           //   DriverStation.startDataLog(DataLogManager.getLog(), false);
           //   config.backend = new FileBackend(DataLogManager.getLog());
           // at home
-          config.minimumImportance = Importance.DEBUG;
+          config.minimumImportance = Importance.INFO;
         });
     Epilogue.bind(this);
     PortForwarder.add(5800, "photon-frontcams.local", 5800);

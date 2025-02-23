@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,7 @@ import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.OptionalDouble;
 
+@Logged(name = "Vision Controller", strategy = Strategy.OPT_IN)
 public class VisionTranslationController {
 
   private final Swerve m_Swerve;
@@ -28,16 +30,23 @@ public class VisionTranslationController {
   private final AprilTagCamera m_CoralCamera;
   private final AprilTagCamera m_CenterCamera;
 
+  @Logged(importance = Importance.INFO)
   private double lastSeenTagTime = 0.0;
 
+  @Logged(importance = Importance.INFO)
   private OptionalDouble currentPitch;
+
+  @Logged(importance = Importance.INFO)
   private OptionalDouble currentYaw;
 
-  @Logged(name = "TranslateToBranch/XCommand", importance = Importance.CRITICAL)
+  @Logged(name = "XOutput", importance = Importance.INFO)
   private double xCommand;
 
-  @Logged(name = "TranslateToBranch/YCommand", importance = Importance.CRITICAL)
+  @Logged(name = "YOutput", importance = Importance.INFO)
   private double yCommand;
+
+  @Logged(importance = Importance.INFO)
+  private ChassisSpeeds output;
 
   private TunableNumber[] xPID_Coral = {
     new TunableNumber("VisionController/CoralCamera/xP", 0.05),
@@ -85,6 +94,7 @@ public class VisionTranslationController {
 
     if (target == null) {
       System.out.println("Warning: No target");
+      output = new ChassisSpeeds(0, 0, 0);
       return new ChassisSpeeds(0, 0, 0);
     }
 
@@ -94,6 +104,7 @@ public class VisionTranslationController {
     AprilTagCamera camera = alignLeft ? m_CoralCamera : m_CenterCamera;
 
     if (!camera.hasTarget()) {
+      output = new ChassisSpeeds(xCommand, yCommand, 0);
       return new ChassisSpeeds(xCommand, yCommand, 0);
     }
 
@@ -154,8 +165,6 @@ public class VisionTranslationController {
       currentPitch = camera.getY(tagID); // Y is Pitch
       currentYaw = camera.getX(tagID); // X is Yaw
 
-      System.out.println(currentPitch + " " + currentYaw);
-
       yCommand = yController.calculate(currentYaw.getAsDouble(), target.getX());
       // if (currentYaw.getAsDouble() < 0) {
       //   yCommand *= -1;
@@ -163,10 +172,11 @@ public class VisionTranslationController {
       xCommand =
           xController.calculate(currentPitch.getAsDouble(), target.getY()) * xCommandMultiplier;
     }
-
+    output = new ChassisSpeeds(xCommand, yCommand, 0);
     return new ChassisSpeeds(xCommand, yCommand, 0); // robot relative
   }
 
+  @Logged(importance = Importance.INFO)
   public boolean atGoal() {
     return xController.atSetpoint() && yController.atSetpoint();
   }

@@ -39,7 +39,6 @@ import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
-import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
@@ -72,19 +71,19 @@ public class RobotContainer {
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
 
-  @Logged(name = "Elevator")
+  //   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
-  @Logged(name = "Coral Intake")
+  //   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
-  @Logged(name = "Algae Intake")
+  //   @Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  @Logged(name = "Algae Pivot")
+  //   @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37));
@@ -265,16 +264,16 @@ public class RobotContainer {
     AlignRight.and(() -> !AlignLeft.getAsBoolean())
         .whileTrue(
             new DriveToPose(
-                m_Swerve, 
-                m_PoseAlignController, 
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT), 
+                m_Swerve,
+                m_PoseAlignController,
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
                 false)
             // new DriveVisionAlign(
             //     m_Swerve,
             //     new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
             //     m_PoseAlignController,
             //     m_VisionController));
-        );
+            );
     AlignRight.and(() -> AlignLeft.getAsBoolean())
         .whileTrue(
             new DriveToPose(

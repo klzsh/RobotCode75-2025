@@ -44,7 +44,7 @@ public class VisionAlign extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    System.out.println("brick");
+    m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
   }
 
   @Override

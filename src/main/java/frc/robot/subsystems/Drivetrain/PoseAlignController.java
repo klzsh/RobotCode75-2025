@@ -8,6 +8,9 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.*;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,12 +19,17 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.lib.dashboard.TunableNumber;
 
 /** Add your docs here. */
+@Logged(name = "Pose Controller", strategy = Strategy.OPT_IN)
 public class PoseAlignController {
 
   private ProfiledPIDController xController;
   private ProfiledPIDController yController;
+  // already logged
   private RotationController thetaController;
+
   // private ProfiledPIDController thetaController;
+  @Logged(importance = Importance.INFO)
+  private ChassisSpeeds output;
 
   private final Swerve m_Swerve;
 
@@ -47,6 +55,7 @@ public class PoseAlignController {
     xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     thetaController = new RotationController(swerve);
+    output = new ChassisSpeeds();
     // thetaController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
 
     // thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -96,11 +105,15 @@ public class PoseAlignController {
     thetaController.update(
         Rotation2d.fromRadians(radiansSetpoint), thetaPID[0].getNumber(), thetaPID[2].getNumber());
     // thetaController.calculate(m_Swerve.getRotation2D().getRadians(), radiansSetpoint);
+    output =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            xVel, yVel, thetaController.getOutput(), currentPose.getRotation());
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(
         xVel, yVel, thetaController.getOutput(), currentPose.getRotation());
   }
 
+  @Logged(importance = Importance.INFO)
   public boolean atGoal() {
     return xController.atGoal() && yController.atGoal() && thetaController.atGoal();
   }

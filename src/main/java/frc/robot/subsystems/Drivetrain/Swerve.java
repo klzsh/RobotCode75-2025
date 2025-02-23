@@ -202,7 +202,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
     setpointSpeeds = speeds;
-    var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
+    var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds);
     setModuleStates(swerveModuleStates, false);
   }
 
