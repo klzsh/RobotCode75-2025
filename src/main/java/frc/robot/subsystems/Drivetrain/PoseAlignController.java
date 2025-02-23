@@ -22,8 +22,7 @@ import frc.lib.dashboard.TunableNumber;
 @Logged(name = "Pose Controller", strategy = Strategy.OPT_IN)
 public class PoseAlignController {
 
-  private ProfiledPIDController xController;
-  private ProfiledPIDController yController;
+  private ProfiledPIDController translationController;
   // already logged
   private RotationController thetaController;
 
@@ -33,16 +32,10 @@ public class PoseAlignController {
 
   private final Swerve m_Swerve;
 
-  private TunableNumber[] xPID = {
-    new TunableNumber("AutoAlign/Px", xP),
-    new TunableNumber("AutoAlign/Ix", xI),
-    new TunableNumber("AutoAlign/Dx", xD)
-  };
-
-  private TunableNumber[] yPID = {
-    new TunableNumber("AutoAlign/Py", yP),
-    new TunableNumber("AutoAlign/Iy", yI),
-    new TunableNumber("AutoAlign/Dy", yD)
+  private TunableNumber[] translationPID = {
+    new TunableNumber("AutoAlign/Ptr", xP),
+    new TunableNumber("AutoAlign/Itr", xI),
+    new TunableNumber("AutoAlign/Dtr", xD)
   };
 
   private TunableNumber[] thetaPID = {
@@ -52,59 +45,47 @@ public class PoseAlignController {
   };
 
   public PoseAlignController(Swerve swerve) {
-    xController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
-    yController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
+    translationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     thetaController = new RotationController(swerve);
     output = new ChassisSpeeds();
-    // thetaController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));
 
-    // thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    xController.setTolerance(toleranceTranslation);
-    yController.setTolerance(toleranceTranslation);
+    translationController.setTolerance(toleranceTranslation);
     // thetaController.setTolerance(toleranceRadians);
 
-    xController.setConstraints(
+    translationController.setConstraints(
         new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
-    yController.setConstraints(
-        new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond) / Math.sqrt(2),
-            maxAcceleration.in(MetersPerSecondPerSecond) / Math.sqrt(2)));
-    // thetaController.setConstraints(
-    //     new TrapezoidProfile.Constraints(
-    //         maxAngularVelocityAuto.in(RadiansPerSecond),
-    //         maxAngularAccelerationAuto.in(RadiansPerSecondPerSecond)));
-
+            maxVelocity.in(MetersPerSecond),
+            maxAcceleration.in(MetersPerSecondPerSecond)));
     m_Swerve = swerve;
     reset();
   }
 
+  public double getVelocityFromSwerve() {
+    return Math.sqrt(Math.pow(m_Swerve.getChassisSpeeds().vxMetersPerSecond, 2) + Math.pow(m_Swerve.getChassisSpeeds().vyMetersPerSecond, 2));
+  }
+
   public void reset() {
-    xController.reset(m_Swerve.getPose().getX(), m_Swerve.getChassisSpeeds().vxMetersPerSecond);
-    yController.reset(m_Swerve.getPose().getY(), m_Swerve.getChassisSpeeds().vyMetersPerSecond);
-    // thetaController.reset(
-    //     m_Swerve.getRotation2D().getRadians(),
-    // m_Swerve.getChassisSpeeds().omegaRadiansPerSecond);
+    translationController.reset(0, getVelocityFromSwerve()); // TODO: might need to put an actual value for the position
   }
 
   public ChassisSpeeds update(Pose2d currentPose, Pose2d targetPose) {
     /* Update PID Controllers */
-    xController.setPID(xPID[0].getNumber(), xPID[1].getNumber(), xPID[2].getNumber());
-    yController.setPID(yPID[0].getNumber(), yPID[1].getNumber(), yPID[2].getNumber());
+    translationController.setPID(translationPID[0].getNumber(), translationPID[1].getNumber(), translationPID[2].getNumber());
     // thetaController.setPID(
     //     thetaPID[0].getNumber(), thetaPID[1].getNumber(), thetaPID[2].getNumber());
 
-    double xVel = xController.calculate(currentPose.getX(), targetPose.getX());
-    double yVel = yController.calculate(currentPose.getY(), targetPose.getY());
+    double angleToTarget = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+    double distanceToTarget = Math.hypot(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+
+    double velocity = translationController.calculate(distanceToTarget, 0);
+    double xVel = velocity * Math.cos(angleToTarget);
+    double yVel = velocity * Math.sin(angleToTarget);
 
     double radiansSetpoint = targetPose.getRotation().getRadians();
-
-    // double thetaVel =
     thetaController.update(
         Rotation2d.fromRadians(radiansSetpoint), thetaPID[0].getNumber(), thetaPID[2].getNumber());
     // thetaController.calculate(m_Swerve.getRotation2D().getRadians(), radiansSetpoint);
+
     output =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             xVel, yVel, thetaController.getOutput(), currentPose.getRotation());
@@ -115,6 +96,6 @@ public class PoseAlignController {
 
   @Logged(importance = Importance.INFO)
   public boolean atGoal() {
-    return xController.atGoal() && yController.atGoal() && thetaController.atGoal();
+    return translationController.atGoal() && thetaController.atGoal();
   }
 }
