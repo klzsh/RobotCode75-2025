@@ -116,4 +116,10 @@ public class VisionConstants {
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
               Units.degreesToRadians(-20))); // 0 0 0
+  public static final Transform3d HPCameraPose =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+          new Rotation3d(
+              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)));
 }

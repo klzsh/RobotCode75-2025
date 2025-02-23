@@ -81,8 +81,6 @@ public class TalonFXSwerveModule {
     mAngleMotor = new TalonFX(moduleConstants.angleMotorID(), driveBusName);
     configAngleMotor();
 
-
-
     /* Drive Motor Config */
     mDriveMotor = new TalonFX(moduleConstants.driveMotorID(), driveBusName);
     configDriveMotor();

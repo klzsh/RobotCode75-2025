@@ -1,10 +1,8 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
-import static frc.robot.Constants.FieldConstants.reefRightPoseOffset;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
@@ -12,8 +10,6 @@ import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -21,7 +17,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;

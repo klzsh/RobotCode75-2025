@@ -26,8 +26,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.TunableNumber;
@@ -76,12 +74,12 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
 
-    m_ClimberEncoder =
-        new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
+    m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
 
     climberMMCruiseVelocity =
         new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
-    climberMMCruiseAcceleration = new TunableNumber("Climber/Cruise Acceleration", motionMagicCruiseAcceleration);
+    climberMMCruiseAcceleration =
+        new TunableNumber("Climber/Cruise Acceleration", motionMagicCruiseAcceleration);
     climberMMKv = new TunableNumber("Climber/MM kV", motionMagickV);
     climberMMKa = new TunableNumber("Climber/MM kA", motionMagickA);
 
@@ -103,7 +101,6 @@ public class Climber extends SubsystemBase {
     climberKs = new TunableNumber("Climber/kS", kS);
     climberKa = new TunableNumber("Climber/kA", kA);
     climberKv = new TunableNumber("Climber/kV", kV);
-
 
     m_ClimberMotor1.getConfigurator().apply(getClimberMotorConfig());
     m_ClimberMotor2.getConfigurator().apply(getClimberMotorConfig());
@@ -139,7 +136,6 @@ public class Climber extends SubsystemBase {
     } else {
       runCurrent(0);
     }
-  
   }
 
   public void setPositionRequest(Angle position) {
@@ -155,9 +151,10 @@ public class Climber extends SubsystemBase {
   }
 
   @Logged(name = "Climber Position", importance = Importance.CRITICAL)
-  public double getPositionRotations(){
+  public double getPositionRotations() {
     return getPosition().in(Rotations);
   }
+
   public Angle getPosition() {
     Measure<AngleUnit> motor1Position =
         BaseStatusSignal.getLatencyCompensatedValue(

@@ -86,7 +86,6 @@ public final class ClimberConstants {
       m_ClimberMotorConfig.Slot0.kI = kI; // tune only if needed
       m_ClimberMotorConfig.Slot0.kD = kD; // tune fifth
 
-
       m_ClimberMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
           statorForwardCurrentLimit.in(Amps);
       m_ClimberMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =

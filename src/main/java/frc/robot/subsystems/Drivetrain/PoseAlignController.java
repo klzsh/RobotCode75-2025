@@ -45,7 +45,8 @@ public class PoseAlignController {
   };
 
   public PoseAlignController(Swerve swerve) {
-    translationController = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
+    translationController =
+        new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     thetaController = new RotationController(swerve);
     output = new ChassisSpeeds();
 
@@ -54,28 +55,35 @@ public class PoseAlignController {
 
     translationController.setConstraints(
         new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond),
-            maxAcceleration.in(MetersPerSecondPerSecond)));
+            maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
     m_Swerve = swerve;
     reset();
   }
 
   public double getVelocityFromSwerve() {
-    return Math.sqrt(Math.pow(m_Swerve.getChassisSpeeds().vxMetersPerSecond, 2) + Math.pow(m_Swerve.getChassisSpeeds().vyMetersPerSecond, 2));
+    return Math.sqrt(
+        Math.pow(m_Swerve.getChassisSpeeds().vxMetersPerSecond, 2)
+            + Math.pow(m_Swerve.getChassisSpeeds().vyMetersPerSecond, 2));
   }
 
   public void reset() {
-    translationController.reset(0, getVelocityFromSwerve()); // TODO: might need to put an actual value for the position
+    translationController.reset(
+        0, getVelocityFromSwerve()); // TODO: might need to put an actual value for the position
   }
 
   public ChassisSpeeds update(Pose2d currentPose, Pose2d targetPose) {
     /* Update PID Controllers */
-    translationController.setPID(translationPID[0].getNumber(), translationPID[1].getNumber(), translationPID[2].getNumber());
+    translationController.setPID(
+        translationPID[0].getNumber(),
+        translationPID[1].getNumber(),
+        translationPID[2].getNumber());
     // thetaController.setPID(
     //     thetaPID[0].getNumber(), thetaPID[1].getNumber(), thetaPID[2].getNumber());
 
-    double angleToTarget = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
-    double distanceToTarget = Math.hypot(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+    double angleToTarget =
+        Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+    double distanceToTarget =
+        Math.hypot(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
 
     double velocity = translationController.calculate(distanceToTarget, 0);
     double xVel = velocity * Math.cos(angleToTarget);

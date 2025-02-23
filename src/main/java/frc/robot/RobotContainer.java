@@ -33,7 +33,6 @@ import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
-import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
@@ -63,10 +62,12 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 public class RobotContainer {
   // define subsystems first
   @Logged(name = "Left Facing Mod Cam")
-  private final AprilTagCamera m_LeftFacingCamera = new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
+  private final AprilTagCamera m_LeftFacingCamera =
+      new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
   @Logged(name = "Right Facing Mod Cam")
-  private final AprilTagCamera m_RightFacingCamera = new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
+  private final AprilTagCamera m_RightFacingCamera =
+      new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera);
@@ -164,7 +165,8 @@ public class RobotContainer {
     //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
     //         .repeatedly());
     m_Climber.setDefaultCommand(
-        new InstantCommand(() -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
+        new InstantCommand(
+            () -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
 
     // m_Climber.setDefaultCommand(
     //     new InstantCommand(() -> {
@@ -211,7 +213,7 @@ public class RobotContainer {
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
     // algae ground pickup & scoring
-    m_Controller.povLeft().onTrue(new InstantCommand(()->m_Climber.resetPosition()));
+    m_Controller.povLeft().onTrue(new InstantCommand(() -> m_Climber.resetPosition()));
     m_Controller
         .povRight()
         .whileTrue(
@@ -232,7 +234,11 @@ public class RobotContainer {
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller.povDown().whileTrue(new InstantCommand(()->m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake).repeatedly());
+    m_Controller
+        .povDown()
+        .whileTrue(
+            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
+                .repeatedly());
 
     AlignLeft.and(() -> !AlignRight.getAsBoolean())
         .whileTrue(
