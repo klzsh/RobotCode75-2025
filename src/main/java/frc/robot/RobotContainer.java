@@ -231,28 +231,28 @@ public class RobotContainer {
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
+    // m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
 
-    // m_Controller
-    //     .povDown()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               m_Climber.resetPosition();
-    //
-    // m_Climber.setPositionRequest(climbPositionAbsoluteStart.times(climberGearRatio));
-    //             },
-    //             m_Climber));
-    // m_Controller
-    //     .povLeft()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               m_Climber.resetPosition();
-    //
-    // m_Climber.setPositionRequest(climbPositionAbsoluteFinish.times(climberGearRatio));
-    //             },
-    //             m_Climber));
+    m_Controller
+        .povDown()
+        .whileTrue(
+            new InstantCommand(
+                () -> {
+                  m_Climber.resetPosition();
+    
+    m_Climber.setPositionRequest(climbPositionAbsoluteStart.times(climberGearRatio));
+                },
+                m_Climber));
+    m_Controller
+        .povLeft()
+        .whileTrue(
+            new InstantCommand(
+                () -> {
+                  m_Climber.resetPosition();
+    
+    m_Climber.setPositionRequest(climbPositionAbsoluteFinish.times(climberGearRatio));
+                },
+                m_Climber));
 
     AlignLeft.and(() -> !AlignRight.getAsBoolean())
         .whileTrue(
