@@ -23,6 +23,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
@@ -110,6 +111,21 @@ public class Climber extends SubsystemBase {
 
   public ClimberPositions getState() {
     return m_ClimberState;
+  }
+
+  public void setPositionRequestWithController(XboxController controller) {
+    double leftY = controller.getLeftY();
+    double rightY = controller.getRightY();
+    if (Math.abs(leftY) > 0.2) {
+      runPosition(-controller.getLeftY() * 75);
+    } else if (rightY > 0.2) {
+      resetPosition();
+      setPositionRequest(climbPositionAbsoluteFinish.times(climberGearRatio));
+    } else if (rightY < -0.2) {
+      resetPosition();
+      setPositionRequest(climbPositionAbsoluteStart.times(climberGearRatio));
+    }
+  
   }
 
   public void setPositionRequest(Angle position) {
