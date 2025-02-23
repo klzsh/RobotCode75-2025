@@ -83,8 +83,6 @@ public class EndEffectorConstants {
     public static final Current coralCurrentLowerThreshold = Amps.of(30);
 
     public static final Current coralStatorCurrentLimit = Amps.of(60);
-    public static final Current coralStatorCurrentLimitForward = Amps.of(60);
-    public static final Current coralStatorCurrentLimitReverse = Amps.of(-60);
 
     public static final Time coralCurrentThresholdTime = Seconds.of(0.50);
 

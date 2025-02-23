@@ -27,8 +27,8 @@ public class VisionTranslationController {
   private final PIDController xController;
   private final PIDController yController;
 
-  private final AprilTagCamera m_CoralCamera;
-  private final AprilTagCamera m_CenterCamera;
+  private final AprilTagCamera m_RightFacingCamera;
+  private final AprilTagCamera m_LeftFacingCamera;
 
   @Logged(importance = Importance.INFO)
   private double lastSeenTagTime = 0.0;
@@ -73,14 +73,14 @@ public class VisionTranslationController {
   };
 
   public VisionTranslationController(
-      Swerve swerve, AprilTagCamera coralCamera, AprilTagCamera centerCamera) {
+      Swerve swerve, AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera) {
     m_Swerve = swerve;
 
     xController = new PIDController(0, 0, 0);
     yController = new PIDController(0, 0, 0);
 
-    m_CoralCamera = coralCamera;
-    m_CenterCamera = centerCamera;
+    m_RightFacingCamera = rightFacingCamera;
+    m_LeftFacingCamera = leftFacingCamera;
 
     xController.setTolerance(2);
     yController.setTolerance(2);
@@ -101,7 +101,7 @@ public class VisionTranslationController {
     xController.setSetpoint(target.getY());
     yController.setSetpoint(target.getX());
 
-    AprilTagCamera camera = alignLeft ? m_CoralCamera : m_CenterCamera;
+    AprilTagCamera camera = alignLeft ? m_RightFacingCamera : m_LeftFacingCamera;
 
     if (!camera.hasTarget()) {
       output = new ChassisSpeeds(xCommand, yCommand, 0);
