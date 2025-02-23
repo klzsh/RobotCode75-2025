@@ -87,7 +87,7 @@ public class VisionConstants {
           entry(4, FieldElement.BB));
 
   public static final double maxTimeUntilFallbackToOdometry = 1.0;
-  public static final Transform3d CenterCamPose =
+  public static final Transform3d LeftFacingCameraPose =
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(9.398), // X 9.325
@@ -106,7 +106,7 @@ public class VisionConstants {
   //           Units.degreesToRadians(0),
   //           Units.degreesToRadians(-20),
   //           Units.degreesToRadians(30))); // 0 0 0
-  public static final Transform3d CoralCamPose =
+  public static final Transform3d RightFacingCameraPose =
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(7.693), // X 7.262

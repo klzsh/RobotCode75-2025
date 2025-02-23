@@ -62,14 +62,14 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "CenterCam")
-  private final AprilTagCamera CenterCam = new AprilTagCamera("Center_Cam", CenterCamPose);
+  @Logged(name = "Left Facing Mod Cam")
+  private final AprilTagCamera m_LeftFacingCamera = new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "CoralCam")
-  private final AprilTagCamera CoralCam = new AprilTagCamera("Coral_Cam", CoralCamPose);
+  @Logged(name = "Right Facing Mod Cam")
+  private final AprilTagCamera m_RightFacingCamera = new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
   @Logged(name = "Swerve")
-  private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
+  private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera);
 
   //   @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
@@ -96,7 +96,7 @@ public class RobotContainer {
   // define drivetrain controllers
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
   private final VisionTranslationController m_VisionController =
-      new VisionTranslationController(m_Swerve, CoralCam, CenterCam);
+      new VisionTranslationController(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -211,6 +211,7 @@ public class RobotContainer {
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
     // algae ground pickup & scoring
+    m_Controller.povLeft().onTrue(new InstantCommand(()->m_Climber.resetPosition()));
     m_Controller
         .povRight()
         .whileTrue(
@@ -231,7 +232,7 @@ public class RobotContainer {
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
 
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
+    m_Controller.povDown().whileTrue(new InstantCommand(()->m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake).repeatedly());
 
     AlignLeft.and(() -> !AlignRight.getAsBoolean())
         .whileTrue(

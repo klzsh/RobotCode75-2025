@@ -80,8 +80,8 @@ public class Swerve extends SubsystemBase {
   private final PIDController yController;
   private final PIDController rController;
 
-  private final AprilTagCamera m_CenterCamera;
-  private final AprilTagCamera m_ModuleCamera;
+  private final AprilTagCamera m_RightFacingCamera;
+  private final AprilTagCamera m_LeftFacingCamera;
 
   // do this later
   private final TunableNumber xKP;
@@ -106,10 +106,10 @@ public class Swerve extends SubsystemBase {
   private Pigeon2 m_gyro;
 
   /** define swerve modules, Gyro, odometry */
-  public Swerve(AprilTagCamera moduleCamera, AprilTagCamera centerCamera) {
+  public Swerve(AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera) {
     sample = null;
-    m_ModuleCamera = moduleCamera;
-    m_CenterCamera = centerCamera;
+    m_LeftFacingCamera = leftFacingCamera;
+    m_RightFacingCamera = rightFacingCamera;
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized
@@ -384,50 +384,37 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // update pose estimator with vision measurements
-    // if (m_CenterCamera.getEstimatedPose() != null) {
-    //   swerveOdometry.addVisionMeasurement(
-    //       m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
-    //       m_CenterCamera.getEstimatedPose().timestampSeconds);
-    // }
-
-    Pose2d tagPose =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-            .getTagPose(18)
-            .get()
-            .toPose2d();
-    Rotation2d tagHeading = tagPose.getRotation();
-    poseToDrive =
-        tagPose.transformBy(
-            new Transform2d(
-                Inches.of(21 * -tagHeading.getCos()),
-                Inches.of(21 * -tagHeading.getSin()),
-                Rotation2d.fromDegrees(180)));
-    tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
-    poseToDrive =
-        poseToDrive.transformBy(
-            new Transform2d(
-                reefRightPoseOffset.times(-tagHeading.getCos()),
-                reefRightPoseOffset.times(-tagHeading.getSin()),
-                Rotation2d.fromDegrees(0)));
-
-    m_ModuleCamera.updateHeading(getRotation2D());
-    updatePoseByVision(m_ModuleCamera);
+    m_LeftFacingCamera.updateHeading(getRotation2D());
+    updatePoseByVision(m_LeftFacingCamera);
+    m_RightFacingCamera.updateHeading(getRotation2D());
+    updatePoseByVision(m_RightFacingCamera);
 
     swerveOdometry.update(getRotation2D(), getModulePositions());
 
     // set odometry to vision pose if it deviates by more than half a meter
 
-    if (m_ModuleCamera.getEstimatedPose() != null) {
+    if (m_LeftFacingCamera.getEstimatedPose() != null) {
       if (Math.abs(
-                  m_ModuleCamera.getEstimatedPose().estimatedPose.getX()
+                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
                       - swerveOdometry.getEstimatedPosition().getX())
               > .5
           || Math.abs(
-                  m_ModuleCamera.getEstimatedPose().estimatedPose.getY()
+                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
                       - swerveOdometry.getEstimatedPosition().getY())
               > .5) {
-        setPoseByVision(m_ModuleCamera);
+        setPoseByVision(m_LeftFacingCamera);
+      }
+    }
+    if (m_RightFacingCamera.getEstimatedPose() != null) {
+      if (Math.abs(
+                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
+                      - swerveOdometry.getEstimatedPosition().getX())
+              > .5
+          || Math.abs(
+                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
+                      - swerveOdometry.getEstimatedPosition().getY())
+              > .5) {
+        setPoseByVision(m_RightFacingCamera);
       }
     }
     if (driveKP.getNumber() != drivePIDS.kP

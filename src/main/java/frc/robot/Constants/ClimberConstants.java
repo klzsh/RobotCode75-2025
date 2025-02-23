@@ -16,15 +16,16 @@ public final class ClimberConstants {
   public static final double climberGearRatio = 39.6 / 1.0;
   // TODO: tune
   public static final Angle climbPosition = Rotations.of(0);
+  public static final Angle climbExtendPosition = Rotations.of(100);
   public static final double climbDeadband = 0.5;
   public static final int limitPort = 7;
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
 
   public static final int climberEncoderPort = 6;
-  public static final Angle climberStartPosition = Rotations.of(0.825); // TODO tune
+  // public static final Angle climberStartPosition = Rotations.of(0.015); // TODO tune
   public static final Angle climbPositionAbsoluteStart = Rotations.of(0.288);
-  public static final Angle climbPositionAbsoluteFinish = Rotations.of(0.05); // TODO tune
+  public static final Angle climbPositionAbsoluteFinish = Rotations.of(0.2); // TODO tune
   public static final double climbDeadbandAbsolute = 0.25;
 
   public static final class MotorConfigs {
@@ -44,16 +45,16 @@ public final class ClimberConstants {
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
-    public static final double kA = 0.5; // current per unit of acceleration
-    public static final double kG = 21; // current to overcome gravity
-    public static final double kS = 17; // current to overcome static friction
-    public static final double kV = 0.12; // current per unit of requested velocity
-    public static final double kP = 1;
+    public static final double kA = 0.1; // current per unit of acceleration
+    public static final double kG = 0; // current to overcome gravity
+    public static final double kS = 0; // current to overcome static friction
+    public static final double kV = 0.1; // current per unit of requested velocity
+    public static final double kP = 0.000001;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 5;
 
-    public static final double motionMagicCruiseVelocity = 0;
-    public static final double motionMagicCruiseAcceleration = 0;
+    public static final double motionMagicCruiseVelocity = 25;
+    public static final double motionMagicCruiseAcceleration = 10;
     public static final double motionMagickV = 0.12;
     public static final double motionMagickA = 0.1;
 
@@ -84,6 +85,7 @@ public final class ClimberConstants {
       m_ClimberMotorConfig.Slot0.kP = kP; // tune fourth
       m_ClimberMotorConfig.Slot0.kI = kI; // tune only if needed
       m_ClimberMotorConfig.Slot0.kD = kD; // tune fifth
+
 
       m_ClimberMotorConfig.TorqueCurrent.PeakForwardTorqueCurrent =
           statorForwardCurrentLimit.in(Amps);
