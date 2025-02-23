@@ -51,7 +51,7 @@ public class VisionConstants {
           entry(
               new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT).toString(),
               //   new Translation2d(11.87, -4.75)),
-              new Translation2d(14, -6)),
+              new Translation2d(0.24, -.1)),
           entry(
               new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT).toString(),
               new Translation2d(-8, -4))

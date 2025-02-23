@@ -165,12 +165,9 @@ public class VisionTranslationController {
       currentPitch = camera.getY(tagID); // Y is Pitch
       currentYaw = camera.getX(tagID); // X is Yaw
 
-      yCommand = yController.calculate(currentYaw.getAsDouble(), target.getX());
-      // if (currentYaw.getAsDouble() < 0) {
-      //   yCommand *= -1;
-      // }
-      xCommand =
-          xController.calculate(currentPitch.getAsDouble(), target.getY()) * xCommandMultiplier;
+      yCommand = yController.calculate(Math.sin(currentYaw.getAsDouble()), target.getX());
+
+      xCommand = xController.calculate(currentPitch.getAsDouble(), target.getY()) * xCommandMultiplier;
     }
     output = new ChassisSpeeds(xCommand, yCommand, 0);
     return new ChassisSpeeds(xCommand, yCommand, 0); // robot relative
