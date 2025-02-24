@@ -13,6 +13,8 @@ public class OptionalDoubleLogger extends ClassSpecificLogger<OptionalDouble> {
 
   @Override
   public void update(EpilogueBackend logger, OptionalDouble val) {
-    logger.log("value", val.isPresent() ? val.getAsDouble() : null);
+    if(val != null){
+      logger.log("value", val.isPresent() ? val.getAsDouble() : 0);
+    }
   }
 }

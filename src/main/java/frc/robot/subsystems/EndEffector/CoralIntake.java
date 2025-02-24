@@ -22,7 +22,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-@Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
+//@Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
 public class CoralIntake extends SubsystemBase {
   public static enum CoralStates {
     // no intaking state because coral sits on top of the intake wheels
@@ -35,7 +35,7 @@ public class CoralIntake extends SubsystemBase {
 
   private static CoralStates m_CoralIntakeState;
 
-  @Logged(name = "Coral Motor", importance = Importance.DEBUG)
+  //@Logged(name = "Coral Motor", importance = Importance.DEBUG)
   private TalonFXS m_CoralMotor;
 
   private DigitalInput m_CoralBeamBreak;
@@ -73,12 +73,12 @@ public class CoralIntake extends SubsystemBase {
     m_CoralIntakeState = state;
   }
 
-  @Logged(name = "Coral State", importance = Importance.CRITICAL)
+  //@Logged(name = "Coral State", importance = Importance.CRITICAL)
   public CoralStates getState() {
     return m_CoralIntakeState;
   }
 
-  @Logged(name = "Beam Break", importance = Importance.CRITICAL)
+  //@Logged(name = "Beam Break", importance = Importance.CRITICAL)
   public boolean getBeamBreak() {
     return !m_CoralBeamBreak.get();
   }

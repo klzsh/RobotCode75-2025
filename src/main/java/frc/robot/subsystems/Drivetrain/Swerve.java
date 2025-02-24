@@ -39,28 +39,28 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * has methods to get and set individual module positions (for autos or X-Stance) and for teleop driving
  * also contains most of the logging for the chassis (voltage/current, speed, etc)
  */
-@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain")
+//@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain")
 public class Swerve extends SubsystemBase {
   private SwerveDrivePoseEstimator swerveOdometry;
 
   public TalonFXSwerveModule[] m_SwerveModules;
 
-  @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
+  //@Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
   // TODO: tunable numebr for PIDs + current limits
-  @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
+  //@Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
-  @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
+  //@Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontRight;
 
-  @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
+  //@Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackLeft;
 
-  @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
+  //@Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
   private final TunableNumber driveKP;
@@ -77,6 +77,7 @@ public class Swerve extends SubsystemBase {
 
   private final AprilTagCamera m_RightFacingCamera;
   private final AprilTagCamera m_LeftFacingCamera;
+  private final AprilTagCamera m_HPCamera;
 
   // do this later
   private final TunableNumber xKP;
@@ -94,17 +95,18 @@ public class Swerve extends SubsystemBase {
   private double lastUpdatedTime = 0;
   private boolean m_FieldRelative = true;
 
-  @Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
+  //@Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
   private SwerveSample sample;
 
   // gyro
   private Pigeon2 m_gyro;
 
   /** define swerve modules, Gyro, odometry */
-  public Swerve(AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera) {
+  public Swerve(AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
     sample = null;
     m_LeftFacingCamera = leftFacingCamera;
     m_RightFacingCamera = rightFacingCamera;
+    m_HPCamera = HPCamera;
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized
@@ -273,7 +275,7 @@ public class Swerve extends SubsystemBase {
   /**
    * @return the estimated position of the robot
    */
-  @Logged(name = "Robot Pose", importance = Importance.CRITICAL)
+  //@Logged(name = "Robot Pose", importance = Importance.CRITICAL)
   public Pose2d getPose() {
     return swerveOdometry.getEstimatedPosition();
   }
@@ -321,7 +323,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the state of all swerve modules
    */
-  @Logged(name = "Module States", importance = Importance.CRITICAL)
+  //@Logged(name = "Module States", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -336,7 +338,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the setpoint a module has been set to
    */
-  @Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
+  //@Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleSetpoints() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -350,7 +352,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return position of all swerve modules
    */
-  @Logged(name = "Module Positions", importance = Importance.INFO)
+  //@Logged(name = "Module Positions", importance = Importance.INFO)
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -369,12 +371,12 @@ public class Swerve extends SubsystemBase {
    *
    * @return rotation2d returned by the gyro
    */
-  @Logged(name = "Gyro Angle", importance = Importance.INFO)
+  //@Logged(name = "Gyro Angle", importance = Importance.INFO)
   public Rotation2d getRotation2D() {
     return Rotation2d.fromDegrees(m_gyro.getYaw().getValue().in(Degrees));
   }
 
-  @Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
+  //@Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
   private Pose2d poseToDrive;
 
   @Override
@@ -383,6 +385,8 @@ public class Swerve extends SubsystemBase {
     updatePoseByVision(m_LeftFacingCamera);
     m_RightFacingCamera.updateHeading(getRotation2D());
     updatePoseByVision(m_RightFacingCamera);
+    // m_HPCamera.updateHeading(getRotation2D());
+    // updatePoseByVision(m_HPCamera);
 
     swerveOdometry.update(getRotation2D(), getModulePositions());
 
@@ -412,6 +416,18 @@ public class Swerve extends SubsystemBase {
         setPoseByVision(m_RightFacingCamera);
       }
     }
+    // if (m_HPCamera.getEstimatedPose() != null) {
+    //   if (Math.abs(
+    //               m_HPCamera.getEstimatedPose().estimatedPose.getX()
+    //                   - swerveOdometry.getEstimatedPosition().getX())
+    //           > .5
+    //       || Math.abs(
+    //               m_HPCamera.getEstimatedPose().estimatedPose.getY()
+    //                   - swerveOdometry.getEstimatedPosition().getY())
+    //           > .5) {
+    //     setPoseByVision(m_HPCamera);
+    //   }
+    // }
     if (driveKP.getNumber() != drivePIDS.kP
         || driveKI.getNumber() != drivePIDS.kI
         || driveKD.getNumber() != drivePIDS.kD

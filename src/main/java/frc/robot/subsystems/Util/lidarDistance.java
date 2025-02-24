@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 
-@Logged(name = "Lidar sensor", strategy = Strategy.OPT_IN)
+//@Logged(name = "Lidar sensor", strategy = Strategy.OPT_IN)
 public class LidarDistance {
 
   private double threshold = 0;
@@ -30,7 +30,7 @@ public class LidarDistance {
     return 4 * (getTimeNanoSeconds() - 1e6) / 1000;
   }
 
-  @Logged(name = "distance inches")
+  //@Logged(name = "distance inches")
   public double getDistanceIN() {
     return Units.metersToInches(getDistanceMM() / 1000.0);
   }

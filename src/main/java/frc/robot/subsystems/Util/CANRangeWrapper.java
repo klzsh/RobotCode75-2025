@@ -9,7 +9,7 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Distance;
 
-@Logged(name = "CAN Range Sensor", strategy = Strategy.OPT_IN)
+//@Logged(name = "CAN Range Sensor", strategy = Strategy.OPT_IN)
 public class CANRangeWrapper {
   private final CANrange m_CANrange;
   private final int deviceID = 6;
@@ -20,12 +20,12 @@ public class CANRangeWrapper {
     m_CANrange = new CANrange(deviceID, driveBusName);
   }
 
-  @Logged(name = "CAN Range Distance", importance = Importance.DEBUG)
+  //@Logged(name = "CAN Range Distance", importance = Importance.DEBUG)
   public double getDistanceIN() {
     return m_CANrange.getDistance().refresh().getValue().in(Inches);
   }
 
-  @Logged(name = "CAN Range is Aligned?", importance = Importance.DEBUG)
+  //@Logged(name = "CAN Range is Aligned?", importance = Importance.DEBUG)
   public boolean isAligned() {
     return getDistanceIN() <= threshold;
   }
