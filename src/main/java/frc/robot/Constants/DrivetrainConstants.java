@@ -36,7 +36,7 @@ public final class DrivetrainConstants {
 
   public static final class ControllerConstants {
     public static final double toleranceRadians = Units.degreesToRadians(2);
-    public static final double toleranceTranslation = .07;
+    public static final double toleranceTranslation = .01;
 
     public static final class RotationAlign {
 
@@ -76,8 +76,8 @@ public final class DrivetrainConstants {
       public static final double tD = 0.0;
     }
 
-    public static final LinearVelocity maxVelocity = MetersPerSecond.of(3);
-    public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
+    public static final LinearVelocity maxVelocity = MetersPerSecond.of(1);
+    public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(1);
 
     /** Radians per Second */
     public static final AngularVelocity maxAngularVelocity =

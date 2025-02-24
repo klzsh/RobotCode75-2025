@@ -19,7 +19,7 @@ import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.OptionalDouble;
 
-@Logged(name = "Vision Controller", strategy = Strategy.OPT_IN)
+//@Logged(name = "Vision Controller", strategy = Strategy.OPT_IN)
 public class VisionTranslationController {
 
   private final Swerve m_Swerve;
@@ -30,22 +30,22 @@ public class VisionTranslationController {
   private final AprilTagCamera m_RightFacingCamera;
   private final AprilTagCamera m_LeftFacingCamera;
 
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   private double lastSeenTagTime = 0.0;
 
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   private OptionalDouble currentPitch;
 
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   private OptionalDouble currentYaw;
 
-  @Logged(name = "XOutput", importance = Importance.INFO)
+  //@Logged(name = "XOutput", importance = Importance.INFO)
   private double xCommand;
 
-  @Logged(name = "YOutput", importance = Importance.INFO)
+  //@Logged(name = "YOutput", importance = Importance.INFO)
   private double yCommand;
 
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   private ChassisSpeeds output;
 
   private TunableNumber[] xPID_Coral = {
@@ -173,7 +173,7 @@ public class VisionTranslationController {
     return new ChassisSpeeds(xCommand, yCommand, 0); // robot relative
   }
 
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   public boolean atGoal() {
     return xController.atSetpoint() && yController.atSetpoint();
   }

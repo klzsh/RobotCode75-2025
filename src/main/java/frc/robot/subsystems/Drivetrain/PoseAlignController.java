@@ -25,9 +25,11 @@ public class PoseAlignController {
   private ProfiledPIDController translationController;
   // already logged
   private RotationController thetaController;
+  @Logged(importance = Importance.INFO)
+  private Pose2d targetPose;
 
   // private ProfiledPIDController thetaController;
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   private ChassisSpeeds output;
 
   private final Swerve m_Swerve;
@@ -72,6 +74,7 @@ public class PoseAlignController {
   }
 
   public ChassisSpeeds update(Pose2d currentPose, Pose2d targetPose) {
+    this.targetPose = targetPose;
     /* Update PID Controllers */
     translationController.setPID(
         translationPID[0].getNumber(),
@@ -86,8 +89,8 @@ public class PoseAlignController {
         Math.hypot(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
 
     double velocity = translationController.calculate(distanceToTarget, 0);
-    double xVel = velocity * Math.cos(angleToTarget);
-    double yVel = velocity * Math.sin(angleToTarget);
+    double xVel = -velocity * Math.cos(angleToTarget);
+    double yVel = -velocity * Math.sin(angleToTarget);
 
     double radiansSetpoint = targetPose.getRotation().getRadians();
     thetaController.update(
@@ -102,7 +105,7 @@ public class PoseAlignController {
         xVel, yVel, thetaController.getOutput(), currentPose.getRotation());
   }
 
-  @Logged(importance = Importance.INFO)
+  //@Logged(importance = Importance.INFO)
   public boolean atGoal() {
     return translationController.atGoal() && thetaController.atGoal();
   }

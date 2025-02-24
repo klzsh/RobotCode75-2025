@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
 
-@Logged(name = "Climber", strategy = Strategy.OPT_IN)
+//@Logged(name = "Climber", strategy = Strategy.OPT_IN)
 public class Climber extends SubsystemBase {
 
   public static enum ClimberPositions {
@@ -39,15 +39,15 @@ public class Climber extends SubsystemBase {
     CLIMB
   }
 
-  @Logged(name = "Climber Motor 1", importance = Importance.DEBUG)
+  //@Logged(name = "Climber Motor 1", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor1;
 
-  @Logged(name = "Climber Motor 2", importance = Importance.DEBUG)
+  //@Logged(name = "Climber Motor 2", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor2;
 
   private final DutyCycleEncoder m_ClimberEncoder;
 
-  @Logged(name = "Climber State", importance = Importance.CRITICAL)
+  //@Logged(name = "Climber State", importance = Importance.CRITICAL)
   private ClimberPositions m_ClimberState = ClimberPositions.DEFAULT;
 
   private Slot0Configs PIDConfig = new Slot0Configs();
@@ -145,12 +145,12 @@ public class Climber extends SubsystemBase {
         m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
   }
 
-  @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
+  //@Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
   public double getAbsolutePosition() {
     return m_ClimberEncoder.get();
   }
 
-  @Logged(name = "Climber Position", importance = Importance.CRITICAL)
+  //@Logged(name = "Climber Position", importance = Importance.CRITICAL)
   public double getPositionRotations() {
     return getPosition().in(Rotations);
   }

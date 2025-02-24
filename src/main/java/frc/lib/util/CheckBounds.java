@@ -57,21 +57,23 @@ public class CheckBounds {
             .getTagPose(target)
             .get()
             .toPose2d();
+    // return tagPose;
     Rotation2d tagHeading = tagPose.getRotation();
     double bumperSize = 17.5;
     Pose2d poseToDrive =
         tagPose.transformBy(
             new Transform2d(
-                Inches.of(bumperSize * -tagHeading.getCos()),
-                Inches.of(bumperSize * -tagHeading.getSin()),
-                Rotation2d.fromDegrees(180)));
+               Inches.of(bumperSize).in(Meters),
+                0,
+                new Rotation2d(0)));
+    // flip the pose
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.LEFT) {
       tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
       poseToDrive =
           poseToDrive.transformBy(
               new Transform2d(
-                  reefLeftPoseOffset.times(-tagHeading.getCos()),
-                  reefLeftPoseOffset.times(-tagHeading.getSin()),
+                  0,
+                  reefLeftPoseOffset.in(Meters),
                   Rotation2d.fromDegrees(0)));
     }
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)
@@ -80,10 +82,10 @@ public class CheckBounds {
       poseToDrive =
           poseToDrive.transformBy(
               new Transform2d(
-                  reefRightPoseOffset.times(-tagHeading.getCos()),
-                  reefRightPoseOffset.times(-tagHeading.getSin()),
+                  0,
+                  reefLeftPoseOffset.in(Meters),
                   Rotation2d.fromDegrees(0)));
     }
-    return poseToDrive;
+    return new Pose2d(poseToDrive.getX(), poseToDrive.getY(), Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
   }
 }

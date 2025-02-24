@@ -58,44 +58,49 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-@Logged(strategy = Strategy.OPT_IN)
+//@Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "Left Facing Mod Cam")
+//   //@Logged(name = "Left Facing Mod Cam")
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "Right Facing Mod Cam")
+//   //@Logged(name = "Right Facing Mod Cam")
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  @Logged(name = "Swerve")
-  private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera);
+// //@Logged(name= "HP Cam")
+private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
-  //   @Logged(name = "Elevator")
+  //@Logged(name = "Swerve")
+  private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
+
+  //   //@Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
-  //   @Logged(name = "Coral Intake")
+  //   //@Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
-  @Logged(name = "Climber")
+//   //@Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
-  //   @Logged(name = "Algae Intake")
+  //   //@Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  //   @Logged(name = "Algae Pivot")
+  //   //@Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37));
 
-  //   @Logged(name = "Algae Lidar Sensor")
+  //   //@Logged(name = "Algae Lidar Sensor")
   //   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
 
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
   // define drivetrain controllers
+  @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
+//   //@Logged
   private final VisionTranslationController m_VisionController =
       new VisionTranslationController(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera);
 
@@ -242,11 +247,11 @@ public class RobotContainer {
 
     AlignLeft.and(() -> !AlignRight.getAsBoolean())
         .whileTrue(
-            new DriveVisionAlign(
+            new DriveToPose(
                 m_Swerve,
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
                 m_PoseAlignController,
-                m_VisionController));
+                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+                false));
     AlignRight.and(() -> !AlignLeft.getAsBoolean())
         .whileTrue(
             new DriveToPose(
