@@ -89,7 +89,7 @@ public class CheckBounds {
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
       return new Pose2d(poseToDrive.getX(), poseToDrive.getY(), Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
     }
-    else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement) {
+    else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
       return new Pose2d(poseToDrive.getX(), poseToDrive.getY(), Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 90));
     }
     return poseToDrive;
