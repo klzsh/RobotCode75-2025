@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.*;
@@ -14,98 +10,119 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.lib.dashboard.TunableNumber;
 
-/** Add your docs here. */
 @Logged(name = "Pose Controller", strategy = Strategy.OPT_IN)
 public class PoseAlignController {
 
-  private ProfiledPIDController translationController;
-  // already logged
-  private RotationController thetaController;
-  @Logged(importance = Importance.INFO)
-  private Pose2d targetPose;
+  private final ProfiledPIDController translationController;
+  private final RotationController thetaController;
 
-  // private ProfiledPIDController thetaController;
-  //@Logged(importance = Importance.INFO)
-  private ChassisSpeeds output;
+  @Logged(importance = Importance.INFO)
+  public ChassisSpeeds output;
+
+  @Logged(importance = Importance.INFO)
+  public Pose2d targetPose;
+
+  @Logged(importance = Importance.INFO)
+  public double distance2target;
+
+  // Lock in the desired translation direction (in field coordinates) at reset.
+  private double desiredTranslationAngleField;
 
   private final Swerve m_Swerve;
 
-  private TunableNumber[] translationPID = {
-    new TunableNumber("AutoAlign/Ptr", xP),
-    new TunableNumber("AutoAlign/Itr", xI),
-    new TunableNumber("AutoAlign/Dtr", xD)
+  private final TunableNumber[] translationPID = {
+      new TunableNumber("AutoAlign/Ptr", xP),
+      new TunableNumber("AutoAlign/Itr", xI),
+      new TunableNumber("AutoAlign/Dtr", xD)
   };
 
-  private TunableNumber[] thetaPID = {
-    new TunableNumber("AutoAlign/Pt", tP),
-    new TunableNumber("AutoAlign/It", tI),
-    new TunableNumber("AutoAlign/Dt", tD)
+  private final TunableNumber[] thetaPID = {
+      new TunableNumber("AutoAlign/Pt", tP),
+      new TunableNumber("AutoAlign/It", tI),
+      new TunableNumber("AutoAlign/Dt", tD)
   };
 
   public PoseAlignController(Swerve swerve) {
+    m_Swerve = swerve;
     translationController =
         new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(4, 4));
     thetaController = new RotationController(swerve);
     output = new ChassisSpeeds();
 
     translationController.setTolerance(toleranceTranslation);
-    // thetaController.setTolerance(toleranceRadians);
-
     translationController.setConstraints(
         new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
-    m_Swerve = swerve;
-    reset();
+            maxVelocity.in(MetersPerSecond),
+            maxAcceleration.in(MetersPerSecondPerSecond)));
   }
 
   public double getVelocityFromSwerve() {
-    return Math.sqrt(
-        Math.pow(m_Swerve.getChassisSpeeds().vxMetersPerSecond, 2)
-            + Math.pow(m_Swerve.getChassisSpeeds().vyMetersPerSecond, 2));
+    ChassisSpeeds speeds = m_Swerve.getChassisSpeeds();
+    return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
 
-  public void reset() {
-    translationController.reset(
-        0, getVelocityFromSwerve()); // TODO: might need to put an actual value for the position
+  /**
+   * Resets the controller. The desired translation direction (from current to target) is
+   * computed in field coordinates and then locked in.
+   */
+  public void reset(Pose2d targetPose) {
+    Pose2d currentPose = m_Swerve.getPose();
+    Translation2d errorTranslation = targetPose.getTranslation().minus(currentPose.getTranslation());
+    // Lock in the field-relative direction to the target.
+    desiredTranslationAngleField = errorTranslation.getAngle().getRadians();
+    double distance = errorTranslation.getNorm();
+    translationController.reset(distance, getVelocityFromSwerve());
   }
 
+  /**
+   * Updates the controller. The translation command is computed in robot-relative coordinates
+   * by converting the locked-in field direction using the current robot heading.
+   */
   public ChassisSpeeds update(Pose2d currentPose, Pose2d targetPose) {
-    this.targetPose = targetPose;
-    /* Update PID Controllers */
+    // Update translation PID gains
     translationController.setPID(
         translationPID[0].getNumber(),
         translationPID[1].getNumber(),
         translationPID[2].getNumber());
-    // thetaController.setPID(
-    //     thetaPID[0].getNumber(), thetaPID[1].getNumber(), thetaPID[2].getNumber());
+    // (Optionally update theta PID gains as needed.)
 
-    double angleToTarget =
-        Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
-    double distanceToTarget =
-        Math.hypot(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+    this.targetPose = targetPose;
 
-    double velocity = translationController.calculate(distanceToTarget, 0);
-    double xVel = -velocity * Math.cos(angleToTarget);
-    double yVel = -velocity * Math.sin(angleToTarget);
+    // Compute the current distance error (still in field coordinates).
+    Translation2d errorTranslation = targetPose.getTranslation().minus(currentPose.getTranslation());
+    distance2target = errorTranslation.getNorm();
 
-    double radiansSetpoint = targetPose.getRotation().getRadians();
-    thetaController.update(
-        Rotation2d.fromRadians(radiansSetpoint), thetaPID[0].getNumber(), thetaPID[2].getNumber());
-    // thetaController.calculate(m_Swerve.getRotation2D().getRadians(), radiansSetpoint);
+    // Calculate the translation velocity command.
+    double velocityCommand = translationController.calculate(distance2target, 0);
 
-    output =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            xVel, yVel, thetaController.getOutput(), currentPose.getRotation());
+    // Convert the locked field-relative desired direction into robot-relative coordinates.
+    // (Subtract the current robot heading from the field angle.)
+    Rotation2d currentRotation = currentPose.getRotation();
+    double desiredTranslationAngleRobot = desiredTranslationAngleField - currentRotation.getRadians();
 
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        xVel, yVel, thetaController.getOutput(), currentPose.getRotation());
+    // Compute the robot-relative x and y commands.
+    double xCommand = velocityCommand * Math.cos(desiredTranslationAngleRobot);
+    double yCommand = velocityCommand * Math.sin(desiredTranslationAngleRobot);
+
+    xCommand = Math.min(maxVelocity.in(MetersPerSecond), Math.max(-maxVelocity.in(MetersPerSecond), xCommand));
+    yCommand = Math.min(maxVelocity.in(MetersPerSecond), Math.max(-maxVelocity.in(MetersPerSecond), yCommand));
+
+    // Compute the rotation error and update the rotation controller.
+    // Rotation2d rotationError = targetPose.getRotation().minus(currentPose.getRotation());
+    thetaController.update(targetPose.getRotation(), thetaPID[0].getNumber(), thetaPID[2].getNumber());
+    double rotationalCommand = thetaController.getOutput();
+
+    // Generate chassis speeds in the robot-relative coordinate system.
+    output = ChassisSpeeds.fromRobotRelativeSpeeds(xCommand, yCommand, rotationalCommand, m_Swerve.getRotation2D());
+    return output;
   }
 
-  //@Logged(importance = Importance.INFO)
+  @Logged(importance = Importance.INFO)
   public boolean atGoal() {
     return translationController.atGoal() && thetaController.atGoal();
   }

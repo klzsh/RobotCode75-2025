@@ -22,7 +22,7 @@ public class DriveVisionAlign extends SequentialCommandGroup {
     addCommands(
         Commands.runOnce(
             () -> {
-              poseController.reset();
+              // poseController.reset();
             }),
         new DriveToPose(swerve, poseController, targetPose, false),
         new VisionAlign(swerve, targetPose, visionController));

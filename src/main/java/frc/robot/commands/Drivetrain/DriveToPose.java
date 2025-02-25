@@ -42,7 +42,9 @@ public class DriveToPose extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_controller.reset();
+    m_controller.reset(targetPose == null
+    ? targetPose2d
+    : CheckBounds.getPose2DFromFieldPose(m_swerve, targetPose));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
