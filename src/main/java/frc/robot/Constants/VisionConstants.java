@@ -116,16 +116,18 @@ public class VisionConstants {
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
               Units.degreesToRadians(-20))); // 0 0 0
-    public static final Transform3d HPCameraPose =
-        new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(0), Units.inchesToMeters(-8.033), Units.inchesToMeters(40.25)),
-            new Rotation3d(
-                Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(25)));
-    public static final Transform3d CageDetectCameraPose =
-        new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(.863), Units.inchesToMeters(-8.367), Units.inchesToMeters(34.334)), 
-            new Rotation3d(
-                Units.degreesToRadians(0), Units.degreesToRadians(160), Units.degreesToRadians(160)));
+  public static final Transform3d HPCameraPose =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(0), Units.inchesToMeters(-8.033), Units.inchesToMeters(40.25)),
+          new Rotation3d(
+              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(25)));
+  public static final Transform3d CageDetectCameraPose =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(.863),
+              Units.inchesToMeters(-8.367),
+              Units.inchesToMeters(34.334)),
+          new Rotation3d(
+              Units.degreesToRadians(0), Units.degreesToRadians(160), Units.degreesToRadians(160)));
 }

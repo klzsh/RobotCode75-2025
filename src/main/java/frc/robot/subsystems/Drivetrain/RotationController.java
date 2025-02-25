@@ -10,9 +10,6 @@ import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.maxAng
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.maxAngularVelocity;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.toleranceRadians;
 
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -22,7 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 // for implementation look here:
 // https://github.com/Mechanical-Advantage/RobotCode2024/blob/main/src/main/java/org/littletonrobotics/frc2024/subsystems/drive/controllers/HeadingController.java
 // TODO: Document
-//@Logged(name = "Rotation Controller", strategy = Strategy.OPT_IN)
+// @Logged(name = "Rotation Controller", strategy = Strategy.OPT_IN)
 public class RotationController {
   private double output;
 
@@ -47,7 +44,7 @@ public class RotationController {
         swerve.getRotation2D().getRadians(), swerve.getChassisSpeeds().omegaRadiansPerSecond);
   }
 
-  //@Logged(name = "output", importance = Importance.INFO)
+  // @Logged(name = "output", importance = Importance.INFO)
   public double getOutput() {
     return output;
   }

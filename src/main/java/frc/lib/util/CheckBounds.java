@@ -62,35 +62,31 @@ public class CheckBounds {
     double bumperSize = 17.5;
     Pose2d poseToDrive =
         tagPose.transformBy(
-            new Transform2d(
-               Inches.of(bumperSize).in(Meters),
-                0,
-                new Rotation2d(0)));
+            new Transform2d(Inches.of(bumperSize).in(Meters), 0, new Rotation2d(0)));
     // flip the pose
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.LEFT) {
       tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
       poseToDrive =
           poseToDrive.transformBy(
-              new Transform2d(
-                  0,
-                  reefLeftPoseOffset.in(Meters),
-                  Rotation2d.fromDegrees(0)));
+              new Transform2d(0, reefLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
     }
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)
         && targetPose.offset == Offset.RIGHT) {
       tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
       poseToDrive =
           poseToDrive.transformBy(
-              new Transform2d(
-                  0,
-                  reefLeftPoseOffset.in(Meters),
-                  Rotation2d.fromDegrees(0)));
+              new Transform2d(0, reefRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
     }
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
-      return new Pose2d(poseToDrive.getX(), poseToDrive.getY(), Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
-    }
-    else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
-      return new Pose2d(poseToDrive.getX(), poseToDrive.getY(), Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 90));
+      return new Pose2d(
+          poseToDrive.getX(),
+          poseToDrive.getY(),
+          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
+    } else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+      return new Pose2d(
+          poseToDrive.getX(),
+          poseToDrive.getY(),
+          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 270));
     }
     return poseToDrive;
   }

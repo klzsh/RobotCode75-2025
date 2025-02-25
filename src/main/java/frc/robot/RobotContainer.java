@@ -11,7 +11,6 @@ import static frc.robot.Constants.VisionConstants.*;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
@@ -26,7 +25,6 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.DriveToPose;
-import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -58,21 +56,21 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-//@Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-//   //@Logged(name = "Left Facing Mod Cam")
+  //   //@Logged(name = "Left Facing Mod Cam")
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-//   //@Logged(name = "Right Facing Mod Cam")
+  //   //@Logged(name = "Right Facing Mod Cam")
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-// //@Logged(name= "HP Cam")
-private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
+  // //@Logged(name= "HP Cam")
+  private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
-  //@Logged(name = "Swerve")
+  @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
   //   //@Logged(name = "Elevator")
@@ -81,7 +79,7 @@ private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCamer
   //   //@Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
-//   //@Logged(name = "Climber")
+  //   //@Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
   //   //@Logged(name = "Algae Intake")
@@ -100,7 +98,8 @@ private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCamer
   // define drivetrain controllers
   @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
-//   //@Logged
+
+  //   //@Logged
   private final VisionTranslationController m_VisionController =
       new VisionTranslationController(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera);
 

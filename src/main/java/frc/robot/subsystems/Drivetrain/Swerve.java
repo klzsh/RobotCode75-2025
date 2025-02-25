@@ -10,9 +10,8 @@ import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.Pigeon2;
+
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +30,8 @@ import frc.robot.Constants.DrivetrainConstants.BackRight;
 import frc.robot.Constants.DrivetrainConstants.FrontLeft;
 import frc.robot.Constants.DrivetrainConstants.FrontRight;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 
 /*
  * OVERVIEW OF CHASSIS
@@ -39,28 +40,28 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * has methods to get and set individual module positions (for autos or X-Stance) and for teleop driving
  * also contains most of the logging for the chassis (voltage/current, speed, etc)
  */
-//@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain")
+@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain")
 public class Swerve extends SubsystemBase {
   private SwerveDrivePoseEstimator swerveOdometry;
 
   public TalonFXSwerveModule[] m_SwerveModules;
 
-  //@Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
+  @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
   // TODO: tunable numebr for PIDs + current limits
-  //@Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
-  //@Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontRight;
 
-  //@Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackLeft;
 
-  //@Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
   private final TunableNumber driveKP;
@@ -95,14 +96,15 @@ public class Swerve extends SubsystemBase {
   private double lastUpdatedTime = 0;
   private boolean m_FieldRelative = true;
 
-  //@Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
   private SwerveSample sample;
 
   // gyro
   private Pigeon2 m_gyro;
 
   /** define swerve modules, Gyro, odometry */
-  public Swerve(AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
+  public Swerve(
+      AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
     sample = null;
     m_LeftFacingCamera = leftFacingCamera;
     m_RightFacingCamera = rightFacingCamera;
@@ -248,7 +250,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, 4.7); // TODO: change this back to controller constants
+        desiredStates, 1); // 4.7 // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -275,7 +277,7 @@ public class Swerve extends SubsystemBase {
   /**
    * @return the estimated position of the robot
    */
-  //@Logged(name = "Robot Pose", importance = Importance.CRITICAL)
+  @Logged(name = "Robot Pose", importance = Importance.CRITICAL)
   public Pose2d getPose() {
     return swerveOdometry.getEstimatedPosition();
   }
@@ -306,7 +308,7 @@ public class Swerve extends SubsystemBase {
 
   public void updatePoseByVision(AprilTagCamera camera) {
     double timestamp = Timer.getFPGATimestamp();
-    if (timestamp - lastUpdatedTime < 0.2) {
+    if (timestamp - lastUpdatedTime < 1) {
       return;
     }
 
@@ -323,7 +325,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the state of all swerve modules
    */
-  //@Logged(name = "Module States", importance = Importance.CRITICAL)
+  // @Logged(name = "Module States", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -338,7 +340,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the setpoint a module has been set to
    */
-  //@Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
+  // @Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleSetpoints() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -352,7 +354,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return position of all swerve modules
    */
-  //@Logged(name = "Module Positions", importance = Importance.INFO)
+  // @Logged(name = "Module Positions", importance = Importance.INFO)
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -369,14 +371,12 @@ public class Swerve extends SubsystemBase {
   /**
    * gives a breaking heading (360->0 degrees for example) Takes into account a gyro invert
    *
-   * @return rotation2d returned by the gyro
-   */
-  //@Logged(name = "Gyro Angle", importance = Importance.INFO)
+    */
   public Rotation2d getRotation2D() {
     return Rotation2d.fromDegrees(m_gyro.getYaw().getValue().in(Degrees));
   }
 
-  //@Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
+  // @Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
   private Pose2d poseToDrive;
 
   @Override

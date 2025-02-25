@@ -14,9 +14,6 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -38,20 +35,20 @@ import frc.lib.util.SwerveModuleConstants;
  * and swerve module position (distance drive motor has gone (meters) / angle (rotation2d) )
  * mainly used as an abstraction layer
  */
-//@Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN)
 public class TalonFXSwerveModule {
   public int moduleNumber;
   private Rotation2d angleOffset;
   private Rotation2d lastAngle;
 
-  //@Logged(name = "Angle Motor", importance = Importance.DEBUG)
+  // @Logged(name = "Angle Motor", importance = Importance.DEBUG)
   private TalonFX mAngleMotor;
 
-  //@Logged(name = "Drive Motor", importance = Importance.DEBUG)
+  // @Logged(name = "Drive Motor", importance = Importance.DEBUG)
   private TalonFX mDriveMotor;
 
   // sets the "forward" position of the wheel
-  //@Logged(name = "CanCoder", importance = Importance.DEBUG)
+  // @Logged(name = "CanCoder", importance = Importance.DEBUG)
   private CANcoder angleEncoder;
 
   // used for logging
@@ -180,7 +177,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the current angle of the angle motor
    */
-  //@Logged(name = "Module Angle", importance = Importance.DEBUG)
+  // @Logged(name = "Module Angle", importance = Importance.DEBUG)
   public Rotation2d getAngle() {
     Measure<AngleUnit> LatencyCompensatedPosition =
         BaseStatusSignal.getLatencyCompensatedValue(
@@ -198,7 +195,7 @@ public class TalonFXSwerveModule {
     return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getValue().in(Rotations));
   }
 
-  //@Logged(name = "CANCoder angle", importance = Importance.DEBUG)
+  // @Logged(name = "CANCoder angle", importance = Importance.DEBUG)
   public double logCanCoderDegrees() {
     return angleEncoder.getAbsolutePosition().refresh().getValue().in(Degrees);
   }
@@ -248,7 +245,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the velocity and angle of the module
    */
-  //@Logged(name = "Module State", importance = Importance.DEBUG)
+  // @Logged(name = "Module State", importance = Importance.DEBUG)
   public SwerveModuleState getState() {
     return new SwerveModuleState(
         talonToMPS(mDriveMotor.getVelocity().getValue(), wheelCircumference, driveGearRatio),
@@ -258,7 +255,7 @@ public class TalonFXSwerveModule {
   /**
    * @return the setpoint the module is commanded to go to
    */
-  //@Logged(name = "Module Setpoint", importance = Importance.DEBUG)
+  // @Logged(name = "Module Setpoint", importance = Importance.DEBUG)
   public SwerveModuleState getSetpoint() {
     return setpoint;
   }
@@ -266,7 +263,7 @@ public class TalonFXSwerveModule {
   /**
    * @return meters driven and angle of module
    */
-  //@Logged(name = "Module Position", importance = Importance.DEBUG)
+  // @Logged(name = "Module Position", importance = Importance.DEBUG)
   public SwerveModulePosition getPosition() {
     Measure<AngleUnit> LatencyCompensatedPosition =
         BaseStatusSignal.getLatencyCompensatedValue(

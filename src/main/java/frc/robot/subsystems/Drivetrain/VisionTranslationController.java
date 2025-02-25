@@ -4,9 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,7 +16,7 @@ import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.OptionalDouble;
 
-//@Logged(name = "Vision Controller", strategy = Strategy.OPT_IN)
+// @Logged(name = "Vision Controller", strategy = Strategy.OPT_IN)
 public class VisionTranslationController {
 
   private final Swerve m_Swerve;
@@ -30,22 +27,22 @@ public class VisionTranslationController {
   private final AprilTagCamera m_RightFacingCamera;
   private final AprilTagCamera m_LeftFacingCamera;
 
-  //@Logged(importance = Importance.INFO)
+  // @Logged(importance = Importance.INFO)
   private double lastSeenTagTime = 0.0;
 
-  //@Logged(importance = Importance.INFO)
+  // @Logged(importance = Importance.INFO)
   private OptionalDouble currentPitch;
 
-  //@Logged(importance = Importance.INFO)
+  // @Logged(importance = Importance.INFO)
   private OptionalDouble currentYaw;
 
-  //@Logged(name = "XOutput", importance = Importance.INFO)
+  // @Logged(name = "XOutput", importance = Importance.INFO)
   private double xCommand;
 
-  //@Logged(name = "YOutput", importance = Importance.INFO)
+  // @Logged(name = "YOutput", importance = Importance.INFO)
   private double yCommand;
 
-  //@Logged(importance = Importance.INFO)
+  // @Logged(importance = Importance.INFO)
   private ChassisSpeeds output;
 
   private TunableNumber[] xPID_Coral = {
@@ -167,13 +164,14 @@ public class VisionTranslationController {
 
       yCommand = yController.calculate(Math.sin(currentYaw.getAsDouble()), target.getX());
 
-      xCommand = xController.calculate(currentPitch.getAsDouble(), target.getY()) * xCommandMultiplier;
+      xCommand =
+          xController.calculate(currentPitch.getAsDouble(), target.getY()) * xCommandMultiplier;
     }
     output = new ChassisSpeeds(xCommand, yCommand, 0);
     return new ChassisSpeeds(xCommand, yCommand, 0); // robot relative
   }
 
-  //@Logged(importance = Importance.INFO)
+  // @Logged(importance = Importance.INFO)
   public boolean atGoal() {
     return xController.atSetpoint() && yController.atSetpoint();
   }

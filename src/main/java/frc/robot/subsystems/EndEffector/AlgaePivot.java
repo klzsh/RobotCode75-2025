@@ -11,8 +11,6 @@ import static frc.robot.Constants.RobotConstants.*;
 
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
@@ -36,7 +34,7 @@ public class AlgaePivot extends SubsystemBase {
 
   private PivotState m_PivotState;
 
-  //@Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
+  // @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
   private TalonFX m_AlgaePivot;
 
   public final TunableNumber absoluteEncoderOffset;
@@ -112,12 +110,12 @@ public class AlgaePivot extends SubsystemBase {
     m_AlgaePivot.setPosition(rotations);
   }
 
-  //@Logged
+  // @Logged
   public double getAbsolutePosition() {
     return m_absoluteEncoder.get();
   }
 
-  //@Logged(name = "Pivot Position")
+  // @Logged(name = "Pivot Position")
   public double getPivotPosition() {
     return m_AlgaePivot.getPosition().refresh().getValue().in(Rotations);
   }

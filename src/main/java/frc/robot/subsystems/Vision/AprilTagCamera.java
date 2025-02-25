@@ -6,9 +6,6 @@ package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,7 +28,7 @@ import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-//@Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN)
 public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
@@ -182,7 +179,7 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  //@Logged
+  // @Logged
   public double getPrimaryTagX() {
     if (m_result.getTargets().size() >= 1) {
       return m_result.getBestTarget().getYaw();
@@ -191,7 +188,7 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  //@Logged
+  // @Logged
   public double getPrimaryTagY() {
     if (m_result.getTargets().size() >= 1) {
       return m_result.getBestTarget().getPitch();
@@ -200,7 +197,7 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  //@Logged
+  // @Logged
   public double getPrimaryTagTheta() {
     if (m_result.getTargets().size() >= 1) {
       return m_result.getBestTarget().getSkew();
@@ -252,7 +249,7 @@ public class AprilTagCamera extends SubsystemBase {
    *
    * @return poses of seen april tags
    */
-  //@Logged(name = "Seen Tag Poses", importance = Importance.DEBUG)
+  // @Logged(name = "Seen Tag Poses", importance = Importance.DEBUG)
   public Pose3d[] getSeenTags() {
     List<Pose3d> targets = new ArrayList<>();
     if (getAllTagIds().isPresent()) {
@@ -268,7 +265,7 @@ public class AprilTagCamera extends SubsystemBase {
    *
    * @return
    */
-  //@Logged(name = "Camera Estimated Pose", importance = Importance.DEBUG)
+  // @Logged(name = "Camera Estimated Pose", importance = Importance.DEBUG)
   public Pose2d getVisionPose() {
     if (m_pose != null) {
       return m_pose.estimatedPose.toPose2d();

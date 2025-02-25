@@ -118,7 +118,7 @@ public class PoseAlignController {
     double rotationalCommand = thetaController.getOutput();
 
     // Generate chassis speeds in the robot-relative coordinate system.
-    output = ChassisSpeeds.fromRobotRelativeSpeeds(xCommand, yCommand, rotationalCommand, m_Swerve.getRotation2D());
+    output = new ChassisSpeeds(xCommand, yCommand, rotationalCommand);
     return output;
   }
 

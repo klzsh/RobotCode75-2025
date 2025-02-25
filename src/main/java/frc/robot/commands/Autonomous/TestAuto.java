@@ -32,16 +32,17 @@ public class TestAuto extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     // Went way faster than Choreo velocity constraint
-    addCommands(
-        new SequentialCommandGroup(
-            m_Factory.trajectoryCmd("rl-ht"),
-            new IntakeCoral(CoralIntake),
-            m_Factory.trajectoryCmd("ht-rl"),
-            new VisionAlign(
-                swerve,
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
-                visionController)
-            // new ScoreL4(elevator, CoralIntake)
-            ));
+    // addCommands(
+    //     new SequentialCommandGroup(
+    //         m_Factory.trajectoryCmd("rl-ht"),
+    //         new IntakeCoral(CoralIntake),
+    //         m_Factory.trajectoryCmd("ht-rl"),
+    //         new VisionAlign(
+    //             swerve,
+    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+    //             visionController)
+    //         // new ScoreL4(elevator, CoralIntake)
+    //         ));
+    addCommands(m_Factory.trajectoryCmd("TUNING_PATH_CURVE"));
   }
 }

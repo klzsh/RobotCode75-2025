@@ -13,9 +13,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
@@ -31,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  *  Motion magic is used to prevent the elevator from destroying itself by moving too fast
  *
  */
-//@Logged(strategy = Strategy.OPT_IN, name = "Elevator")
+// @Logged(strategy = Strategy.OPT_IN, name = "Elevator")
 public class Elevator extends SubsystemBase {
 
   // we only have a certain number of states the elevator will be in at any given time
@@ -50,17 +47,17 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  //@Logged(name = "Current Position", importance = Importance.INFO)
+  // @Logged(name = "Current Position", importance = Importance.INFO)
   private ElevatorPositions m_SetpointPosition = ElevatorPositions.HOME;
 
-  //@Logged 
+  // @Logged
   private boolean m_IsAlgae = false;
 
   // define motors
-  //@Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
+  // @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
   private final TalonFX m_ElevatorMotor1;
 
-  //@Logged(name = "Right Elevator Motor", importance = Importance.DEBUG)
+  // @Logged(name = "Right Elevator Motor", importance = Importance.DEBUG)
   private final TalonFX m_ElevatorMotor2;
 
   // sensors
@@ -113,7 +110,7 @@ public class Elevator extends SubsystemBase {
    *
    * @return the position in rotations of the elevator
    */
-  //@Logged(name = "Elevator Position Radians")
+  // @Logged(name = "Elevator Position Radians")
   public Angle getPosition() {
     Measure<AngleUnit> motor1Position =
         BaseStatusSignal.getLatencyCompensatedValue(
@@ -130,7 +127,7 @@ public class Elevator extends SubsystemBase {
    *
    * @return the position in rotations of the elevator
    */
-  //@Logged(name = "Elevator Position")
+  // @Logged(name = "Elevator Position")
   public double logPosition() {
     return getPosition().in(Rotations);
   }
@@ -199,12 +196,8 @@ public class Elevator extends SubsystemBase {
     }
 
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
-      m_ElevatorMotor1.setControl(
-          m_CharacterizationRequest
-              .withOutput(0));
-      m_ElevatorMotor2.setControl(
-          m_CharacterizationRequest
-              .withOutput(0));
+      m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(0));
+      m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(0));
     } else {
       m_ElevatorMotor1.setControl(
           m_PositionRequest
