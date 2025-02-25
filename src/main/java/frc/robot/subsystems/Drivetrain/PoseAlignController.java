@@ -96,6 +96,7 @@ public class PoseAlignController {
     // Compute the current distance error (still in field coordinates).
     Translation2d errorTranslation = targetPose.getTranslation().minus(currentPose.getTranslation());
     distance2target = errorTranslation.getNorm();
+    desiredTranslationAngleField = errorTranslation.getAngle().getRadians();
 
     // Calculate the translation velocity command.
     double velocityCommand = translationController.calculate(distance2target, 0);
