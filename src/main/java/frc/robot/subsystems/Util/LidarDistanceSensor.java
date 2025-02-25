@@ -9,12 +9,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 
 // @Logged(name = "Lidar sensor", strategy = Strategy.OPT_IN)
-public class LidarDistance {
+public class LidarDistanceSensor {
 
   private double threshold = 0;
   DutyCycle sensorCycle;
 
-  public LidarDistance(Distance threshold) {
+  public LidarDistanceSensor(Distance threshold) {
     sensorCycle = new DutyCycle(new DigitalInput(algaeLidarSensorPort));
     this.threshold = threshold.in(Inches);
   }

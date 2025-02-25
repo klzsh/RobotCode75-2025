@@ -16,7 +16,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
-import frc.robot.subsystems.Util.LidarDistance;
+import frc.robot.subsystems.Util.LidarDistanceSensor;
 
 // @Logged(name = "Algae Intake", strategy = Strategy.OPT_IN)
 public class AlgaeIntake extends SubsystemBase {
@@ -41,7 +41,7 @@ public class AlgaeIntake extends SubsystemBase {
 
   // private final DigitalInput m_AlgaeIntakeLimit;
   // @Logged
-  private final LidarDistance m_AlgaeDetector;
+  private final LidarDistanceSensor m_AlgaeDetector;
 
   // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =
@@ -54,7 +54,7 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeMotor = new TalonFX(algaeMotorCanID, superstructureCANBusName);
     m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = AlgaeStates.NONE;
-    m_AlgaeDetector = new LidarDistance(Inches.of(4));
+    m_AlgaeDetector = new LidarDistanceSensor(Inches.of(4));
 
     // m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
 
