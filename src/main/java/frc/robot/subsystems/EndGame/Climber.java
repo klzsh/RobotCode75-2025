@@ -22,6 +22,7 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -43,6 +44,7 @@ public class Climber extends SubsystemBase {
   private final TalonFX m_ClimberMotor2;
 
   private final DutyCycleEncoder m_ClimberEncoder;
+  private final Servo m_ClimberBrake;
 
   // @Logged(name = "Climber State", importance = Importance.CRITICAL)
   private ClimberPositions m_ClimberState = ClimberPositions.DEFAULT;
@@ -72,6 +74,7 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
 
     m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
+    m_ClimberBrake = new Servo(0);
 
     climberMMCruiseVelocity =
         new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
@@ -181,6 +184,11 @@ public class Climber extends SubsystemBase {
   public void resetPosition() {
     m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
     m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+  }
+  public void brakeOff(){
+  }
+  public void brakeOn(){
+
   }
 
   @Override
