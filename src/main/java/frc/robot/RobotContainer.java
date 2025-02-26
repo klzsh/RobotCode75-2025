@@ -28,6 +28,7 @@ import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
+import frc.robot.commands.Drivetrain.TranslateToBranch;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
@@ -76,7 +77,7 @@ public class RobotContainer {
   //   //@Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
-  //   //@Logged(name = "Coral Intake")
+  @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   //   //@Logged(name = "Climber")
@@ -244,33 +245,35 @@ public class RobotContainer {
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
                 .repeatedly());
 
-    AlignLeft.and(() -> !AlignRight.getAsBoolean())
-        .whileTrue(
-            new DriveToPose(
-                m_Swerve,
-                m_PoseAlignController,
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
-                false));
-    AlignRight.and(() -> !AlignLeft.getAsBoolean())
-        .whileTrue(
-            new DriveToPose(
-                m_Swerve,
-                m_PoseAlignController,
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
-                false)
-            // new DriveVisionAlign(
-            //     m_Swerve,
-            //     new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
-            //     m_PoseAlignController,
-            //     m_VisionController));
-            );
-    AlignRight.and(() -> AlignLeft.getAsBoolean())
-        .whileTrue(
-            new DriveToPose(
-                m_Swerve,
-                m_PoseAlignController,
-                new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
-                false));
+    // AlignLeft.and(() -> !AlignRight.getAsBoolean())
+    //     .whileTrue(
+    //         new DriveToPose(
+    //             m_Swerve,
+    //             m_PoseAlignController,
+    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+    //             false));
+    // AlignRight.and(() -> !AlignLeft.getAsBoolean())
+    //     .whileTrue(
+    //         new DriveToPose(
+    //             m_Swerve,
+    //             m_PoseAlignController,
+    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
+    //             false)
+    //         // new DriveVisionAlign(
+    //         //     m_Swerve,
+    //         //     new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
+    //         //     m_PoseAlignController,
+    //         //     m_VisionController));
+    //         );
+    // AlignRight.and(() -> AlignLeft.getAsBoolean())
+    //     .whileTrue(
+    //         new DriveToPose(
+    //             m_Swerve,
+    //             m_PoseAlignController,
+    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
+    //             false));
+    AlignLeft.whileTrue(new TranslateToBranch(m_Swerve, m_RightFacingCamera, true, m_PoseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
+    // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
 
     // m_Controller
     //     .rightBumper()

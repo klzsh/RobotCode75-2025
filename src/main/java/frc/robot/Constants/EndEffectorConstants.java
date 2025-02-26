@@ -116,7 +116,7 @@ public class EndEffectorConstants {
     public static final double coralVelocityKP = 3;
     public static final double coralVelocityKI = 0.0;
     public static final double coralVelocityKD = 0.0;
-    public static final double coralVelocityKS = 15;
+    public static final double coralVelocityKS = 25;
 
     public static final double coralPositionKP = 0.75;
     public static final double coralPositionKI = 0.0;

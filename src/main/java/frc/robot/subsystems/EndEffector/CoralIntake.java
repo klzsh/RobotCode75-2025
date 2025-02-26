@@ -15,11 +15,14 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
+
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.epilogue.Logged.Strategy;
 
-// @Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
+@Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
 public class CoralIntake extends SubsystemBase {
   public static enum CoralStates {
     // no intaking state because coral sits on top of the intake wheels
@@ -89,6 +92,10 @@ public class CoralIntake extends SubsystemBase {
             m_CoralMotor.getPosition().getValue().in(Rotations)
                 - coralRotationsAfterIntake.in(Rotations))
         < coralPositionDeadband;
+  }
+  @Logged(name = "Velocity")
+  public double getVelocity(){
+    return m_CoralMotor.getVelocity(true).getValue().in(RotationsPerSecond);
   }
 
   @Override

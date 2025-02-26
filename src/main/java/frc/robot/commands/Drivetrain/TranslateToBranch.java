@@ -6,8 +6,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.dashboard.TunableNumber;
+import frc.lib.util.CheckBounds;
+import frc.lib.util.FieldPose;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.xP;
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.yP;
+
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -27,19 +35,30 @@ public class TranslateToBranch extends Command {
 
   private final PIDController xController;
   private final PIDController yController;
+  private final TunableNumber xP;
+  private final TunableNumber yP;
   private double xCommand;
   private double yCommand;
 
   private Optional<List<Integer>> visibleTagIDs;
   private int targetIDToFocus;
 
-  public TranslateToBranch(Swerve swerve, AprilTagCamera camera, boolean alignLeft) {
+  private PoseAlignController fallbackController;
+  private FieldPose fallbackPose;
+
+  public TranslateToBranch(Swerve swerve, AprilTagCamera camera, boolean alignLeft, PoseAlignController fallbackController, FieldPose fallbackPose) {
+    xP = new TunableNumber("Auto Align/Clapped X P", 0.1);
+    yP = new TunableNumber("Auto Align/Clapped Y P", 0.1);
+
+    this.fallbackController = fallbackController;
+    this.fallbackPose = fallbackPose;
+
     m_Swerve = swerve;
     m_Camera = camera;
     left = alignLeft;
 
-    xController = new PIDController(0.1, 0, 0);
-    yController = new PIDController(0.1, 0, 0);
+    xController = new PIDController(xP.getNumber(), 0, 0);
+    yController = new PIDController(yP.getNumber(), 0, 0);
 
     if (left) {
       finalYawSetpoint = finalYawSetpointLeft;
@@ -95,6 +114,9 @@ public class TranslateToBranch extends Command {
 
   @Override
   public void execute() {
+    xController.setP(xP.getNumber());
+    yController.setP(yP.getNumber());
+
     Optional<PhotonTrackedTarget> target = m_Camera.getTarget(targetIDToFocus);
     if (target.isPresent()) {
       double currentPitch = target.get().getPitch();
@@ -103,9 +125,10 @@ public class TranslateToBranch extends Command {
       xCommand = xController.calculate(currentPitch, finalPitchSetpoint);
       yCommand = yController.calculate(target.get().getYaw(), yawSetpoint);
 
-      m_Swerve.setRobotRelative(new ChassisSpeeds(xCommand, yCommand, 0));
+      m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, yCommand, 0));
     } else {
-      m_Swerve.setRobotRelative(new ChassisSpeeds());
+      ChassisSpeeds speeds = fallbackController.update(m_Swerve.getPose(), CheckBounds.getPose2DFromFieldPose(m_Swerve, fallbackPose));
+      m_Swerve.setChassisSpeeds(speeds);
     }
   }
 
@@ -113,8 +136,8 @@ public class TranslateToBranch extends Command {
   public boolean isFinished() {
     Optional<PhotonTrackedTarget> target = m_Camera.getTarget(targetIDToFocus);
     if (target.isPresent()) {
-      return Math.abs(target.get().getPitch() - finalPitchSetpoint) < 0.5
-          && Math.abs(target.get().getYaw() - finalYawSetpoint) < 0.5;
+      return Math.abs(target.get().getPitch() - finalPitchSetpoint) < 1
+          && Math.abs(target.get().getYaw() - finalYawSetpoint) < 1;
     }
     return false;
   }
