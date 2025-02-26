@@ -101,8 +101,8 @@ public class Swerve extends SubsystemBase {
   private double lastUpdatedTime = 0;
   private boolean m_FieldRelative = true;
 
-  // @Logged(name = "mod/Swerve Sample", importance = Importance.CRITICAL)
-  private SwerveSample sample;
+  @Logged(name = "Swerve/Sample Pose", importance = Importance.CRITICAL)
+  private Pose2d sample;
 
   // gyro
   private Pigeon2 m_gyro;
@@ -110,6 +110,7 @@ public class Swerve extends SubsystemBase {
   /** define swerve modules, Gyro, odometry */
   public Swerve(
       AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
+     
     sample = null;
     m_LeftFacingCamera = leftFacingCamera;
     m_RightFacingCamera = rightFacingCamera;
@@ -245,7 +246,7 @@ public class Swerve extends SubsystemBase {
 
   /** follows an autonomous path provided by choreo */
   public void followSwerveSample(SwerveSample sample) {
-    this.sample = sample;
+    this.sample = sample.getPose();
     Pose2d pose = getPose();
 
     ChassisSpeeds speeds =
@@ -413,30 +414,30 @@ public class Swerve extends SubsystemBase {
 
     // set odometry to vision pose if it deviates by more than half a meter
 
-    if (m_LeftFacingCamera.getEstimatedPose() != null) {
-      if (Math.abs(
-                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
-                      - swerveOdometry.getEstimatedPosition().getX())
-              > .5
-          || Math.abs(
-                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
-                      - swerveOdometry.getEstimatedPosition().getY())
-              > .5) {
-        setPoseByVision(m_LeftFacingCamera);
-      }
-    }
-    if (m_RightFacingCamera.getEstimatedPose() != null) {
-      if (Math.abs(
-                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
-                      - swerveOdometry.getEstimatedPosition().getX())
-              > .5
-          || Math.abs(
-                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
-                      - swerveOdometry.getEstimatedPosition().getY())
-              > .5) {
-        setPoseByVision(m_RightFacingCamera);
-      }
-    }
+    // if (m_LeftFacingCamera.getEstimatedPose() != null) {
+    //   if (Math.abs(
+    //               m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
+    //                   - swerveOdometry.getEstimatedPosition().getX())
+    //           > .5
+    //       || Math.abs(
+    //               m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
+    //                   - swerveOdometry.getEstimatedPosition().getY())
+    //           > .5) {
+    //     setPoseByVision(m_LeftFacingCamera);
+    //   }
+    // }
+    // if (m_RightFacingCamera.getEstimatedPose() != null) {
+    //   if (Math.abs(
+    //               m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
+    //                   - swerveOdometry.getEstimatedPosition().getX())
+    //           > .5
+    //       || Math.abs(
+    //               m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
+    //                   - swerveOdometry.getEstimatedPosition().getY())
+    //           > .5) {
+    //     setPoseByVision(m_RightFacingCamera);
+    //   }
+    // }
     // if (m_HPCamera.getEstimatedPose() != null) {
     //   if (Math.abs(
     //               m_HPCamera.getEstimatedPose().estimatedPose.getX()
