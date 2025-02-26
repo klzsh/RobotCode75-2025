@@ -6,6 +6,9 @@ package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -28,7 +31,7 @@ import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-// @Logged(strategy = Strategy.OPT_IN)
+@Logged(strategy = Strategy.OPT_IN)
 public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
@@ -178,6 +181,20 @@ public class AprilTagCamera extends SubsystemBase {
       return OptionalDouble.of(target.getArea());
     }
   }
+  public OptionalDouble minTagArea() {
+    double minArea = Double.MAX_VALUE;
+    for (PhotonTrackedTarget target : m_result.getTargets()) {
+      if (target.getArea() < minArea) {
+        minArea = target.getArea();
+      }
+    }
+
+    if (minArea == Double.MAX_VALUE) {
+      return OptionalDouble.empty();
+    } else {
+      return OptionalDouble.of(minArea);
+    }
+  }
 
   // @Logged
   public double getPrimaryTagX() {
@@ -207,7 +224,19 @@ public class AprilTagCamera extends SubsystemBase {
   }
 
   public EstimatedRobotPose getEstimatedPose() {
+    if (minTagArea().isPresent() && minTagArea().getAsDouble() < 0) {
+      return null;
+    }
     return m_pose;
+  }
+
+  @Logged(name = "Estimated Pose", importance = Importance.DEBUG)
+  public Pose2d getEstimatedPose2d() {
+    if (m_pose != null) {
+      return m_pose.estimatedPose.toPose2d();
+    } else {
+      return null;
+    }
   }
 
   /**

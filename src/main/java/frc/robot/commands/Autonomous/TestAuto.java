@@ -5,13 +5,19 @@
 package frc.robot.commands.Autonomous;
 
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
@@ -27,7 +33,8 @@ public class TestAuto extends SequentialCommandGroup {
       CoralIntake CoralIntake,
       Swerve swerve,
       Elevator elevator,
-      VisionTranslationController visionController) {
+      VisionTranslationController visionController,
+      PoseAlignController poseAlignController) {
     m_Factory = factory;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
@@ -43,6 +50,17 @@ public class TestAuto extends SequentialCommandGroup {
     //             visionController)
     //         // new ScoreL4(elevator, CoralIntake)
     //         ));
-    addCommands(m_Factory.trajectoryCmd("TUNING_PATH_CURVE"));
+    addCommands(
+      Commands.runOnce(() -> {
+      swerve.zeroGyro(Rotation2d.fromDegrees(180));
+      swerve.setPose(
+        new Pose2d(AutoConstants.blueStartPositions.get("st").getX(), AutoConstants.blueStartPositions.get("st").getY(), Rotation2d.fromDegrees(180)));
+      }),
+      m_Factory.trajectoryCmd("st-rtl"),
+      new DriveToPose(
+                swerve,
+                poseAlignController,
+                new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT),
+                false));
   }
 }

@@ -59,15 +59,15 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 // @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  //   //@Logged(name = "Left Facing Mod Cam")
+    @Logged(name = "Left Facing Mod Cam")
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  //   //@Logged(name = "Right Facing Mod Cam")
+    @Logged(name = "Right Facing Mod Cam")
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  // //@Logged(name= "HP Cam")
+  @Logged(name= "HP Cam")
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
   @Logged(name = "Swerve")
@@ -341,7 +341,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController);
+    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController, m_PoseAlignController);
     // return null;
   }
 }

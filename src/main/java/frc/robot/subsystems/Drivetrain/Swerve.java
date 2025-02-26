@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
@@ -22,7 +23,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
@@ -93,6 +96,8 @@ public class Swerve extends SubsystemBase {
   private final TunableNumber rotationKI;
   private final TunableNumber rotationKD;
 
+  private final TunableNumber maxAutosSpeed;
+
   private double lastUpdatedTime = 0;
   private boolean m_FieldRelative = true;
 
@@ -157,12 +162,20 @@ public class Swerve extends SubsystemBase {
     rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
     rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
 
+    maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
+
     drivePIDS =
         new Slot0Configs()
             .withKP(driveTorqueKP)
             .withKI(0)
             .withKD(driveTorqueKD)
             .withKS(driveTorqueKS);
+    if(DriverStation.getAlliance().get() == Alliance.Blue){
+      zeroGyro(Rotation2d.fromDegrees(180));
+    } else {
+      zeroGyro(Rotation2d.fromDegrees(0));
+    }
+    // setPoseByVision(m_LeftFacingCamera);
   }
 
   /**
@@ -250,7 +263,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, 1); // 4.7 // TODO: change this back to controller constants
+        desiredStates, maxAutosSpeed.getNumber()); // 4.7 // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -308,9 +321,9 @@ public class Swerve extends SubsystemBase {
 
   public void updatePoseByVision(AprilTagCamera camera) {
     double timestamp = Timer.getFPGATimestamp();
-    if (timestamp - lastUpdatedTime < 1) {
-      return;
-    }
+    // if (timestamp - lastUpdatedTime < 0.005) {
+    //   return;
+    // }
 
     lastUpdatedTime = timestamp;
     if (camera.getEstimatedPose() != null) {
@@ -368,12 +381,20 @@ public class Swerve extends SubsystemBase {
     m_gyro.setYaw(0);
   }
 
+  public void zeroGyro(Rotation2d startVal) {
+    m_gyro.setYaw(startVal.getDegrees());
+  }
+
   /**
    * gives a breaking heading (360->0 degrees for example) Takes into account a gyro invert
    *
     */
   public Rotation2d getRotation2D() {
-    return Rotation2d.fromDegrees(m_gyro.getYaw().getValue().in(Degrees));
+    return Rotation2d.fromDegrees(m_gyro.getYaw(true).getValue().in(Degrees));
+  }
+  @Logged(name = "Gyro Angle Degrees", importance = Importance.CRITICAL)
+  public double getRotationDegrees(){
+    return m_gyro.getYaw(true).getValue().in(Degrees);
   }
 
   // @Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
