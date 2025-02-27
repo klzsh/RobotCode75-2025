@@ -27,7 +27,7 @@ public class TranslateToBranch extends Command {
   private final boolean left;
 
   private final double finalYawSetpointLeft = 12.36;
-  private final double finalPitchSetpointLeft = -5.67;
+  private final double finalPitchSetpointLeft = -6.5;
   private final double finalYawSetpointRight = -7.97;
   private final double finalPitchSetpointRight = -7.88;
   private final double finalYawSetpoint;
@@ -98,6 +98,7 @@ public class TranslateToBranch extends Command {
       return Optional.of(largestAreaID);
     } else {
       end(true);
+      
       return Optional.empty();
     }
   }

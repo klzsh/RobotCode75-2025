@@ -9,7 +9,11 @@ import static frc.robot.Constants.ClimberConstants.*;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import choreo.Choreo;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -26,6 +30,7 @@ import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.TranslateToBranch;
@@ -37,6 +42,7 @@ import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
@@ -80,7 +86,7 @@ public class RobotContainer {
   @Logged(name = "Coral Intake")
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
-  //   //@Logged(name = "Climber")
+  @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
   //   //@Logged(name = "Algae Intake")
@@ -172,16 +178,6 @@ public class RobotContainer {
     m_Climber.setDefaultCommand(
         new InstantCommand(
             () -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
-
-    // m_Climber.setDefaultCommand(
-    //     new InstantCommand(() -> {
-    //         if (m_Controller.getLeftY() < -0.1) {
-    //             m_Climber.setPositionRequest(climbPositionAbsoluteStart);
-    //         } else if (m_Controller.getLeftY() > 0.1) {
-    //             m_Climber.setPositionRequest(climbPositionAbsoluteFinish);
-    //         }
-    //     }, m_Climber)
-    // );
   }
 
   /**
@@ -218,7 +214,7 @@ public class RobotContainer {
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
     // algae ground pickup & scoring
-    m_Controller.povLeft().onTrue(new InstantCommand(() -> m_Climber.resetPosition()));
+    // m_Controller.povLeft().onTrue(new InstantCommand(() -> m_Climber.resetPosition()));
     m_Controller
         .povRight()
         .whileTrue(
@@ -237,7 +233,7 @@ public class RobotContainer {
                     m_AlgaePivot)
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
-
+    // coral commands
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
         .povDown()
@@ -272,18 +268,11 @@ public class RobotContainer {
     //             m_PoseAlignController,
     //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
     //             false));
-    AlignLeft.whileTrue(new TranslateToBranch(m_Swerve, m_RightFacingCamera, true, m_PoseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
+
+    AlignLeft.whileTrue(new RotateToSimilarFace(m_Swerve).andThen(new TranslateToBranch(m_Swerve, m_RightFacingCamera, true, m_PoseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT))));
     // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
 
-    // m_Controller
-    //     .rightBumper()
-    //     .whileTrue(
-    //         new DriveVisionAlign(
-    //             m_Swerve,
-    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
-    //             m_PoseAlignController,
-    //             m_VisionController));
-
+   
     // manual elevator overrides
 
     m_Controller
@@ -344,7 +333,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController, m_PoseAlignController);
+    m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
+
+    return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
+    // return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController, m_PoseAlignController);
     // return null;
   }
 }

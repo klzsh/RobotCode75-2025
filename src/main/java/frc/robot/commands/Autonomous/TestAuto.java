@@ -15,6 +15,7 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.Drivetrain.DriveToPose;
+import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TranslateToBranch;
 import frc.robot.commands.Drivetrain.VisionAlign;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
@@ -57,12 +58,14 @@ public class TestAuto extends SequentialCommandGroup {
       swerve.setPose(
         new Pose2d(AutoConstants.blueStartPositions.get("st").getX(), AutoConstants.blueStartPositions.get("st").getY(), Rotation2d.fromDegrees(180)));
       }),
-      m_Factory.trajectoryCmd("st-rtl"),
+      m_Factory.trajectoryCmd("st-rtl")//,
       // new DriveToPose(
       //           swerve,
       //           poseAlignController,
       //           new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT),
       //           false));
-      new TranslateToBranch(swerve, visionController.m_RightFacingCamera, true, poseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
+      // new RotateToSimilarFace(swerve),
+      // new TranslateToBranch(swerve, visionController.m_RightFacingCamera, true, poseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT))
+      );
   }
 }
