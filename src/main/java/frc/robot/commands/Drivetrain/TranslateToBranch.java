@@ -2,6 +2,7 @@ package frc.robot.commands.Drivetrain;
 
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.xP;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.yP;
+import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -26,10 +27,6 @@ public class TranslateToBranch extends Command {
   private final AprilTagCamera m_Camera;
   private final boolean left;
 
-  private final double finalYawSetpointLeft = 12.36;
-  private final double finalPitchSetpointLeft = -6.5;
-  private final double finalYawSetpointRight = -7.97;
-  private final double finalPitchSetpointRight = -7.88;
   private final double finalYawSetpoint;
   private final double finalPitchSetpoint;
 
