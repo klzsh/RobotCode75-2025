@@ -2,7 +2,6 @@ package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;

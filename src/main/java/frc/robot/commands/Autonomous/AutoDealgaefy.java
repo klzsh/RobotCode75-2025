@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
@@ -35,11 +36,14 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       Elevator elevator,
       AlgaeIntake intake,
       AlgaePivot pivot,
-      String reefPoint,
       VisionTranslationController visionController,
       PoseAlignController poseController) {
     addRequirements(swerve, elevator, intake, pivot);
-    ElevatorPositions elevatorHeight = algaeHeights.get(reefPoint);
+    FieldElement elem = CheckBounds.nearestElement(swerve.getPose());
+    if (!FieldPose.fieldElementIsReef(elem)) {
+      return;
+    }
+    ElevatorPositions elevatorHeight = algaeHeights.get(elem.toString());
     addCommands(
         new ParallelCommandGroup(
             new DriveVisionAlign(
