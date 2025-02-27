@@ -159,6 +159,6 @@ public class TranslateToBranch extends Command {
   @Override
   public void end(boolean interrupted) {
     // stop the robot
-    m_Swerve.drive(new Translation2d(0, 0), 0);
+    m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
   }
 }
