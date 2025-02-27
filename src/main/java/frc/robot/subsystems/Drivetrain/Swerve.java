@@ -1,6 +1,8 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
@@ -184,7 +186,7 @@ public class Swerve extends SubsystemBase {
                     translation.getX(), translation.getY(), rotation, getRotation2D())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, 3);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed.in(MetersPerSecond));
 
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, false);
@@ -239,11 +241,10 @@ public class Swerve extends SubsystemBase {
   public void followSwerveSample(SwerveSample sample) {
     this.sample = sample.getPose();
     Pose2d pose = getPose();
-    // System.out.println(xController.getP());
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx, // + xController.calculate(pose.getX(), sample.x),
-            sample.vy, // + yController.calculate(pose.getY(), sample.y),
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
             sample.omega + rController.calculate(pose.getRotation().getRadians(), sample.heading));
     this.setFieldRelative(speeds);
   }
@@ -255,8 +256,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates,
-        maxAutosSpeed.getNumber()); // 4.7 // TODO: change this back to controller constants
+        desiredStates, 3.5); // 4.7 // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -393,10 +393,10 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_LeftFacingCamera.updateHeading(getRotation2D());
-    updatePoseByVision(m_LeftFacingCamera);
-    m_RightFacingCamera.updateHeading(getRotation2D());
-    updatePoseByVision(m_RightFacingCamera);
+    // m_LeftFacingCamera.updateHeading(getRotation2D());
+    // updatePoseByVision(m_LeftFacingCamera);
+    // m_RightFacingCamera.updateHeading(getRotation2D());
+    // updatePoseByVision(m_RightFacingCamera);
     // m_HPCamera.updateHeading(getRotation2D());
     // updatePoseByVision(m_HPCamera);
 
@@ -404,30 +404,30 @@ public class Swerve extends SubsystemBase {
 
     // set odometry to vision pose if it deviates by more than half a meter
 
-    if (m_LeftFacingCamera.getEstimatedPose() != null) {
-      if (Math.abs(
-                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
-                      - swerveOdometry.getEstimatedPosition().getX())
-              > .5
-          || Math.abs(
-                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
-                      - swerveOdometry.getEstimatedPosition().getY())
-              > .5) {
-        setPoseByVision(m_LeftFacingCamera);
-      }
-    }
-    if (m_RightFacingCamera.getEstimatedPose() != null) {
-      if (Math.abs(
-                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
-                      - swerveOdometry.getEstimatedPosition().getX())
-              > .5
-          || Math.abs(
-                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
-                      - swerveOdometry.getEstimatedPosition().getY())
-              > .5) {
-        setPoseByVision(m_RightFacingCamera);
-      }
-    }
+    // if (m_LeftFacingCamera.getEstimatedPose() != null) {
+    //   if (Math.abs(
+    //               m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
+    //                   - swerveOdometry.getEstimatedPosition().getX())
+    //           > .5
+    //       || Math.abs(
+    //               m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
+    //                   - swerveOdometry.getEstimatedPosition().getY())
+    //           > .5) {
+    //     setPoseByVision(m_LeftFacingCamera);
+    //   }
+    // }
+    // if (m_RightFacingCamera.getEstimatedPose() != null) {
+    //   if (Math.abs(
+    //               m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
+    //                   - swerveOdometry.getEstimatedPosition().getX())
+    //           > .5
+    //       || Math.abs(
+    //               m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
+    //                   - swerveOdometry.getEstimatedPosition().getY())
+    //           > .5) {
+    //     setPoseByVision(m_RightFacingCamera);
+    //   }
+    // }
     // if (m_HPCamera.getEstimatedPose() != null) {
     //   if (Math.abs(
     //               m_HPCamera.getEstimatedPose().estimatedPose.getX()
