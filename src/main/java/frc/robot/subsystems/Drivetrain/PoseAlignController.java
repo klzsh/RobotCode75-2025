@@ -36,15 +36,15 @@ public class PoseAlignController {
   private final Swerve m_Swerve;
 
   private final TunableNumber[] translationPID = {
-      new TunableNumber("AutoAlign/Ptr", xP),
-      new TunableNumber("AutoAlign/Itr", xI),
-      new TunableNumber("AutoAlign/Dtr", xD)
+    new TunableNumber("AutoAlign/Ptr", xP),
+    new TunableNumber("AutoAlign/Itr", xI),
+    new TunableNumber("AutoAlign/Dtr", xD)
   };
 
   private final TunableNumber[] thetaPID = {
-      new TunableNumber("AutoAlign/Pt", tP),
-      new TunableNumber("AutoAlign/It", tI),
-      new TunableNumber("AutoAlign/Dt", tD)
+    new TunableNumber("AutoAlign/Pt", tP),
+    new TunableNumber("AutoAlign/It", tI),
+    new TunableNumber("AutoAlign/Dt", tD)
   };
 
   public PoseAlignController(Swerve swerve) {
@@ -57,8 +57,7 @@ public class PoseAlignController {
     translationController.setTolerance(toleranceTranslation);
     translationController.setConstraints(
         new TrapezoidProfile.Constraints(
-            maxVelocity.in(MetersPerSecond),
-            maxAcceleration.in(MetersPerSecondPerSecond)));
+            maxVelocity.in(MetersPerSecond), maxAcceleration.in(MetersPerSecondPerSecond)));
   }
 
   public double getVelocityFromSwerve() {
@@ -67,12 +66,13 @@ public class PoseAlignController {
   }
 
   /**
-   * Resets the controller. The desired translation direction (from current to target) is
-   * computed in field coordinates and then locked in.
+   * Resets the controller. The desired translation direction (from current to target) is computed
+   * in field coordinates and then locked in.
    */
   public void reset(Pose2d targetPose) {
     Pose2d currentPose = m_Swerve.getPose();
-    Translation2d errorTranslation = targetPose.getTranslation().minus(currentPose.getTranslation());
+    Translation2d errorTranslation =
+        targetPose.getTranslation().minus(currentPose.getTranslation());
     // Lock in the field-relative direction to the target.
     desiredTranslationAngleField = errorTranslation.getAngle().getRadians();
     double distance = errorTranslation.getNorm();
@@ -80,8 +80,8 @@ public class PoseAlignController {
   }
 
   /**
-   * Updates the controller. The translation command is computed in robot-relative coordinates
-   * by converting the locked-in field direction using the current robot heading.
+   * Updates the controller. The translation command is computed in robot-relative coordinates by
+   * converting the locked-in field direction using the current robot heading.
    */
   public ChassisSpeeds update(Pose2d currentPose, Pose2d targetPose) {
     // Update translation PID gains
@@ -94,7 +94,8 @@ public class PoseAlignController {
     this.targetPose = targetPose;
 
     // Compute the current distance error (still in field coordinates).
-    Translation2d errorTranslation = targetPose.getTranslation().minus(currentPose.getTranslation());
+    Translation2d errorTranslation =
+        targetPose.getTranslation().minus(currentPose.getTranslation());
     distance2target = errorTranslation.getNorm();
     desiredTranslationAngleField = errorTranslation.getAngle().getRadians();
 
@@ -104,18 +105,24 @@ public class PoseAlignController {
     // Convert the locked field-relative desired direction into robot-relative coordinates.
     // (Subtract the current robot heading from the field angle.)
     Rotation2d currentRotation = currentPose.getRotation();
-    double desiredTranslationAngleRobot = desiredTranslationAngleField - currentRotation.getRadians();
+    double desiredTranslationAngleRobot =
+        desiredTranslationAngleField - currentRotation.getRadians();
 
     // Compute the robot-relative x and y commands.
     double xCommand = velocityCommand * Math.cos(desiredTranslationAngleRobot);
     double yCommand = velocityCommand * Math.sin(desiredTranslationAngleRobot);
 
-    xCommand = Math.min(maxVelocity.in(MetersPerSecond), Math.max(-maxVelocity.in(MetersPerSecond), xCommand));
-    yCommand = Math.min(maxVelocity.in(MetersPerSecond), Math.max(-maxVelocity.in(MetersPerSecond), yCommand));
+    xCommand =
+        Math.min(
+            maxVelocity.in(MetersPerSecond), Math.max(-maxVelocity.in(MetersPerSecond), xCommand));
+    yCommand =
+        Math.min(
+            maxVelocity.in(MetersPerSecond), Math.max(-maxVelocity.in(MetersPerSecond), yCommand));
 
     // Compute the rotation error and update the rotation controller.
     // Rotation2d rotationError = targetPose.getRotation().minus(currentPose.getRotation());
-    thetaController.update(targetPose.getRotation(), thetaPID[0].getNumber(), thetaPID[2].getNumber());
+    thetaController.update(
+        targetPose.getRotation(), thetaPID[0].getNumber(), thetaPID[2].getNumber());
     double rotationalCommand = thetaController.getOutput();
 
     // Generate chassis speeds in the robot-relative coordinate system.

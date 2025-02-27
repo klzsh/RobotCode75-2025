@@ -24,8 +24,8 @@ public class VisionTranslationController {
   private final PIDController xController;
   private final PIDController yController;
 
-  public final AprilTagCamera m_RightFacingCamera; //TODO make private again
-  public  final AprilTagCamera m_LeftFacingCamera;
+  public final AprilTagCamera m_RightFacingCamera; // TODO make private again
+  public final AprilTagCamera m_LeftFacingCamera;
 
   // @Logged(importance = Importance.INFO)
   private double lastSeenTagTime = 0.0;

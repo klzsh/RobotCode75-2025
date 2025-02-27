@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.DrivetrainConstants.*;
 import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
@@ -11,8 +10,9 @@ import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.Pigeon2;
-
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,9 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
@@ -33,8 +31,6 @@ import frc.robot.Constants.DrivetrainConstants.BackRight;
 import frc.robot.Constants.DrivetrainConstants.FrontLeft;
 import frc.robot.Constants.DrivetrainConstants.FrontRight;
 import frc.robot.subsystems.Vision.AprilTagCamera;
-import edu.wpi.first.epilogue.Logged.Importance;
-import edu.wpi.first.epilogue.Logged.Strategy;
 
 /*
  * OVERVIEW OF CHASSIS
@@ -110,7 +106,7 @@ public class Swerve extends SubsystemBase {
   /** define swerve modules, Gyro, odometry */
   public Swerve(
       AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
-     
+
     sample = null;
     m_LeftFacingCamera = leftFacingCamera;
     m_RightFacingCamera = rightFacingCamera;
@@ -246,8 +242,8 @@ public class Swerve extends SubsystemBase {
     // System.out.println(xController.getP());
     ChassisSpeeds speeds =
         new ChassisSpeeds(
-            sample.vx,// + xController.calculate(pose.getX(), sample.x),
-            sample.vy,// + yController.calculate(pose.getY(), sample.y),
+            sample.vx, // + xController.calculate(pose.getX(), sample.x),
+            sample.vy, // + yController.calculate(pose.getY(), sample.y),
             sample.omega + rController.calculate(pose.getRotation().getRadians(), sample.heading));
     this.setFieldRelative(speeds);
   }
@@ -259,7 +255,8 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, maxAutosSpeed.getNumber()); // 4.7 // TODO: change this back to controller constants
+        desiredStates,
+        maxAutosSpeed.getNumber()); // 4.7 // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -381,15 +378,13 @@ public class Swerve extends SubsystemBase {
     m_gyro.setYaw(startVal.getDegrees());
   }
 
-  /**
-   * gives a breaking heading (360->0 degrees for example) Takes into account a gyro invert
-   *
-    */
+  /** gives a breaking heading (360->0 degrees for example) Takes into account a gyro invert */
   public Rotation2d getRotation2D() {
     return Rotation2d.fromDegrees(m_gyro.getYaw(true).getValue().in(Degrees));
   }
+
   @Logged(name = "Gyro Angle Degrees", importance = Importance.CRITICAL)
-  public double getRotationDegrees(){
+  public double getRotationDegrees() {
     return m_gyro.getYaw(true).getValue().in(Degrees);
   }
 

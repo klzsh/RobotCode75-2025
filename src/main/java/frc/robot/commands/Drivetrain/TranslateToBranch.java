@@ -1,9 +1,13 @@
 package frc.robot.commands.Drivetrain;
 
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.xP;
+import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.yP;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
@@ -12,10 +16,6 @@ import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.AprilTagCamera;
-
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.xP;
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.yP;
-
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -46,7 +46,12 @@ public class TranslateToBranch extends Command {
   private PoseAlignController fallbackController;
   private FieldPose fallbackPose;
 
-  public TranslateToBranch(Swerve swerve, AprilTagCamera camera, boolean alignLeft, PoseAlignController fallbackController, FieldPose fallbackPose) {
+  public TranslateToBranch(
+      Swerve swerve,
+      AprilTagCamera camera,
+      boolean alignLeft,
+      PoseAlignController fallbackController,
+      FieldPose fallbackPose) {
     xP = new TunableNumber("Auto Align/Clapped X P", 0.1);
     yP = new TunableNumber("Auto Align/Clapped Y P", 0.1);
 
@@ -98,7 +103,7 @@ public class TranslateToBranch extends Command {
       return Optional.of(largestAreaID);
     } else {
       end(true);
-      
+
       return Optional.empty();
     }
   }
@@ -123,12 +128,20 @@ public class TranslateToBranch extends Command {
       double currentPitch = target.get().getPitch();
       double yawSetpoint =
           left ? getLeftYawSetpoint(currentPitch) : getRightYawSetpoint(currentPitch);
-      xCommand = xController.calculate(currentPitch, finalPitchSetpoint);
-      yCommand = yController.calculate(target.get().getYaw(), yawSetpoint);
+      xCommand =
+          xController.calculate(
+              Math.sin(Units.degreesToRadians(currentPitch)),
+              Math.sin(Units.degreesToRadians(finalPitchSetpoint)));
+      yCommand =
+          yController.calculate(
+              Math.sin(Units.degreesToRadians(target.get().getYaw())),
+              Math.sin(Units.degreesToRadians(yawSetpoint)));
 
       m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, yCommand, 0));
     } else {
-      ChassisSpeeds speeds = fallbackController.update(m_Swerve.getPose(), CheckBounds.getPose2DFromFieldPose(m_Swerve, fallbackPose));
+      ChassisSpeeds speeds =
+          fallbackController.update(
+              m_Swerve.getPose(), CheckBounds.getPose2DFromFieldPose(m_Swerve, fallbackPose));
       m_Swerve.setChassisSpeeds(speeds);
     }
   }

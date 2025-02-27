@@ -119,13 +119,9 @@ public class VisionConstants {
   public static final Transform3d HPCameraPose =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0),
-              Units.inchesToMeters(-6.033),
-              Units.inchesToMeters(40.25)),
+              Units.inchesToMeters(0), Units.inchesToMeters(-6.033), Units.inchesToMeters(40.25)),
           new Rotation3d(
-              Units.degreesToRadians(0), 
-              Units.degreesToRadians(0), 
-              Units.degreesToRadians(125)));
+              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(125)));
   public static final Transform3d CageDetectCameraPose =
       new Transform3d(
           new Translation3d(

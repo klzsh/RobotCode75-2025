@@ -17,8 +17,8 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
-import edu.wpi.first.epilogue.Logged.Strategy;
 
 @Logged(name = "Climber", strategy = Strategy.OPT_IN)
 public class Climber extends SubsystemBase {
@@ -124,6 +123,7 @@ public class Climber extends SubsystemBase {
   public double absoluteEncoderToRotations(double x) {
     return 132.2772 * Math.sin(3.36922 * x);
   }
+
   // TODO: rewrite so it does not take in a command xbox controller
   public void setPositionRequestWithController(CommandXboxController controller) {
     double leftY = controller.getLeftY();
@@ -188,13 +188,13 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
     m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
   }
-  public void brakeOff(){
-  }
-  public void brakeOn(){
 
-  }
+  public void brakeOff() {}
+
+  public void brakeOn() {}
+
   @Logged
-  public double getServoPosition(){
+  public double getServoPosition() {
     return m_ClimberBrake.get();
   }
 

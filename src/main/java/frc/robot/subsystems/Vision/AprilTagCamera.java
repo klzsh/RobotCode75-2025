@@ -181,6 +181,7 @@ public class AprilTagCamera extends SubsystemBase {
       return OptionalDouble.of(target.getArea());
     }
   }
+
   public OptionalDouble minTagArea() {
     double minArea = Double.MAX_VALUE;
     for (PhotonTrackedTarget target : m_result.getTargets()) {

@@ -11,9 +11,6 @@ import static frc.robot.Constants.VisionConstants.*;
 
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoTrajectory;
-import choreo.trajectory.SwerveSample;
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -27,8 +24,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Autonomous.TestAuto;
-import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -42,7 +37,6 @@ import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
-import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
@@ -66,15 +60,15 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
 // @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-    @Logged(name = "Left Facing Mod Cam")
+  @Logged(name = "Left Facing Mod Cam")
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-    @Logged(name = "Right Facing Mod Cam")
+  @Logged(name = "Right Facing Mod Cam")
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  @Logged(name= "HP Cam")
+  @Logged(name = "HP Cam")
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
   @Logged(name = "Swerve")
@@ -269,10 +263,17 @@ public class RobotContainer {
     //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
     //             false));
 
-    AlignLeft.whileTrue(new RotateToSimilarFace(m_Swerve).andThen(new TranslateToBranch(m_Swerve, m_RightFacingCamera, true, m_PoseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT))));
+    AlignLeft.whileTrue(
+        new RotateToSimilarFace(m_Swerve)
+            .andThen(
+                new TranslateToBranch(
+                    m_Swerve,
+                    m_RightFacingCamera,
+                    true,
+                    m_PoseAlignController,
+                    new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT))));
     // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
 
-   
     // manual elevator overrides
 
     m_Controller
@@ -336,7 +337,8 @@ public class RobotContainer {
     m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
 
     return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    // return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController, m_PoseAlignController);
+    // return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController,
+    // m_PoseAlignController);
     // return null;
   }
 }
