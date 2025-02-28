@@ -29,10 +29,9 @@ import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.commands.Drivetrain.ResetHeading;
-import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
-import frc.robot.commands.Drivetrain.TranslateToBranch;
+import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
@@ -295,14 +294,12 @@ public class RobotContainer {
     //             false));
 
     AlignLeft.whileTrue(
-        new RotateToSimilarFace(m_Swerve)
-            .andThen(
-                new TranslateToBranch(
+                new AlignToBranch(
                     m_Swerve,
                     m_RightFacingCamera,
                     true,
                     m_PoseAlignController,
-                    new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT))));
+                    new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
     // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
 
     // manual elevator overrides

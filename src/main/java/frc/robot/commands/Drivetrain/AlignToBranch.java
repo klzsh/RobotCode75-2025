@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class TranslateToBranch extends Command {
+public class AlignToBranch extends Command {
 
   private final Swerve m_Swerve;
   private final AprilTagCamera m_Camera;
@@ -51,7 +51,7 @@ public class TranslateToBranch extends Command {
   private final double rotationP = 0.1;
   private final double rotationD = 0.0;
 
-  public TranslateToBranch(
+  public AlignToBranch(
       Swerve swerve,
       AprilTagCamera camera,
       boolean alignLeft,
