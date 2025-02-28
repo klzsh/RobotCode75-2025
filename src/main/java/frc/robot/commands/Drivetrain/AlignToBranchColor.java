@@ -11,21 +11,15 @@ import static frc.robot.Constants.VisionConstants.widthTolerance;
 import static frc.robot.Constants.VisionConstants.xSetpoint;
 import static frc.robot.Constants.VisionConstants.xTolerance;
 
-import java.util.List;
-
-import org.photonvision.targeting.PhotonTrackedTarget;
-import org.photonvision.targeting.TargetCorner;
-
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
-import frc.lib.util.CheckBounds;
-import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import java.util.List;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignToBranchColor extends Command {
@@ -86,10 +80,8 @@ public class AlignToBranchColor extends Command {
       return;
     }
     // robot relative, assuming heading is already aligned
-    double xCommand = m_XController.calculate(
-        (topLeft.x + bottomRight.x) / 2, xSetpoint);
-    double yCommand = m_WidthController.calculate(
-        bottomRight.x - topLeft.x, widthSetpoint);
+    double xCommand = m_XController.calculate((topLeft.x + bottomRight.x) / 2, xSetpoint);
+    double yCommand = m_WidthController.calculate(bottomRight.x - topLeft.x, widthSetpoint);
     m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, yCommand, 0));
   }
 

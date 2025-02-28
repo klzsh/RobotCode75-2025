@@ -130,14 +130,12 @@ public class VisionConstants {
               Units.inchesToMeters(34.334)),
           new Rotation3d(
               Units.degreesToRadians(0), Units.degreesToRadians(160), Units.degreesToRadians(160)));
-    public static final Transform3d BranchCameraPose =
-        new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(0.0),
-                Units.inchesToMeters(0.0),
-                Units.inchesToMeters(0.0)),
-            new Rotation3d(
-                Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)));
+  public static final Transform3d BranchCameraPose =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(0.0), Units.inchesToMeters(0.0), Units.inchesToMeters(0.0)),
+          new Rotation3d(
+              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)));
   public static final double finalYawSetpointLeft = 12.36;
   public static final double finalPitchSetpointLeft = -6.5;
   public static final double finalYawSetpointRight = -7.97;

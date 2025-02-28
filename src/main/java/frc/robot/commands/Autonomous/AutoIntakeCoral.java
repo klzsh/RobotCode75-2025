@@ -37,10 +37,7 @@ public class AutoIntakeCoral extends SequentialCommandGroup {
         new DriveToPose(
             swerve,
             poseAlignController,
-            new FieldPose(
-                DriverStation.getAlliance().get(),
-                elem,
-                offset),
+            new FieldPose(DriverStation.getAlliance().get(), elem, offset),
             false),
         new IntakeCoral(coralIntake));
   }
