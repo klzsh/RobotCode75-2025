@@ -9,7 +9,6 @@ import static frc.robot.Constants.ClimberConstants.*;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -24,10 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Autonomous.AutoDealgaefy;
-import frc.robot.commands.Autonomous.AutoScoreL1;
-import frc.robot.commands.Autonomous.AutoScoreL4;
-import frc.robot.commands.Autonomous.AutoScoreProcessor;
+import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
@@ -54,7 +50,6 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Vision.AprilTagCamera;
-import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -102,7 +97,7 @@ public class RobotContainer {
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
   // define drivetrain controllers
-  @Logged
+  // @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
 
   //   //@Logged
@@ -132,38 +127,40 @@ public class RobotContainer {
       new AutoFactory(
           m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
-  private final Map<Integer, Command> m_AutoMap =
-      Map.of(
-          1,
-              new AutoScoreL1(
-                  m_Swerve, m_Elevator, m_CoralIntake, m_VisionController, m_PoseAlignController),
-          2,
-              new AutoDealgaefy(
-                  m_Swerve,
-                  m_Elevator,
-                  m_AlgaeIntake,
-                  m_AlgaePivot,
-                  m_VisionController,
-                  m_PoseAlignController),
-          3,
-              new AutoScoreL4(
-                  m_Swerve,
-                  m_Elevator,
-                  m_CoralIntake,
-                  m_VisionController,
-                  m_PoseAlignController,
-                  true),
-          4,
-              new AutoScoreL4(
-                  m_Swerve,
-                  m_Elevator,
-                  m_CoralIntake,
-                  m_VisionController,
-                  m_PoseAlignController,
-                  true),
-          5, new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot),
-          6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
-          );
+  // private final Map<Integer, Command> m_AutoMap =
+  //     Map.of(
+  //         1,
+  //             new AutoScoreL1(
+  //                 m_Swerve, m_Elevator, m_CoralIntake, m_VisionController,
+  // m_PoseAlignController),
+  //         2,
+  //             new AutoDealgaefy(
+  //                 m_Swerve,
+  //                 m_Elevator,
+  //                 m_AlgaeIntake,
+  //                 m_AlgaePivot,
+  //                 m_VisionController,
+  //                 m_PoseAlignController),
+  //         3,
+  //             new AutoScoreL4(
+  //                 m_Swerve,
+  //                 m_Elevator,
+  //                 m_CoralIntake,
+  //                 m_VisionController,
+  //                 m_PoseAlignController,
+  //                 true),
+  //         4,
+  //             new AutoScoreL4(
+  //                 m_Swerve,
+  //                 m_Elevator,
+  //                 m_CoralIntake,
+  //                 m_VisionController,
+  //                 m_PoseAlignController,
+  //                 true),
+  //         5, new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake,
+  // m_AlgaePivot),
+  //         6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
+  //         );
 
   //   private final AutoSelector m_Selector =
   //       new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new
@@ -366,11 +363,11 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
+    // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
 
-    return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    // return new TestAuto(m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController,
-    // m_PoseAlignController);
+    // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
+    return new TestAuto(
+        m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_VisionController, m_PoseAlignController);
     // return null;
   }
 }

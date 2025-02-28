@@ -273,7 +273,7 @@ def draw_rounded_rect(surface, rect, color, corner_radius):
 def main():
     pygame.init()
     reduction_factor = 1.25
-    image_file = "./FRCGameField.png"  # Update path as needed.
+    image_file = "./reefscapefield.png"  # Update path as needed.
     try:
         field_img = pygame.image.load(image_file)
     except pygame.error as e:
