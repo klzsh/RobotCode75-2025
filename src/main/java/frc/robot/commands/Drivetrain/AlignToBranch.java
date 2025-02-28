@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -126,7 +125,8 @@ public class AlignToBranch extends Command {
 
   @Override
   public void execute() {
-    rotationSetpoint = Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
+    rotationSetpoint =
+        Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
     rotationController.update(rotationSetpoint, rotationP, rotationD);
     if (!rotationController.atGoal()) {
       m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, rotationController.getOutput()));

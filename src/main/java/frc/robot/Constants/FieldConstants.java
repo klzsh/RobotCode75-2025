@@ -30,20 +30,20 @@ public class FieldConstants {
           entry("RTR", ElevatorPositions.L3),
           entry("RTL", ElevatorPositions.L2));
 
-  public static final Map<Integer, Double> tagToHeadingMap = Map.ofEntries(
-    entry(7, 0.0),
-    entry(8, 60.0),
-    entry(9, 120.0),
-    entry(10, 180.0),
-    entry(11, 240.0),
-    entry(6, 300.0),
-    entry(18, 0.0),
-    entry(17, 60.0),
-    entry(22, 120.0),
-    entry(21, 180.0),
-    entry(20, 240.0),
-    entry(19, 300.0)
-  );
+  public static final Map<Integer, Double> tagToHeadingMap =
+      Map.ofEntries(
+          entry(7, 0.0),
+          entry(8, 60.0),
+          entry(9, 120.0),
+          entry(10, 180.0),
+          entry(11, 240.0),
+          entry(6, 300.0),
+          entry(18, 0.0),
+          entry(17, 60.0),
+          entry(22, 120.0),
+          entry(21, 180.0),
+          entry(20, 240.0),
+          entry(19, 300.0));
 
   public static final Distance reefLeftPoseOffset = Meters.of(0.14);
   public static final Distance reefRightPoseOffset = Meters.of(0.5);
