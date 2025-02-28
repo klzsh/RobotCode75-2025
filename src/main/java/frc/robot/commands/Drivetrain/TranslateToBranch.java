@@ -2,10 +2,12 @@ package frc.robot.commands.Drivetrain;
 
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.xP;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.yP;
+import static frc.robot.Constants.FieldConstants.tagToHeadingMap;
 import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
 import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.List;
@@ -39,8 +43,13 @@ public class TranslateToBranch extends Command {
   private Optional<List<Integer>> visibleTagIDs;
   private int targetIDToFocus;
 
+  private RotationController rotationController;
   private PoseAlignController fallbackController;
   private FieldPose fallbackPose;
+  private Rotation2d rotationSetpoint;
+
+  private final double rotationP = 0.1;
+  private final double rotationD = 0.0;
 
   public TranslateToBranch(
       Swerve swerve,
@@ -51,6 +60,7 @@ public class TranslateToBranch extends Command {
     xP = new TunableNumber("Auto Align/Clapped X P", 0.1);
     yP = new TunableNumber("Auto Align/Clapped Y P", 0.1);
 
+    rotationController = new RotationController(swerve);
     this.fallbackController = fallbackController;
     this.fallbackPose = fallbackPose;
 
@@ -112,10 +122,18 @@ public class TranslateToBranch extends Command {
     if (targetID.isPresent()) {
       targetIDToFocus = targetID.get();
     }
+    
+    rotationSetpoint = Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
   }
 
   @Override
   public void execute() {
+    rotationController.update(rotationSetpoint, rotationP, rotationD);
+    if (!rotationController.atGoal()) {
+      m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, rotationController.getOutput()));
+      return;
+    }
+
     xController.setP(xP.getNumber());
     yController.setP(yP.getNumber());
 
