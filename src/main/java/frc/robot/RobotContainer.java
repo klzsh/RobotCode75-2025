@@ -71,6 +71,9 @@ public class RobotContainer {
   @Logged(name = "HP Cam")
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
+  @Logged(name = "Branch Cam")
+  private final AprilTagCamera m_BranchCamera = new AprilTagCamera("Branch_Cam", BranchCameraPose);
+
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 

@@ -126,6 +126,13 @@ public class AprilTagCamera extends SubsystemBase {
     return Optional.empty();
   }
 
+  public Optional<PhotonTrackedTarget> getBestTarget() {
+    if (m_result.getBestTarget() == null) {
+      return Optional.empty();
+    }
+    return Optional.of(m_result.getBestTarget());
+  }
+
   public OptionalDouble getRange(int id) {
     PhotonTrackedTarget target = getTarget(id).isPresent() ? getTarget(id).get() : null;
     if (target == null) {
