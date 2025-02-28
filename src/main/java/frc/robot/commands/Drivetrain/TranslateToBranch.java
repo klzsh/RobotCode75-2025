@@ -122,12 +122,11 @@ public class TranslateToBranch extends Command {
     if (targetID.isPresent()) {
       targetIDToFocus = targetID.get();
     }
-    
-    rotationSetpoint = Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
   }
 
   @Override
   public void execute() {
+    rotationSetpoint = Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
     rotationController.update(rotationSetpoint, rotationP, rotationD);
     if (!rotationController.atGoal()) {
       m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, rotationController.getOutput()));
