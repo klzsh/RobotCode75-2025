@@ -125,12 +125,14 @@ public class AlignToBranch extends Command {
 
   @Override
   public void execute() {
-    rotationSetpoint =
-        Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
-    rotationController.update(rotationSetpoint, rotationP, rotationD);
-    if (!rotationController.atGoal()) {
-      m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, rotationController.getOutput()));
-      return;
+    if (tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())) != null) {
+      rotationSetpoint =
+          Rotation2d.fromDegrees(tagToHeadingMap.get(CheckBounds.nearestTag(m_Swerve.getPose())));
+      rotationController.update(rotationSetpoint, rotationP, rotationD);
+      if (!rotationController.atGoal()) {
+        m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, rotationController.getOutput()));
+        return;
+      }
     }
 
     xController.setP(xP.getNumber());
