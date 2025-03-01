@@ -143,9 +143,9 @@ public class RobotContainer {
           m_LeftFacingCamera,
           m_RightFacingCamera);
 
-    private final AutoSelector m_AutoSelector =
-        new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new
-    ArrayList<Command>());
+  private final AutoSelector m_AutoSelector =
+      new AutoSelector(
+          m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -350,14 +350,6 @@ public class RobotContainer {
     // m_AutoSelector.generatePaths();
     // return m_AutoSelector.getAutoCommand();
     return new TestAuto(
-        m_Factory,
-        m_CoralIntake,
-        m_Swerve,
-        m_Elevator,
-        m_LeftFacingCamera,
-        m_RightFacingCamera,
-        m_VisionController,
-        m_PoseAlignController);
         m_Factory,
         m_CoralIntake,
         m_Swerve,
