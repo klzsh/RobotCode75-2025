@@ -136,8 +136,8 @@ public class VisionConstants {
               Units.inchesToMeters(0.0), Units.inchesToMeters(0.0), Units.inchesToMeters(0.0)),
           new Rotation3d(
               Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)));
-  public static final double finalYawSetpointLeft = 12.36;
-  public static final double finalPitchSetpointLeft = -5.7;
+  public static final double finalYawSetpointLeft = 13.8;
+  public static final double finalPitchSetpointLeft = -3.37;
   public static final double finalYawSetpointRight = -7.97;
   public static final double finalPitchSetpointRight = -7.88;
 

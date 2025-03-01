@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
@@ -76,7 +77,7 @@ public class AutoSelector {
   private Pose2d m_startPose;
   private Field2d m_field;
   private Map<Integer, Command> m_actionMap;
-  private Swerve m_drivetrain;
+  private Swerve m_swerve;
   private List<Command> m_startCommands;
   private List<Command> m_endCommands;
   private Map<String, Pose2d> m_startPositions;
@@ -89,7 +90,7 @@ public class AutoSelector {
 
   public AutoSelector(
       Map<Integer, Command> actionMap,
-      Swerve drivetrain,
+      Swerve swerve,
       List<Command> startCommands,
       List<Command> endCommands) {
     NetworkTableInstance nt = NetworkTableInstance.getDefault();
@@ -100,18 +101,18 @@ public class AutoSelector {
 
     m_field = new Field2d();
     m_actionMap = actionMap;
-    m_drivetrain = drivetrain;
+    m_swerve = swerve;
     m_startCommands = startCommands;
     m_endCommands = endCommands;
 
     // define auto factory for autos
     factory =
         new AutoFactory(
-            m_drivetrain::getPose,
-            m_drivetrain::setPose,
-            m_drivetrain::followSwerveSample,
+            m_swerve::getPose,
+            m_swerve::setPose,
+            m_swerve::followSwerveSample,
             true,
-            m_drivetrain);
+            m_swerve);
   }
 
   public void clearField() {
@@ -246,8 +247,8 @@ public class AutoSelector {
       }
       if (point != "" && lastPose != "") {
         try {
-          m_trajectories.add(
-              new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+          // m_trajectories.add(
+          //     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
           parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
           if (DriverStation.getAlliance().get() == Alliance.Red) {
             m_trajectories.set(
@@ -265,12 +266,13 @@ public class AutoSelector {
       if (m_actionMap.containsKey(action)) {
         parallelGroup.addCommands(m_actionMap.get(action));
         s.append(m_actionMap.get(action).getName() + " ");
-      } else {
+      } else if (action != -1) {
         setFeedback("Action Not Found: " + action);
         m_autoCommand = Commands.runOnce(() -> {});
         return;
       }
       sequential.addCommands(parallelGroup);
+      sequential.addCommands(new InstantCommand(() -> m_swerve.stopModules(), m_swerve));
     }
     setFeedback("Auto Sequence: " + s.toString());
     drawPaths();

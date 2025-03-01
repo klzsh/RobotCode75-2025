@@ -49,15 +49,11 @@ public final class DrivetrainConstants {
     }
 
     public static final class OdometryAlign {
-      public static final double xP = 1.65;
+      public static final double xP = -1.65;
       public static final double xI = 0.0;
       public static final double xD = 0.0;
 
-      public static final double yP = 2.0;
-      public static final double yI = 0.0;
-      public static final double yD = 0.05;
-
-      public static final double tP = 0.8;
+      public static final double tP = -0.8;
       public static final double tI = 0.0;
       public static final double tD = 0.0;
     }

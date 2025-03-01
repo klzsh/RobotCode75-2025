@@ -64,7 +64,7 @@ public class CheckBounds {
             .toPose2d();
     // return tagPose;
     Rotation2d tagHeading = tagPose.getRotation();
-    double bumperSize = 17.5;
+    double bumperSize = 18.5;
     Pose2d poseToDrive =
         tagPose.transformBy(
             new Transform2d(Inches.of(bumperSize).in(Meters), 0, new Rotation2d(0)));

@@ -153,12 +153,32 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
+  @Logged
+  public double getXSin() {
+    if (getTarget(18).isEmpty()) {
+      return 0;
+    } else {
+      PhotonTrackedTarget target = getTarget(18).get();
+      return Math.sin(Units.degreesToRadians(target.getYaw()));
+    }
+  }
+
   public OptionalDouble getY(int id) {
     if (getTarget(id).isEmpty()) {
       return OptionalDouble.empty();
     } else {
       PhotonTrackedTarget target = getTarget(id).get();
       return OptionalDouble.of(target.getPitch());
+    }
+  }
+
+  @Logged
+  public double getYSin() {
+    if (getTarget(18).isEmpty()) {
+      return 0;
+    } else {
+      PhotonTrackedTarget target = getTarget(18).get();
+      return Math.sin(Units.degreesToRadians(target.getPitch()));
     }
   }
 

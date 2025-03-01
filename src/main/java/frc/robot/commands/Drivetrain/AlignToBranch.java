@@ -1,7 +1,5 @@
 package frc.robot.commands.Drivetrain;
 
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.xP;
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.OdometryAlign.yP;
 import static frc.robot.Constants.FieldConstants.tagToHeadingMap;
 import static frc.robot.Constants.VisionConstants.*;
 
