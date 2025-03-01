@@ -142,10 +142,13 @@ public class VisionConstants {
   public static final double finalPitchSetpointRight = -7.88;
 
   // color branch align
+  // TODO tune all
   public static final double heightThreshold = 0.0;
   public static final double widthThreshold = 0.0;
   public static final double widthSetpoint = 0.0;
   public static final double xSetpoint = 0.0;
   public static final double widthTolerance = 0.0;
   public static final double xTolerance = 0.0;
+
+  public static final double heightWidthRatioThreshold = 0.0;
 }

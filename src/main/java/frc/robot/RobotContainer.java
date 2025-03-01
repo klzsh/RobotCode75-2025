@@ -61,19 +61,19 @@ import java.util.ArrayList;
 // @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "Left Facing Mod Cam")
+  // @Logged(name = "Left Facing Mod Cam")
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "Right Facing Mod Cam")
+  // @Logged(name = "Right Facing Mod Cam")
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  @Logged(name = "HP Cam")
+  // @Logged(name = "HP Cam")
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
-  @Logged(name = "Branch Cam")
-  private final AprilTagCamera m_BranchCamera = new AprilTagCamera("Branch_Cam", BranchCameraPose);
+  // @Logged(name = "Branch Cam")
+  // private final AprilTagCamera m_BranchCamera = new AprilTagCamera("Branch_Cam", BranchCameraPose);
 
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
