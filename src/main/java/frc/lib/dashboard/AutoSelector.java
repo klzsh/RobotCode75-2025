@@ -1,6 +1,5 @@
 package frc.lib.dashboard;
 
-import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -108,11 +107,7 @@ public class AutoSelector {
     // define auto factory for autos
     factory =
         new AutoFactory(
-            m_swerve::getPose,
-            m_swerve::setPose,
-            m_swerve::followSwerveSample,
-            true,
-            m_swerve);
+            m_swerve::getPose, m_swerve::setPose, m_swerve::followSwerveSample, true, m_swerve);
   }
 
   public void clearField() {

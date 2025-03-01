@@ -8,9 +8,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -57,6 +54,8 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -141,8 +140,7 @@ public class RobotContainer {
       Map.of(
           1,
               new AutoScoreL1(
-                  m_Swerve, m_Elevator, m_CoralIntake, m_VisionController,
-  m_PoseAlignController),
+                  m_Swerve, m_Elevator, m_CoralIntake, m_VisionController, m_PoseAlignController),
           2,
               new AutoDealgaefy(
                   m_Swerve,
@@ -167,14 +165,12 @@ public class RobotContainer {
                   m_LeftFacingCamera,
                   m_PoseAlignController,
                   true),
-          5, new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake,
-  m_AlgaePivot),
+          5, new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot),
           6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
           );
 
-    private final AutoSelector m_AutoSelector =
-        new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new
-    ArrayList<Command>());
+  private final AutoSelector m_AutoSelector =
+      new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -379,7 +375,14 @@ public class RobotContainer {
     // m_AutoSelector.generatePaths();
     // return m_AutoSelector.getAutoCommand();
     return new TestAuto(
-        m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_LeftFacingCamera, m_RightFacingCamera, m_VisionController, m_PoseAlignController);
+        m_Factory,
+        m_CoralIntake,
+        m_Swerve,
+        m_Elevator,
+        m_LeftFacingCamera,
+        m_RightFacingCamera,
+        m_VisionController,
+        m_PoseAlignController);
     // return null;
   }
 }
