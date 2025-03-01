@@ -5,6 +5,7 @@
 package frc.robot.commands.Drivetrain;
 
 import static frc.robot.Constants.VisionConstants.heightThreshold;
+import static frc.robot.Constants.VisionConstants.heightWidthRatioThreshold;
 import static frc.robot.Constants.VisionConstants.widthSetpoint;
 import static frc.robot.Constants.VisionConstants.widthThreshold;
 import static frc.robot.Constants.VisionConstants.widthTolerance;
@@ -13,29 +14,56 @@ import static frc.robot.Constants.VisionConstants.xTolerance;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 import java.util.List;
-import org.photonvision.targeting.PhotonTrackedTarget;
-import org.photonvision.targeting.TargetCorner;
+import java.util.Set;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignToBranchColor extends Command {
+
+  private class VisionData {
+    public double x;
+    public double y;
+    public double width;
+    public double height;
+
+    public VisionData(double x, double y, double width, double height) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+    }
+
+    public VisionData(String data) {
+      String[] split = data.split(",");
+      x = Double.parseDouble(split[0]);
+      y = Double.parseDouble(split[1]);
+      width = Double.parseDouble(split[2]);
+      height = Double.parseDouble(split[3]);
+    }
+  }
+
   private final Swerve m_Swerve;
-  private final AprilTagCamera m_BranchCam;
+  private final NetworkTableInstance nt;
+  private final NetworkTable ntTable;
   private final PIDController m_XController = new PIDController(0, 0, 0);
-  private final PIDController m_WidthController = new PIDController(0, 0, 0);
+  // private final PIDController m_WidthController = new PIDController(0, 0, 0);
   private final TunableNumber xP;
-  private final TunableNumber wP;
+  // private final TunableNumber wP;
 
   /** Creates a new AlignToBranchColor. */
-  public AlignToBranchColor(Swerve swerve, AprilTagCamera branchCam) {
+  public AlignToBranchColor(Swerve swerve) {
+
     m_Swerve = swerve;
-    m_BranchCam = branchCam;
     xP = new TunableNumber("AlignToBranchColor/xP", 0.1);
-    wP = new TunableNumber("AlignToBranchColor/wP", 0.1);
+    // wP = new TunableNumber("AlignToBranchColor/wP", 0.1);
+
+    nt = NetworkTableInstance.getDefault();
+    ntTable = nt.getTable("RaiderVision");
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerve);
   }
@@ -44,45 +72,32 @@ public class AlignToBranchColor extends Command {
   @Override
   public void initialize() {
     m_XController.setSetpoint(xSetpoint);
-    m_WidthController.setSetpoint(widthSetpoint);
+    // m_WidthController.setSetpoint(widthSetpoint);
     m_XController.setTolerance(xTolerance);
-    m_WidthController.setTolerance(widthTolerance);
+    // m_WidthController.setTolerance(widthTolerance);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_BranchCam.getBestTarget().isEmpty()) {
-      m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
-      return;
-    }
     m_XController.setP(xP.getNumber());
-    m_WidthController.setP(wP.getNumber());
-    PhotonTrackedTarget target = m_BranchCam.getBestTarget().get();
-    List<TargetCorner> corners = target.getMinAreaRectCorners();
-    TargetCorner topLeft = new TargetCorner(999, 999), bottomRight = new TargetCorner(0, 0);
-    for (TargetCorner corner : corners) {
-      if (corner.x < topLeft.x) {
-        topLeft.x = corner.x;
-      }
-      if (corner.y < topLeft.y) {
-        topLeft.y = corner.y;
-      }
-      if (corner.x > bottomRight.x) {
-        bottomRight.x = corner.x;
-      }
-      if (corner.y > bottomRight.y) {
-        bottomRight.y = corner.y;
-      }
-    }
-    if (bottomRight.y - topLeft.y < heightThreshold || bottomRight.x - topLeft.x < widthThreshold) {
+    // m_WidthController.setP(wP.getNumber());
+
+    String target = ntTable.getEntry("target").getString("None");
+    if (target == "None") {
       m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
       return;
     }
-    // robot relative, assuming heading is already aligned
-    double xCommand = m_XController.calculate((topLeft.x + bottomRight.x) / 2, xSetpoint);
-    double yCommand = m_WidthController.calculate(bottomRight.x - topLeft.x, widthSetpoint);
-    m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, yCommand, 0));
+
+    // if (bottomRight.y - topLeft.y < heightThreshold || bottomRight.x - topLeft.x <
+    // widthThreshold) {
+    //   m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
+    //   return;
+    // }
+    // // robot relative, assuming heading is already aligned
+    // double xCommand = m_XController.calculate((topLeft.x + bottomRight.x) / 2, xSetpoint);
+    // double yCommand = m_WidthController.calculate(bottomRight.x - topLeft.x, widthSetpoint);
+    // m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, yCommand, 0));
   }
 
   // Called once the command ends or is interrupted.
@@ -94,6 +109,6 @@ public class AlignToBranchColor extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_XController.atSetpoint() && m_WidthController.atSetpoint();
+    return m_XController.atSetpoint();
   }
 }
