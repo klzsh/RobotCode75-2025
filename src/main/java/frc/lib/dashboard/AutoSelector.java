@@ -1,6 +1,5 @@
 package frc.lib.dashboard;
 
-import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -12,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -76,7 +76,7 @@ public class AutoSelector {
   private Command m_autoCommand = Commands.runOnce(() -> {});
   private Pose2d m_startPose;
   private Field2d m_field;
-  private Map<Integer, Command> m_actionMap;
+  private ActionFactory m_actionFactory;
   private Swerve m_swerve;
   private List<Command> m_startCommands;
   private List<Command> m_endCommands;
@@ -89,7 +89,7 @@ public class AutoSelector {
   private final AutoFactory factory;
 
   public AutoSelector(
-      Map<Integer, Command> actionMap,
+      ActionFactory actionFactory,
       Swerve swerve,
       List<Command> startCommands,
       List<Command> endCommands) {
@@ -100,7 +100,7 @@ public class AutoSelector {
     feedbackEntry.setString("Enter a command!");
 
     m_field = new Field2d();
-    m_actionMap = actionMap;
+    m_actionFactory = actionFactory;
     m_swerve = swerve;
     m_startCommands = startCommands;
     m_endCommands = endCommands;
@@ -108,11 +108,7 @@ public class AutoSelector {
     // define auto factory for autos
     factory =
         new AutoFactory(
-            m_swerve::getPose,
-            m_swerve::setPose,
-            m_swerve::followSwerveSample,
-            true,
-            m_swerve);
+            m_swerve::getPose, m_swerve::setPose, m_swerve::followSwerveSample, true, m_swerve);
   }
 
   public void clearField() {
@@ -156,7 +152,13 @@ public class AutoSelector {
   }
 
   public void setupAutoTab() {
+    System.out.println("setting up auto tab");
+    NetworkTableInstance nt = NetworkTableInstance.getDefault();
+    NetworkTable ntTable = nt.getTable("Shuffleboard").getSubTable("Auto");
+
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+
+    Timer.delay(3);
 
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
@@ -172,9 +174,6 @@ public class AutoSelector {
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
         .withPosition(1, 2);
-
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable ntTable = inst.getTable("Shuffleboard").getSubTable("Auto");
 
     ntTable.addListener(
         "Generate",
@@ -197,9 +196,11 @@ public class AutoSelector {
   }
 
   public void generatePaths() {
+    setFeedback("Generating paths...");
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
 
+    System.out.println(autoString.length());
     if (!m_startPositions.containsKey(words[0].toLowerCase())) {
       setFeedback("Invalid start position");
       return;
@@ -263,9 +264,9 @@ public class AutoSelector {
           return;
         }
       }
-      if (m_actionMap.containsKey(action)) {
-        parallelGroup.addCommands(m_actionMap.get(action));
-        s.append(m_actionMap.get(action).getName() + " ");
+      if (action != -1 && m_actionFactory.getCommand(action) != null) {
+        parallelGroup.addCommands(m_actionFactory.getCommand(action));
+        s.append(m_actionFactory.getName(action) + " ");
       } else if (action != -1) {
         setFeedback("Action Not Found: " + action);
         m_autoCommand = Commands.runOnce(() -> {});

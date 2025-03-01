@@ -6,14 +6,9 @@ package frc.robot.commands.Autonomous;
 
 import static frc.robot.Constants.EndEffectorConstants.coralScoreDelay;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.FieldPose;
-import frc.lib.util.FieldPose.FieldElement;
-import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
@@ -34,11 +29,11 @@ public class AutoScoreL1 extends SequentialCommandGroup {
     addRequirements(swerve, elevator, coralIntake);
     addCommands(
         new ParallelCommandGroup(
-            new DriveVisionAlign(
-                swerve,
-                new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
-                poseController,
-                visionController),
+            // new DriveVisionAlign(
+            //     swerve,
+            //     new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
+            //     poseController,
+            //     visionController),
             new SetElevatorPosition(elevator, ElevatorPositions.L1, true)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake),

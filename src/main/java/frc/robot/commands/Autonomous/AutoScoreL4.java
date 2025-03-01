@@ -6,22 +6,18 @@ package frc.robot.commands.Autonomous;
 
 import static frc.robot.Constants.EndEffectorConstants.coralScoreDelay;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
-import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToBranch;
-import frc.robot.commands.Drivetrain.DriveVisionAlign;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
@@ -39,7 +35,15 @@ public class AutoScoreL4 extends SequentialCommandGroup {
     addRequirements(swerve, elevator, coralIntake);
     addCommands(
         new ParallelCommandGroup(
-            new AlignToBranch(swerve, camera, isLeft, poseController, new FieldPose(DriverStation.getAlliance().get(), CheckBounds.nearestElement(swerve.getPose()), isLeft ? Offset.LEFT : Offset.RIGHT)),
+            new AlignToBranch(
+                swerve,
+                camera,
+                isLeft,
+                poseController,
+                new FieldPose(
+                    DriverStation.getAlliance().get(),
+                    CheckBounds.nearestElement(swerve.getPose()),
+                    isLeft ? Offset.LEFT : Offset.RIGHT)),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, true)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake),

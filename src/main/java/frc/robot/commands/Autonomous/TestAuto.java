@@ -5,28 +5,19 @@
 package frc.robot.commands.Autonomous;
 
 import choreo.auto.AutoFactory;
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.FieldPose;
-import frc.lib.util.FieldPose.FieldElement;
-import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.AlignToBranch;
-import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
-import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
-import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
+import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -67,7 +58,8 @@ public class TestAuto extends SequentialCommandGroup {
         m_Factory.trajectoryCmd("st-rtl"),
         new InstantCommand(() -> swerve.stopModules(), swerve),
         // new RotateToSimilarFace(swerve),
-        // new AlignToBranch(swerve, rightCamera, true, poseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)),
+        // new AlignToBranch(swerve, rightCamera, true, poseAlignController, new
+        // FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)),
         new ScoreL4(elevator, coralIntake),
         m_Factory.trajectoryCmd("rtl-ht"),
         // new SnapHoldRotation(swerve, Rotation2d.fromDegrees(36), () -> 0, () -> 0),

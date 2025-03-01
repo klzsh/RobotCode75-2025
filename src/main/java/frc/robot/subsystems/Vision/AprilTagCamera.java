@@ -153,7 +153,7 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  @Logged
+  // @Logged
   public double getXSin() {
     if (getTarget(18).isEmpty()) {
       return 0;
@@ -172,7 +172,7 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  @Logged
+  // @Logged
   public double getYSin() {
     if (getTarget(18).isEmpty()) {
       return 0;

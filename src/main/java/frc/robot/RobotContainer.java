@@ -8,28 +8,21 @@ import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Autonomous.AutoDealgaefy;
-import frc.robot.commands.Autonomous.AutoScoreL1;
-import frc.robot.commands.Autonomous.AutoScoreL4;
-import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.ResetHeading;
@@ -57,6 +50,7 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import java.util.ArrayList;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -131,50 +125,27 @@ public class RobotContainer {
 
   private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton);
 
-  private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  // private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
   private final AutoFactory m_Factory =
       new AutoFactory(
           m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
-  private final Map<Integer, Command> m_AutoMap =
-      Map.of(
-          1,
-              new AutoScoreL1(
-                  m_Swerve, m_Elevator, m_CoralIntake, m_VisionController,
-  m_PoseAlignController),
-          2,
-              new AutoDealgaefy(
-                  m_Swerve,
-                  m_Elevator,
-                  m_AlgaeIntake,
-                  m_AlgaePivot,
-                  m_VisionController,
-                  m_PoseAlignController),
-          3,
-              new AutoScoreL4(
-                  m_Swerve,
-                  m_Elevator,
-                  m_CoralIntake,
-                  m_RightFacingCamera,
-                  m_PoseAlignController,
-                  true),
-          4,
-              new AutoScoreL4(
-                  m_Swerve,
-                  m_Elevator,
-                  m_CoralIntake,
-                  m_LeftFacingCamera,
-                  m_PoseAlignController,
-                  true),
-          5, new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake,
-  m_AlgaePivot),
-          6, new IntakeCoral(m_CoralIntake) // TODO add left/middle/right distinction
-          );
+  private final ActionFactory m_ActionFactory =
+      new ActionFactory(
+          m_Swerve,
+          m_Elevator,
+          m_CoralIntake,
+          m_AlgaePivot,
+          m_AlgaeIntake,
+          m_PoseAlignController,
+          m_VisionController,
+          m_LeftFacingCamera,
+          m_RightFacingCamera);
 
-    private final AutoSelector m_AutoSelector =
-        new AutoSelector(m_AutoMap, m_Swerve, new ArrayList<Command>(), new
-    ArrayList<Command>());
+  private final AutoSelector m_AutoSelector =
+      new AutoSelector(
+          m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -379,7 +350,14 @@ public class RobotContainer {
     // m_AutoSelector.generatePaths();
     // return m_AutoSelector.getAutoCommand();
     return new TestAuto(
-        m_Factory, m_CoralIntake, m_Swerve, m_Elevator, m_LeftFacingCamera, m_RightFacingCamera, m_VisionController, m_PoseAlignController);
+        m_Factory,
+        m_CoralIntake,
+        m_Swerve,
+        m_Elevator,
+        m_LeftFacingCamera,
+        m_RightFacingCamera,
+        m_VisionController,
+        m_PoseAlignController);
     // return null;
   }
 }
