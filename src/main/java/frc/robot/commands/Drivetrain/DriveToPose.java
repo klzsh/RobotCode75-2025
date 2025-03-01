@@ -45,7 +45,7 @@ public class DriveToPose extends Command {
     m_controller.reset(
         targetPose == null
             ? targetPose2d
-            : CheckBounds.getPose2DFromFieldPose(m_swerve, targetPose));
+            : CheckBounds.getNearestFieldPose2d(m_swerve, targetPose));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -56,7 +56,7 @@ public class DriveToPose extends Command {
             m_swerve.getPose(),
             targetPose == null
                 ? targetPose2d
-                : CheckBounds.getPose2DFromFieldPose(m_swerve, targetPose));
+                : CheckBounds.getNearestFieldPose2d(m_swerve, targetPose));
     m_swerve.setChassisSpeeds(speeds);
   }
 

@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 import static java.util.Map.entry;
 
 import edu.wpi.first.units.measure.Distance;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import java.util.Map;
 
@@ -44,6 +45,30 @@ public class FieldConstants {
           entry(21, 180.0),
           entry(20, 240.0),
           entry(19, 300.0));
+
+  public static final Map<FieldElement, Integer> blueTags =
+      Map.ofEntries(
+          entry(FieldElement.HT, 13),
+          entry(FieldElement.HB, 14),
+          entry(FieldElement.P, 16),
+          entry(FieldElement.RL, 18),
+          entry(FieldElement.RBL, 17),
+          entry(FieldElement.RBR, 22),
+          entry(FieldElement.RR, 21),
+          entry(FieldElement.RTR, 20),
+          entry(FieldElement.RTL, 19));
+
+  public static final Map<FieldElement, Integer> redTags =
+      Map.ofEntries(
+          entry(FieldElement.HT, 1),
+          entry(FieldElement.HB, 2),
+          entry(FieldElement.P, 3),
+          entry(FieldElement.RL, 7),
+          entry(FieldElement.RBL, 8),
+          entry(FieldElement.RBR, 9),
+          entry(FieldElement.RR, 10),
+          entry(FieldElement.RTR, 11),
+          entry(FieldElement.RTL, 6));
 
   public static final Distance reefLeftPoseOffset = Meters.of(0.14);
   public static final Distance reefRightPoseOffset = Meters.of(0.5);

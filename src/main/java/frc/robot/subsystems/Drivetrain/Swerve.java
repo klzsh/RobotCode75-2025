@@ -392,10 +392,10 @@ public class Swerve extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // m_LeftFacingCamera.updateHeading(getRotation2D());
-    // updatePoseByVision(m_LeftFacingCamera);
-    // m_RightFacingCamera.updateHeading(getRotation2D());
-    // updatePoseByVision(m_RightFacingCamera);
+    m_LeftFacingCamera.updateHeading(getRotation2D());
+    updatePoseByVision(m_LeftFacingCamera);
+    m_RightFacingCamera.updateHeading(getRotation2D());
+    updatePoseByVision(m_RightFacingCamera);
     // m_HPCamera.updateHeading(getRotation2D());
     // updatePoseByVision(m_HPCamera);
 
@@ -403,30 +403,30 @@ public class Swerve extends SubsystemBase {
 
     // set odometry to vision pose if it deviates by more than half a meter
 
-    // if (m_LeftFacingCamera.getEstimatedPose() != null) {
-    //   if (Math.abs(
-    //               m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
-    //                   - swerveOdometry.getEstimatedPosition().getX())
-    //           > .5
-    //       || Math.abs(
-    //               m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
-    //                   - swerveOdometry.getEstimatedPosition().getY())
-    //           > .5) {
-    //     setPoseByVision(m_LeftFacingCamera);
-    //   }
-    // }
-    // if (m_RightFacingCamera.getEstimatedPose() != null) {
-    //   if (Math.abs(
-    //               m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
-    //                   - swerveOdometry.getEstimatedPosition().getX())
-    //           > .5
-    //       || Math.abs(
-    //               m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
-    //                   - swerveOdometry.getEstimatedPosition().getY())
-    //           > .5) {
-    //     setPoseByVision(m_RightFacingCamera);
-    //   }
-    // }
+    if (m_LeftFacingCamera.getEstimatedPose() != null) {
+      if (Math.abs(
+                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
+                      - swerveOdometry.getEstimatedPosition().getX())
+              > .5
+          || Math.abs(
+                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
+                      - swerveOdometry.getEstimatedPosition().getY())
+              > .5) {
+        setPoseByVision(m_LeftFacingCamera);
+      }
+    }
+    if (m_RightFacingCamera.getEstimatedPose() != null) {
+      if (Math.abs(
+                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
+                      - swerveOdometry.getEstimatedPosition().getX())
+              > .5
+          || Math.abs(
+                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
+                      - swerveOdometry.getEstimatedPosition().getY())
+              > .5) {
+        setPoseByVision(m_RightFacingCamera);
+      }
+    }
     // if (m_HPCamera.getEstimatedPose() != null) {
     //   if (Math.abs(
     //               m_HPCamera.getEstimatedPose().estimatedPose.getX()

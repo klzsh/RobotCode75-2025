@@ -99,7 +99,7 @@ public class RobotContainer {
   // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
   // define drivetrain controllers
-  // @Logged
+  @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
 
   //   //@Logged

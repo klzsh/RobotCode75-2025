@@ -156,7 +156,7 @@ public class AlignToBranch extends Command {
     } else {
       ChassisSpeeds speeds =
           fallbackController.update(
-              m_Swerve.getPose(), CheckBounds.getPose2DFromFieldPose(m_Swerve, fallbackPose));
+              m_Swerve.getPose(), CheckBounds.getNearestFieldPose2d(m_Swerve, fallbackPose));
       m_Swerve.setChassisSpeeds(speeds);
     }
   }

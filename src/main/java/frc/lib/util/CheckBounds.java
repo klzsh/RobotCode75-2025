@@ -10,6 +10,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -49,12 +50,16 @@ public class CheckBounds {
     return nearestTag;
   }
 
-  public static Pose2d getPose2DFromFieldPose(Swerve swerve, FieldPose targetPose) {
-    int target = nearestTag(swerve.getPose());
-    targetPose.fieldElement = CheckBounds.nearestElement(swerve.getPose());
+  public static Pose2d getNearestFieldPose2d(Swerve swerve, FieldPose targetPose) {
+    // int target = nearestTag(swerve.getPose());
+    // targetPose.fieldElement = CheckBounds.nearestElement(swerve.getPose());
+    int targetTag =
+        targetPose.alliance == Alliance.Blue
+            ? blueTags.get(targetPose.fieldElement)
+            : redTags.get(targetPose.fieldElement);
     Pose2d tagPose =
         AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-            .getTagPose(target)
+            .getTagPose(targetTag)
             .get()
             .toPose2d();
     // return tagPose;
@@ -86,7 +91,7 @@ public class CheckBounds {
       return new Pose2d(
           poseToDrive.getX(),
           poseToDrive.getY(),
-          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 270));
+          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 90));
     }
     return poseToDrive;
   }

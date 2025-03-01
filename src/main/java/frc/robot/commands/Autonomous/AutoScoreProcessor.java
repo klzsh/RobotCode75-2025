@@ -26,7 +26,7 @@ public class AutoScoreProcessor extends SequentialCommandGroup {
       Swerve swerve, PoseAlignController poseController, AlgaeIntake intake, AlgaePivot pivot) {
     addRequirements(swerve, intake, pivot);
     Pose2d poseToDrive =
-        CheckBounds.getPose2DFromFieldPose(
+        CheckBounds.getNearestFieldPose2d(
             swerve, new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID));
     addCommands(
         new DriveToPose(swerve, poseController, poseToDrive, false),

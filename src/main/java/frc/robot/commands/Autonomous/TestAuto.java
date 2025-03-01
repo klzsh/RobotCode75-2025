@@ -5,11 +5,16 @@
 package frc.robot.commands.Autonomous;
 
 import choreo.auto.AutoFactory;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.AutoConstants;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
@@ -47,18 +52,31 @@ public class TestAuto extends SequentialCommandGroup {
         Commands.runOnce(
             () -> {
               swerve.zeroGyro(Rotation2d.fromDegrees(180));
-              swerve.setPose(
-                  new Pose2d(
-                      AutoConstants.blueStartPositions.get("st").getX(),
-                      AutoConstants.blueStartPositions.get("st").getY(),
-                      Rotation2d.fromDegrees(180)));
             }),
-        m_Factory.trajectoryCmd("st-rtl") // ,
-        // new DriveToPose(
-        //           swerve,
-        //           poseAlignController,
-        //           new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT),
-        //           false));
+        m_Factory.resetOdometry("st-rtl"),
+        m_Factory.trajectoryCmd("st-rtl"),
+        new InstantCommand(() -> swerve.stopModules(), swerve),
+        new DriveToPose(
+            swerve,
+            poseAlignController,
+            new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT),
+            false),
+        new WaitCommand(0.5),
+        m_Factory.trajectoryCmd("rtl-ht"),
+        new InstantCommand(() -> swerve.stopModules(), swerve),
+        new DriveToPose(
+            swerve,
+            poseAlignController,
+            new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID),
+            false),
+        new WaitCommand(0.5),
+        m_Factory.trajectoryCmd("ht-rtr"),
+        new InstantCommand(() -> swerve.stopModules(), swerve),
+        new DriveToPose(
+            swerve,
+            poseAlignController,
+            new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
+            false)
         // new RotateToSimilarFace(swerve),
         // new TranslateToBranch(swerve, visionController.m_RightFacingCamera, true,
         // poseAlignController, new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT))
