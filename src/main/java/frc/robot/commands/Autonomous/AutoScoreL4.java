@@ -6,37 +6,28 @@ package frc.robot.commands.Autonomous;
 
 import static frc.robot.Constants.EndEffectorConstants.coralScoreDelay;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.CheckBounds;
-import frc.lib.util.FieldPose;
-import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
+import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
-import frc.robot.subsystems.Vision.AprilTagCamera;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScoreL4 extends SequentialCommandGroup {
-  public AutoScoreL4(
-      Swerve swerve,
-      Elevator elevator,
-      CoralIntake coralIntake) {
+  public AutoScoreL4(Swerve swerve, Elevator elevator, CoralIntake coralIntake) {
     addRequirements(swerve, elevator, coralIntake);
     addCommands(
+        new IntakeCoral(coralIntake),
         new ParallelCommandGroup(
             // align to branch color
             new RotateToSimilarFace(swerve),
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, true)
-        ),
+            new SetElevatorPosition(elevator, ElevatorPositions.L4, true)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, false)),

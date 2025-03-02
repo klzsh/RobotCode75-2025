@@ -6,6 +6,7 @@ import java.util.OptionalDouble;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 public class ObjectDetetectorCamera extends SubsystemBase {
   // TODO: fix this mess
@@ -54,6 +55,18 @@ public class ObjectDetetectorCamera extends SubsystemBase {
   public OptionalDouble getTargetArea(int targetID) {
     if (m_Result.hasTargets()) {
       return OptionalDouble.of(m_Result.getTargets().get(targetID).getArea());
+    }
+    return OptionalDouble.empty();
+  }
+
+  public OptionalDouble getTargetXFromCenter(int targetID) {
+    if (m_Result.hasTargets()) {
+      List<TargetCorner> corners = m_Result.getTargets().get(targetID).getMinAreaRectCorners();
+      double sum = 0;
+      for (TargetCorner corner : corners) {
+        sum += corner.x;
+      }
+      return OptionalDouble.of(320 - sum / 4);
     }
     return OptionalDouble.empty();
   }

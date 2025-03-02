@@ -6,7 +6,6 @@ import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
-import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Drivetrain.VisionTranslationController;
@@ -62,8 +61,7 @@ public class ActionFactory {
             m_VisionController,
             m_PoseAlignController);
       case 3:
-        return new AutoScoreL4(
-            m_Swerve, m_Elevator, m_CoralIntake);
+        return new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake);
       case 4:
         return new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot);
       case 5:

@@ -258,11 +258,11 @@ public class AutoSelector {
 
           if (!isOdometryReset) {
             sequential.addCommands(
-             Commands.runOnce(() -> m_swerve.zeroGyro(Rotation2d.fromDegrees(180))), 
-            factory.resetOdometry(lastPose + "-" + point));
+                Commands.runOnce(() -> m_swerve.zeroGyro(Rotation2d.fromDegrees(180))),
+                factory.resetOdometry(lastPose + "-" + point));
             isOdometryReset = true;
           }
-          
+
           parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
           if (DriverStation.getAlliance().get() == Alliance.Red) {
             m_trajectories.set(
