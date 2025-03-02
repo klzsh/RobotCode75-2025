@@ -95,7 +95,7 @@ public class RobotContainer {
   //   //@Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  //   //@Logged(name = "Algae Pivot")
+    @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37)); // ain't this unplugged?

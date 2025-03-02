@@ -50,24 +50,45 @@ public class TestAuto extends SequentialCommandGroup {
     //         // new ScoreL4(elevator, CoralIntake)
     //         ));
     addCommands(
-        Commands.runOnce(
-            () -> {
-              swerve.zeroGyro(Rotation2d.fromDegrees(180));
-            }),
-        m_Factory.resetOdometry("st-rtl"),
-        m_Factory.trajectoryCmd("st-rtl"),
-        new InstantCommand(() -> swerve.stopModules(), swerve),
+        // Commands.runOnce(
+        //     () -> {
+        //       swerve.zeroGyro(Rotation2d.fromDegrees(180));
+        //     }),
+        // m_Factory.resetOdometry("st-rtl"),
+        // m_Factory.trajectoryCmd("st-rtl"),
+        // new InstantCommand(() -> swerve.stopModules(), swerve),
+        // // new RotateToSimilarFace(swerve),
+        // // new AlignToBranch(swerve, rightCamera, true, poseAlignController, new
+        // // FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)),
+        // new ScoreL4(elevator, coralIntake),
+        // m_Factory.trajectoryCmd("rtl-ht"),
+        // // new SnapHoldRotation(swerve, Rotation2d.fromDegrees(36), () -> 0, () -> 0),
+        // new InstantCommand(() -> coralIntake.setState(CoralStates.INTAKING)),
+        // new WaitCommand(0.5),
+        // m_Factory.trajectoryCmd("ht-rl"),
         // new RotateToSimilarFace(swerve),
-        // new AlignToBranch(swerve, rightCamera, true, poseAlignController, new
-        // FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)),
-        new ScoreL4(elevator, coralIntake),
-        m_Factory.trajectoryCmd("rtl-ht"),
-        // new SnapHoldRotation(swerve, Rotation2d.fromDegrees(36), () -> 0, () -> 0),
-        new InstantCommand(() -> coralIntake.setState(CoralStates.INTAKING)),
-        new WaitCommand(0.5),
-        m_Factory.trajectoryCmd("ht-rl"),
-        new RotateToSimilarFace(swerve),
-        new ScoreL4(elevator, coralIntake)
+        // new ScoreL4(elevator, coralIntake)
+
+        Commands.runOnce(
+          () -> {
+            swerve.zeroGyro(Rotation2d.fromDegrees(180));
+          }),
+      m_Factory.resetOdometry("sm-dl"),
+      m_Factory.trajectoryCmd("sm-dl"),
+      new InstantCommand(() -> swerve.stopModules(), swerve),
+      // new RotateToSimilarFace(swerve),
+      // new AlignToBranch(swerve, rightCamera, true, poseAlignController, new
+      // FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)),
+      new ScoreL4(elevator, coralIntake),
+      m_Factory.trajectoryCmd("d-hb"),
+      // new SnapHoldRotation(swerve, Rotation2d.fromDegrees(36), () -> 0, () -> 0),
+      new InstantCommand(() -> coralIntake.setState(CoralStates.INTAKING)),
+      new WaitCommand(0.5),
+      m_Factory.trajectoryCmd("hb-fl"),
+      new RotateToSimilarFace(swerve),
+      new ScoreL4(elevator, coralIntake)
+
+        
         // m_Factory.trajectoryCmd("rtl-ht"),
         // new InstantCommand(() -> swerve.stopModules(), swerve),
         // new DriveToPose(
