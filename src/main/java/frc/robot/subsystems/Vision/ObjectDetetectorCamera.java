@@ -24,10 +24,11 @@ public class ObjectDetetectorCamera extends SubsystemBase {
     }
   }
 
+  // Unused now
   // Using deprecated method for testing
-  public void updateByLatestResult() {
-    m_Result = m_Camera.getLatestResult();
-  }
+  // public void updateByLatestResult() {
+  //   m_Result = m_Camera.getLatestResult();
+  // }
 
   public OptionalDouble getTargetPitch(int targetID) {
     if (m_Result.hasTargets()) {

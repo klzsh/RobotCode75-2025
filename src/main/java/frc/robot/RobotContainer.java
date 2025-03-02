@@ -25,6 +25,7 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.AlignToBranch;
+import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -50,6 +51,8 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+
 import java.util.ArrayList;
 
 /**
@@ -72,6 +75,8 @@ public class RobotContainer {
   // @Logged(name = "HP Cam")
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
 
+  private final ObjectDetetectorCamera m_CageDetetectorCamera = new ObjectDetetectorCamera("Cage_camera"); 
+
   // @Logged(name = "Branch Cam")
   // private final AprilTagCamera m_BranchCamera = new AprilTagCamera("Branch_Cam", BranchCameraPose);
 
@@ -93,7 +98,7 @@ public class RobotContainer {
   //   //@Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
-  private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37));
+  private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37)); // ain't this unplugged?
 
   //   //@Logged(name = "Algae Lidar Sensor")
   //   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
@@ -115,15 +120,17 @@ public class RobotContainer {
 
   // define driver buttons
   private final JoystickButton robotRelative =
-      new JoystickButton(m_RightStick, robotRelativeButton);
-  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, resetHeadingButton);
+      new JoystickButton(m_RightStick, robotRelativeButton); // center button
+  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, resetHeadingButton); // left button
   private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
 
-  private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 1);
-  private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 1);
-  private final JoystickButton SimilarFaceRotate = new JoystickButton(m_RightStick, 3);
+  private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 1); // trigger
+  private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 1); // trigger
+  private final JoystickButton SimilarFaceRotate = new JoystickButton(m_RightStick, 3); // left button
 
-  private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton);
+  private final JoystickButton CageAlign = new JoystickButton(m_LeftStick, 2); // center button
+
+  private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
 
   // private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
@@ -280,6 +287,8 @@ public class RobotContainer {
             true,
             m_PoseAlignController,
             new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
+    
+    CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
     // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
