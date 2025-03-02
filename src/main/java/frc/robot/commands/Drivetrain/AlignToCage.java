@@ -6,6 +6,8 @@ import java.util.OptionalDouble;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -56,7 +58,7 @@ public class AlignToCage extends Command {
         
         currentYaw = m_CageDetector.getTargetYaw(0);
         currentPitch = m_CageDetector.getTargetPitch(0);
-        rotationCommand = rotationController.calculate(m_Swerve.getRotation2D().getDegrees(), 0);
+        rotationCommand = rotationController.calculate(m_Swerve.getRotation2D().getDegrees(), DriverStation.getAlliance().get() == Alliance.Blue ? 0 : 180);
 
         if (currentYaw.isPresent() && currentPitch.isPresent()) {
             yawSetpoint = -0.290486*(currentPitch.getAsDouble()) - 12.11571; // Linear regression
