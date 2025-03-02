@@ -204,8 +204,8 @@ public class RobotContainer {
   private void configureBindings() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    holdButton.whileTrue(
-        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+    // holdButton.whileTrue(
+        // new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
     // Score L* commands
     m_Controller
         .a()
@@ -245,7 +245,7 @@ public class RobotContainer {
                     m_AlgaePivot)
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
-    m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, m_PoseAlignController, new FieldPose(DriverStation.getAlliance().get(), FieldElement.D, Offset.MID), false));
+    // m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, m_PoseAlignController, new FieldPose(DriverStation.getAlliance().get(), FieldElement.D, Offset.MID), false));
     // coral commands
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
@@ -292,7 +292,7 @@ public class RobotContainer {
     
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
-    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
+    // SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
     // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
 
     // manual elevator overrides
