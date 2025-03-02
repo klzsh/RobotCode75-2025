@@ -2,6 +2,7 @@ package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.Autonomous.AutoDealgaefy;
+import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
@@ -62,14 +63,11 @@ public class ActionFactory {
             m_PoseAlignController);
       case 3:
         return new AutoScoreL4(
-            m_Swerve, m_Elevator, m_CoralIntake, m_RightFacingCamera, m_PoseAlignController, true);
+            m_Swerve, m_Elevator, m_CoralIntake);
       case 4:
-        return new AutoScoreL4(
-            m_Swerve, m_Elevator, m_CoralIntake, m_LeftFacingCamera, m_PoseAlignController, false);
-      case 5:
         return new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot);
-      case 6:
-        return new IntakeCoral(m_CoralIntake);
+      case 5:
+        return new AutoIntakeCoral(m_Swerve, m_CoralIntake);
     }
     return null;
   }
@@ -81,12 +79,10 @@ public class ActionFactory {
       case 2:
         return "Dealgaefy";
       case 3:
-        return "L4Left";
+        return "L4";
       case 4:
-        return "L4Right";
-      case 5:
         return "Processor";
-      case 6:
+      case 5:
         return "Intake";
     }
     return null;

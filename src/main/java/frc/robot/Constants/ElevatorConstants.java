@@ -27,7 +27,7 @@ public class ElevatorConstants {
 
   // Distance from GROUND.
   public static final Angle algaeRemovalOffset = Rotations.of(4.871);
-  public static final Angle l1Position = Rotations.of(2);
+  public static final Angle l1Position = Rotations.of(5.5);
   public static final Angle l2Position = Rotations.of(7.5);
   public static final Angle l3Position = Rotations.of(15.7);
   public static final Angle l4Position = Rotations.of(25.8);

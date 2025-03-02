@@ -18,57 +18,57 @@ public class FieldConstants {
 
   public static final Map<String, ElevatorPositions> algaeHeights =
       Map.ofEntries(
-          entry("rl", ElevatorPositions.L3),
-          entry("rbl", ElevatorPositions.L2),
-          entry("rbr", ElevatorPositions.L3),
-          entry("rr", ElevatorPositions.L2),
-          entry("rtr", ElevatorPositions.L3),
-          entry("rtl", ElevatorPositions.L2),
-          entry("RL", ElevatorPositions.L3),
-          entry("RBL", ElevatorPositions.L2),
-          entry("RBR", ElevatorPositions.L3),
-          entry("RR", ElevatorPositions.L2),
-          entry("RTR", ElevatorPositions.L3),
-          entry("RTL", ElevatorPositions.L2));
+          entry("a", ElevatorPositions.L3),
+          entry("b", ElevatorPositions.L2),
+          entry("c", ElevatorPositions.L3),
+          entry("d", ElevatorPositions.L2),
+          entry("e", ElevatorPositions.L3),
+          entry("f", ElevatorPositions.L2),
+          entry("A", ElevatorPositions.L3),
+          entry("B", ElevatorPositions.L2),
+          entry("C", ElevatorPositions.L3),
+          entry("D", ElevatorPositions.L2),
+          entry("E", ElevatorPositions.L3),
+          entry("F", ElevatorPositions.L2));
 
   public static final Map<Integer, Double> tagToHeadingMap =
       Map.ofEntries(
+          entry(6, 300.0),
           entry(7, 0.0),
           entry(8, 60.0),
           entry(9, 120.0),
           entry(10, 180.0),
           entry(11, 240.0),
-          entry(6, 300.0),
-          entry(18, 0.0),
           entry(17, 60.0),
-          entry(22, 120.0),
-          entry(21, 180.0),
+          entry(18, 0.0),
+          entry(19, 300.0),
           entry(20, 240.0),
-          entry(19, 300.0));
+          entry(21, 180.0),
+          entry(22, 120.0));
 
   public static final Map<FieldElement, Integer> blueTags =
       Map.ofEntries(
+          entry(FieldElement.A, 18),
+          entry(FieldElement.B, 19),
+          entry(FieldElement.C, 20),
+          entry(FieldElement.D, 21),
+          entry(FieldElement.E, 22),
+          entry(FieldElement.F, 17),
           entry(FieldElement.HT, 13),
           entry(FieldElement.HB, 14),
-          entry(FieldElement.P, 16),
-          entry(FieldElement.RL, 18),
-          entry(FieldElement.RBL, 17),
-          entry(FieldElement.RBR, 22),
-          entry(FieldElement.RR, 21),
-          entry(FieldElement.RTR, 20),
-          entry(FieldElement.RTL, 19));
+          entry(FieldElement.P, 16));
 
   public static final Map<FieldElement, Integer> redTags =
       Map.ofEntries(
-          entry(FieldElement.HT, 1),
-          entry(FieldElement.HB, 2),
+          entry(FieldElement.A, 7),
+          entry(FieldElement.B, 6),
+          entry(FieldElement.C, 11),
+          entry(FieldElement.D, 10),
+          entry(FieldElement.E, 9),
+          entry(FieldElement.F, 8),
           entry(FieldElement.P, 3),
-          entry(FieldElement.RL, 7),
-          entry(FieldElement.RBL, 8),
-          entry(FieldElement.RBR, 9),
-          entry(FieldElement.RR, 10),
-          entry(FieldElement.RTR, 11),
-          entry(FieldElement.RTL, 6));
+          entry(FieldElement.HT, 1),
+          entry(FieldElement.HB, 2));
 
   public static final Distance reefLeftPoseOffset = Meters.of(0.14);
   public static final Distance reefRightPoseOffset = Meters.of(0.5);

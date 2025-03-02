@@ -26,6 +26,7 @@ import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.AlignToCage;
+import frc.robot.commands.Drivetrain.DriveToPose;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.SnapHoldRotation;
@@ -73,7 +74,7 @@ public class RobotContainer {
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
   // @Logged(name = "HP Cam")
-  private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
+  private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera = new ObjectDetetectorCamera("Cage_camera"); 
 
@@ -244,6 +245,7 @@ public class RobotContainer {
                     m_AlgaePivot)
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
+    m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, m_PoseAlignController, new FieldPose(DriverStation.getAlliance().get(), FieldElement.D, Offset.MID), false));
     // coral commands
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
@@ -286,7 +288,7 @@ public class RobotContainer {
             m_RightFacingCamera,
             true,
             m_PoseAlignController,
-            new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
+            new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
     
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
@@ -356,17 +358,17 @@ public class RobotContainer {
     // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
 
     // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    // m_AutoSelector.generatePaths();
-    // return m_AutoSelector.getAutoCommand();
-    return new TestAuto(
-        m_Factory,
-        m_CoralIntake,
-        m_Swerve,
-        m_Elevator,
-        m_LeftFacingCamera,
-        m_RightFacingCamera,
-        m_VisionController,
-        m_PoseAlignController);
+    m_AutoSelector.generatePaths();
+    return m_AutoSelector.getAutoCommand();
+    // return new TestAuto(
+    //     m_Factory,
+    //     m_CoralIntake,
+    //     m_Swerve,
+    //     m_Elevator,
+    //     m_LeftFacingCamera,
+    //     m_RightFacingCamera,
+    //     m_VisionController,
+    //     m_PoseAlignController);
     // return null;
   }
 }

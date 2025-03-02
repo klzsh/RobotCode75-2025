@@ -7,12 +7,12 @@ public class FieldPose {
   public enum FieldElement {
     HT,
     HB,
-    RL,
-    RBL,
-    RBR,
-    RR,
-    RTR,
-    RTL,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
     P,
     // only placeholders, not  used for alignment
     BT,
@@ -21,24 +21,24 @@ public class FieldPose {
 
   public static FieldElement fromString(String reefPoint) {
     switch (reefPoint.toUpperCase()) {
-      case "RL":
-        return FieldElement.RL;
-      case "RBL":
-        return FieldElement.RBL;
-      case "RBR":
-        return FieldElement.RBR;
-      case "RR":
-        return FieldElement.RR;
-      case "RTR":
-        return FieldElement.RTR;
-      case "RTL":
-        return FieldElement.RTL;
+      case "A":
+        return FieldElement.A;
+      case "B":
+        return FieldElement.B;
+      case "C":
+        return FieldElement.C;
+      case "D":
+        return FieldElement.D;
+      case "E":
+        return FieldElement.E;
+      case "F":
+        return FieldElement.F;
+      case "P":
+        return FieldElement.P;
       case "HT":
         return FieldElement.HT;
       case "HB":
         return FieldElement.HB;
-      case "P":
-        return FieldElement.P;
       case "BT":
         return FieldElement.BT;
       case "BB":
@@ -49,12 +49,12 @@ public class FieldPose {
   }
 
   public static boolean fieldElementIsReef(FieldElement fieldElement) {
-    return (fieldElement == FieldElement.RL
-        || fieldElement == FieldElement.RBL
-        || fieldElement == FieldElement.RBR
-        || fieldElement == FieldElement.RR
-        || fieldElement == FieldElement.RTR
-        || fieldElement == FieldElement.RTL);
+    return (fieldElement == FieldElement.A
+        || fieldElement == FieldElement.B
+        || fieldElement == FieldElement.C
+        || fieldElement == FieldElement.D
+        || fieldElement == FieldElement.E
+        || fieldElement == FieldElement.F);
   }
 
   public static boolean fieldElementIsHPStation(FieldElement fieldElement) {

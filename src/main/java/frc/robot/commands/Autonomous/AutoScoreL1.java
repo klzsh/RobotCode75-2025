@@ -29,11 +29,7 @@ public class AutoScoreL1 extends SequentialCommandGroup {
     addRequirements(swerve, elevator, coralIntake);
     addCommands(
         new ParallelCommandGroup(
-            // new DriveVisionAlign(
-            //     swerve,
-            //     new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
-            //     poseController,
-            //     visionController),
+            // align to branch color
             new SetElevatorPosition(elevator, ElevatorPositions.L1, true)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake),

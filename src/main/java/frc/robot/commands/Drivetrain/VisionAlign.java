@@ -23,7 +23,7 @@ public class VisionAlign extends Command {
     m_Swerve = swerve;
 
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
-      targetPose.fieldElement = FieldElement.RL;
+      targetPose.fieldElement = FieldElement.A;
     }
     if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
       targetPose.fieldElement = FieldElement.HT;
