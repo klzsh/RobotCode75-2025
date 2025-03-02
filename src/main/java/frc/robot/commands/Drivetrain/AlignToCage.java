@@ -1,6 +1,5 @@
 package frc.robot.commands.Drivetrain;
 
-import java.util.Optional;
 import java.util.OptionalDouble;
 
 import edu.wpi.first.math.MathUtil;
@@ -9,7 +8,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 

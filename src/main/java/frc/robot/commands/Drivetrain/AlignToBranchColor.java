@@ -4,13 +4,7 @@
 
 package frc.robot.commands.Drivetrain;
 
-import static frc.robot.Constants.VisionConstants.heightThreshold;
-import static frc.robot.Constants.VisionConstants.heightWidthRatioThreshold;
-import static frc.robot.Constants.VisionConstants.widthSetpoint;
-import static frc.robot.Constants.VisionConstants.widthThreshold;
-import static frc.robot.Constants.VisionConstants.widthTolerance;
-import static frc.robot.Constants.VisionConstants.xSetpoint;
-import static frc.robot.Constants.VisionConstants.xTolerance;
+import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,33 +13,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import java.util.List;
-import java.util.Set;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlignToBranchColor extends Command {
-
-  private class VisionData {
-    public double x;
-    public double y;
-    public double width;
-    public double height;
-
-    public VisionData(double x, double y, double width, double height) {
-      this.x = x;
-      this.y = y;
-      this.width = width;
-      this.height = height;
-    }
-
-    public VisionData(String data) {
-      String[] split = data.split(",");
-      x = Double.parseDouble(split[0]);
-      y = Double.parseDouble(split[1]);
-      width = Double.parseDouble(split[2]);
-      height = Double.parseDouble(split[3]);
-    }
-  }
 
   private final Swerve m_Swerve;
   private final NetworkTableInstance nt;
