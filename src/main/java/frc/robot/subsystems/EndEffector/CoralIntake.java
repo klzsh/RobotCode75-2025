@@ -29,6 +29,7 @@ public class CoralIntake extends SubsystemBase {
     SCORING,
     INTAKING,
     POSITIONING,
+    REVERSING,
     DEFAULT // default is when the intake is doing nothing
   }
 
@@ -134,6 +135,9 @@ public class CoralIntake extends SubsystemBase {
             m_PositionRequest
                 .withPosition(coralRotationsAfterIntake.in(Rotations) * coralMotorGearRatio)
                 .withSlot(1));
+      }
+      case REVERSING -> {
+        m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralReverseSpeed).withSlot(0));
       }
       case DEFAULT -> {
         m_CoralMotor.setControl(m_CharacterizationRequest.withOutput(0));

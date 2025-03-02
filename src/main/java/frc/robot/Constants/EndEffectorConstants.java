@@ -47,6 +47,7 @@ public class EndEffectorConstants {
 
   public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(1000);
   public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(100);
+  public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-100);
   public static final Angle coralRotationsAfterIntake = Rotations.of(0.5);
   public static final double coralScoreDelay = 0.3;
 

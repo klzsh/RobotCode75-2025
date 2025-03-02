@@ -46,14 +46,14 @@ public class VisionConstants {
 
           // Reef offsets (THESE SHOULD ALL BE THE SAME, THEY ARE JUST HERE FOR CONSISTENCY )
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID).toString(),
+              new FieldPose(Alliance.Blue, FieldElement.A, Offset.MID).toString(),
               new Translation2d(0.0, 0.0)),
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT).toString(),
+              new FieldPose(Alliance.Blue, FieldElement.A, Offset.LEFT).toString(),
               //   new Translation2d(11.87, -4.75)),
               new Translation2d(0.24, -.1)),
           entry(
-              new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT).toString(),
+              new FieldPose(Alliance.Blue, FieldElement.A, Offset.RIGHT).toString(),
               new Translation2d(-8, -4))
 
           // TODO: Auto field flipping for blue side (or red side ig)
@@ -62,24 +62,24 @@ public class VisionConstants {
   public static final Map<Integer, FieldElement> tagIDToFieldElement =
       Map.ofEntries(
           // blue
-          entry(18, FieldElement.RL),
-          entry(17, FieldElement.RBL),
-          entry(22, FieldElement.RBR),
-          entry(21, FieldElement.RR),
-          entry(20, FieldElement.RTR),
-          entry(19, FieldElement.RTL),
+          entry(18, FieldElement.A),
+          entry(17, FieldElement.F),
+          entry(22, FieldElement.E),
+          entry(21, FieldElement.D),
+          entry(20, FieldElement.C),
+          entry(19, FieldElement.B),
           entry(13, FieldElement.HT),
           entry(12, FieldElement.HB),
           entry(16, FieldElement.P),
           entry(14, FieldElement.BT),
           entry(15, FieldElement.BB),
           // red
-          entry(7, FieldElement.RL),
-          entry(8, FieldElement.RBL),
-          entry(9, FieldElement.RBR),
-          entry(10, FieldElement.RR),
-          entry(11, FieldElement.RTR),
-          entry(6, FieldElement.RTL),
+          entry(7, FieldElement.A),
+          entry(8, FieldElement.F),
+          entry(9, FieldElement.E),
+          entry(10, FieldElement.D),
+          entry(11, FieldElement.C),
+          entry(6, FieldElement.B),
           entry(1, FieldElement.HT),
           entry(2, FieldElement.HB),
           entry(3, FieldElement.P),

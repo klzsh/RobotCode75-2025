@@ -23,12 +23,10 @@ import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Autonomous.TestAuto;
 import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
-import frc.robot.commands.Drivetrain.SnapHoldRotation;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
@@ -52,7 +50,6 @@ import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
-
 import java.util.ArrayList;
 
 /**
@@ -75,10 +72,12 @@ public class RobotContainer {
   // @Logged(name = "HP Cam")
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
-  private final ObjectDetetectorCamera m_CageDetetectorCamera = new ObjectDetetectorCamera("Cage_camera"); 
+  private final ObjectDetetectorCamera m_CageDetetectorCamera =
+      new ObjectDetetectorCamera("Cage_camera");
 
   // @Logged(name = "Branch Cam")
-  // private final AprilTagCamera m_BranchCamera = new AprilTagCamera("Branch_Cam", BranchCameraPose);
+  //   private final ObjectDetetectorCamera m_BranchCamera = new
+  // ObjectDetetectorCamera("Branch_Cam");
 
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
@@ -95,7 +94,7 @@ public class RobotContainer {
   //   //@Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-    @Logged(name = "Algae Pivot")
+  @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
 //   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37)); // ain't this unplugged?
@@ -121,16 +120,19 @@ public class RobotContainer {
   // define driver buttons
   private final JoystickButton robotRelative =
       new JoystickButton(m_RightStick, robotRelativeButton); // center button
-  private final JoystickButton resetHeading = new JoystickButton(m_LeftStick, resetHeadingButton); // left button
+  private final JoystickButton resetHeading =
+      new JoystickButton(m_LeftStick, resetHeadingButton); // left button
   private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
 
   private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 1); // trigger
   private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 1); // trigger
-  private final JoystickButton SimilarFaceRotate = new JoystickButton(m_RightStick, 3); // left button
+  private final JoystickButton SimilarFaceRotate =
+      new JoystickButton(m_RightStick, 3); // left button
 
   private final JoystickButton CageAlign = new JoystickButton(m_LeftStick, 2); // center button
 
-  private final JoystickButton holdButton = new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
+  private final JoystickButton holdButton =
+      new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
 
   // private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
 
@@ -203,8 +205,8 @@ public class RobotContainer {
   private void configureBindings() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    holdButton.whileTrue(
-        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+    // holdButton.whileTrue(
+    // new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
     // Score L* commands
     m_Controller
         .a()
@@ -244,6 +246,8 @@ public class RobotContainer {
                     m_AlgaePivot)
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
+    // m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, m_PoseAlignController, new
+    // FieldPose(DriverStation.getAlliance().get(), FieldElement.D, Offset.MID), false));
     // coral commands
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
@@ -286,8 +290,8 @@ public class RobotContainer {
             m_RightFacingCamera,
             true,
             m_PoseAlignController,
-            new FieldPose(Alliance.Blue, FieldElement.RTL, Offset.LEFT)));
-    
+            new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
+
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
@@ -356,17 +360,17 @@ public class RobotContainer {
     // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
 
     // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    // m_AutoSelector.generatePaths();
-    // return m_AutoSelector.getAutoCommand();
-    return new TestAuto(
-        m_Factory,
-        m_CoralIntake,
-        m_Swerve,
-        m_Elevator,
-        m_LeftFacingCamera,
-        m_RightFacingCamera,
-        m_VisionController,
-        m_PoseAlignController);
+    m_AutoSelector.generatePaths();
+    return m_AutoSelector.getAutoCommand();
+    // return new TestAuto(
+    //     m_Factory,
+    //     m_CoralIntake,
+    //     m_Swerve,
+    //     m_Elevator,
+    //     m_LeftFacingCamera,
+    //     m_RightFacingCamera,
+    //     m_VisionController,
+    //     m_PoseAlignController);
     // return null;
   }
 }

@@ -6,9 +6,11 @@ package frc.robot.commands.Autonomous;
 
 import static frc.robot.Constants.FieldConstants.algaeHeights;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
@@ -43,11 +45,8 @@ public class AutoDealgaefy extends SequentialCommandGroup {
     ElevatorPositions elevatorHeight = algaeHeights.get(elem.toString());
     addCommands(
         new ParallelCommandGroup(
-            // new DriveVisionAlign(
-            //     swerve,
-            //     new FieldPose(DriverStation.getAlliance().get(), FieldElement.RL, Offset.MID),
-            //     poseController,
-            //     visionController),
+            // new DriveToPose(swerve, poseController, new
+            // FieldPose(DriverStation.getAlliance().get(), elem, Offset.MID), false),
             new SetElevatorPosition(elevator, elevatorHeight, true)),
         new ParallelCommandGroup(
                 new InstantCommand(
@@ -61,7 +60,18 @@ public class AutoDealgaefy extends SequentialCommandGroup {
                     .until(() -> intake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                 new SetElevatorPosition(elevator, elevatorHeight, true))
             .until(() -> intake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-        new InstantCommand(() -> pivot.setPivotState(PivotState.RETRACTED))
+        new ParallelCommandGroup(
+            new InstantCommand(
+                () -> {
+                  swerve.setRobotRelative(new ChassisSpeeds(-0.25, 0, 0));
+                }),
+            new WaitCommand(0.5),
+            new SetElevatorPosition(elevator, elevatorHeight, true)),
+        new InstantCommand(
+                () -> {
+                  pivot.setPivotState(PivotState.RETRACTED);
+                  elevator.setPosition(ElevatorPositions.HOME, false);
+                })
             .repeatedly()
             .until(() -> pivot.isAtPosition(PivotState.RETRACTED)));
   }

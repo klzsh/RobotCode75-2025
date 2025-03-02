@@ -4,28 +4,22 @@
 
 package frc.robot.commands.Autonomous;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
-import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.DriveToPose;
-import frc.robot.commands.EndEffector.Coral.IntakeCoral;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.CoralIntake;
+import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AutoIntakeCoral extends SequentialCommandGroup {
   /** Creates a new AutoIntakeCoral. */
-  public AutoIntakeCoral(
-      Swerve swerve,
-      CoralIntake coralIntake,
-      PoseAlignController poseAlignController,
-      Offset offset) {
+  public AutoIntakeCoral(Swerve swerve, CoralIntake coralIntake) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(swerve, coralIntake);
@@ -34,11 +28,7 @@ public class AutoIntakeCoral extends SequentialCommandGroup {
       elem = FieldElement.HT;
     }
     addCommands(
-        new DriveToPose(
-            swerve,
-            poseAlignController,
-            new FieldPose(DriverStation.getAlliance().get(), elem, offset),
-            false),
-        new IntakeCoral(coralIntake));
+        new InstantCommand(() -> coralIntake.setState(CoralStates.INTAKING), coralIntake),
+        new WaitCommand(0.5));
   }
 }

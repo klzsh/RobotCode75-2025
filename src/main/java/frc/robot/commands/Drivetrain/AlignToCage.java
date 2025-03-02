@@ -1,20 +1,18 @@
 package frc.robot.commands.Drivetrain;
 
-import java.util.OptionalDouble;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+import java.util.OptionalDouble;
 
 public class AlignToCage extends Command {
 
-    private final Swerve m_Swerve;
-    private final ObjectDetetectorCamera m_CageDetector;
+  private final Swerve m_Swerve;
+  private final ObjectDetetectorCamera m_CageDetector;
 
     private final double finalYawSetpoint = -8;
     private final double finalPitchSetpoint = -9;
@@ -23,33 +21,33 @@ public class AlignToCage extends Command {
     private double yawSetpoint;
     private double pitchSetpoint;
 
-    private OptionalDouble currentYaw;
-    private OptionalDouble currentPitch;
+  private OptionalDouble currentYaw;
+  private OptionalDouble currentPitch;
 
-    private final PIDController xController;
-    private final PIDController yController;
-    private final PIDController rotationController;
+  private final PIDController xController;
+  private final PIDController yController;
+  private final PIDController rotationController;
 
-    private double xCommand;
-    private double yCommand;
-    private double rotationCommand;
+  private double xCommand;
+  private double yCommand;
+  private double rotationCommand;
 
-    public AlignToCage(Swerve swerve, ObjectDetetectorCamera cageDetector) {
-        m_Swerve = swerve;
-        m_CageDetector = cageDetector;
+  public AlignToCage(Swerve swerve, ObjectDetetectorCamera cageDetector) {
+    m_Swerve = swerve;
+    m_CageDetector = cageDetector;
 
         xController = new PIDController(0.05, 0.0, 0.0);
         yController = new PIDController(0.05, 0.0, 0.0);
         rotationController = new PIDController(0.05, 0.0, 0.0);
         rotationController.setTolerance(1.5);
 
-        addRequirements(m_Swerve);
-    }
+    addRequirements(m_Swerve);
+  }
 
-    @Override
-    public void initialize() {
-        m_CageDetector.updateByUnreadResults();
-    }
+  @Override
+  public void initialize() {
+    m_CageDetector.updateByUnreadResults();
+  }
 
     @Override
     public void execute() {
@@ -81,15 +79,11 @@ public class AlignToCage extends Command {
         }
     }
 
-    @Override
-    public void end(boolean interrupted) {
+  @Override
+  public void end(boolean interrupted) {}
 
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }

@@ -199,6 +199,9 @@ public class Swerve extends SubsystemBase {
   public void toggleFieldRelative() {
     m_FieldRelative = true;
   }
+  public boolean getFieldRelative(){
+    return m_FieldRelative;
+  }
 
   /**
    * intermediary function to convert between chassis speeds and swerve module states

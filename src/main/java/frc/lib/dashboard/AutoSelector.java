@@ -2,6 +2,7 @@ package frc.lib.dashboard;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -47,18 +48,18 @@ import java.util.Map;
  */
 
 /* ACTIONS
- * 1 for align + score L1 + move back to R point
- * 2 for align + elevator movement & dealgify (decide level by last point or apriltag) + move back to R point
- * 3, 4 for align + elevator movement & score left/right L4 + move back to R point
- * 5 for align + elevator movement & processor + move back to P point
- * 6, 7, 8 for align to left/middle/right coral station + check for beam break + move back to H point
+ * 1 for align + score L1
+ * 2 for align + elevator movement & dealgify (decide level by last point or apriltag)
+ * 3 for align + elevator movement & score L4
+ * 4 for align + elevator movement & processor
+ * 5 for align to left/middle/right coral station + wait set time
  */
 
 /* POINTS
  * ST, SM, SB - top/middle/bottom starting positions
  * L - arbitrary leave point
  * P - processor
- * RTL, RTR, RBL, RBR, RR, RL - reef points
+ * A, B, C, D, E, F - reef points, followed by L/M/R for offset (M for algae)
  * HT, HB - human player stations
  */
 
@@ -209,6 +210,7 @@ public class AutoSelector {
 
     SequentialCommandGroup sequential = new SequentialCommandGroup();
     StringBuilder s = new StringBuilder();
+    boolean isOdometryReset = false;
     m_trajectories.clear();
 
     for (Command startCommand : m_startCommands) {
@@ -250,6 +252,17 @@ public class AutoSelector {
         try {
           // m_trajectories.add(
           //     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+          if (lastPose.charAt(0) >= 'a' && lastPose.charAt(0) <= 'f') {
+            lastPose = lastPose.substring(0, 1);
+          }
+
+          if (!isOdometryReset) {
+            sequential.addCommands(
+                Commands.runOnce(() -> m_swerve.zeroGyro(Rotation2d.fromDegrees(180))),
+                factory.resetOdometry(lastPose + "-" + point));
+            isOdometryReset = true;
+          }
+
           parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
           if (DriverStation.getAlliance().get() == Alliance.Red) {
             m_trajectories.set(
@@ -275,7 +288,7 @@ public class AutoSelector {
       sequential.addCommands(parallelGroup);
       sequential.addCommands(new InstantCommand(() -> m_swerve.stopModules(), m_swerve));
     }
-    setFeedback("Auto Sequence: " + s.toString());
+    setFeedback(s.toString());
     drawPaths();
     m_autoCommand = sequential;
   }
