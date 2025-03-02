@@ -48,7 +48,7 @@ public class AprilTagCamera extends SubsystemBase {
 
     m_poseEstimator =
         new PhotonPoseEstimator(m_tagLayout, PoseStrategy.CONSTRAINED_SOLVEPNP, cameraPose);
-    m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
+    m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
   }
 
   public boolean hasTarget() {

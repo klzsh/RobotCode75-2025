@@ -18,9 +18,10 @@ public class AlignToCage extends Command {
 
     private final double finalYawSetpoint = -8;
     private final double finalPitchSetpoint = -9;
-    private final double intermediateYawSetpoint = -3;  // only used if align needs to be two step
+    private final double intermediatePitchSetpoint = 0;  // only used if align needs to be two step
 
     private double yawSetpoint;
+    private double pitchSetpoint;
 
     private OptionalDouble currentYaw;
     private OptionalDouble currentPitch;
@@ -37,8 +38,8 @@ public class AlignToCage extends Command {
         m_Swerve = swerve;
         m_CageDetector = cageDetector;
 
-        xController = new PIDController(0.10, 0.0, 0.0);
-        yController = new PIDController(0.10, 0.0, 0.0);
+        xController = new PIDController(0.05, 0.0, 0.0);
+        yController = new PIDController(0.05, 0.0, 0.0);
         rotationController = new PIDController(0.05, 0.0, 0.0);
         rotationController.setTolerance(1.5);
 
@@ -56,20 +57,27 @@ public class AlignToCage extends Command {
         
         currentYaw = m_CageDetector.getTargetYaw(0);
         currentPitch = m_CageDetector.getTargetPitch(0);
-        rotationCommand = rotationController.calculate(m_Swerve.getRotation2D().getDegrees(), DriverStation.getAlliance().get() == Alliance.Blue ? 0 : 180);
+        rotationCommand = rotationController.calculate(m_Swerve.getRotation2D().getDegrees(), DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0);
+
 
         if (currentYaw.isPresent() && currentPitch.isPresent()) {
+            if (Math.abs(currentYaw.getAsDouble() - finalYawSetpoint) >= .1) {
+                xCommand = xController.calculate(currentPitch.getAsDouble(), intermediatePitchSetpoint);
+            }
+            else {
+                xCommand = -1; // drive forward after aligned
+            }
+
             yawSetpoint = -0.290486*(currentPitch.getAsDouble()) - 12.11571; // Linear regression
-            xCommand = xController.calculate(currentPitch.getAsDouble(), finalPitchSetpoint);
+
             yCommand = yController.calculate(currentYaw.getAsDouble(), yawSetpoint);
-            
             xCommand = MathUtil.clamp(xCommand, -1, 1); // not tryna fly away n shi
             yCommand = MathUtil.clamp(yCommand, -1, 1);
 
-            m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, yCommand, rotationCommand));
+            m_Swerve.setChassisSpeeds(new ChassisSpeeds(xCommand, -yCommand, rotationCommand));
         }
         else {
-            m_Swerve.setChassisSpeeds(new ChassisSpeeds(0.3, 0, rotationCommand)); // creep forward
+            m_Swerve.setChassisSpeeds(new ChassisSpeeds(-0.3, 0, rotationCommand)); // creep forward
         }
     }
 

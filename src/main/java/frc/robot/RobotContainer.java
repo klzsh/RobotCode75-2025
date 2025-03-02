@@ -73,7 +73,7 @@ public class RobotContainer {
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
   // @Logged(name = "HP Cam")
-  private final AprilTagCamera m_HPCamera = new AprilTagCamera("Cage_Cam", HPCameraPose);
+  private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera = new ObjectDetetectorCamera("Cage_camera"); 
 
@@ -98,7 +98,7 @@ public class RobotContainer {
     @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
-  private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37)); // ain't this unplugged?
+//   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37)); // ain't this unplugged?
 
   //   //@Logged(name = "Algae Lidar Sensor")
   //   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
