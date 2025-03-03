@@ -319,7 +319,7 @@ public class RobotContainer {
     // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
 
     // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    m_AutoSelector.generatePaths();
+    m_AutoSelector.generatePaths(); // TODO: move to robot or smth due to the delay
     return m_AutoSelector.getAutoCommand();
     // return new TestAuto(
     //     m_Factory,
