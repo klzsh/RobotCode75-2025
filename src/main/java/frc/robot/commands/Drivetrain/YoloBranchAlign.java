@@ -3,12 +3,22 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import java.util.OptionalDouble;
 
 public class YoloBranchAlign extends Command {
+
+  private final TunableNumber[] strafePID = {
+    new TunableNumber("YOLO Align/P", 0),
+    new TunableNumber("YOLO Align/I", 0),
+    new TunableNumber("YOLO Align/D", 0),
+    new TunableNumber("YOLO Align/Tolderance", 0.05)
+  };
+
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
   private final boolean isLeft;
@@ -37,7 +47,7 @@ public class YoloBranchAlign extends Command {
 
     xController = new PIDController(.1, 0, 0);
     yController = new PIDController(.1, 0, 0);
-    yController.setTolerance(.1);
+    yController.setTolerance(.01);
     yController.setSetpoint(Math.sin(Units.degreesToRadians(finalYawSetpoint)));
 
     desiredSpeeds = new ChassisSpeeds();
@@ -45,11 +55,19 @@ public class YoloBranchAlign extends Command {
     addRequirements(m_Swerve);
   }
 
+
   @Override
   public void initialize() {}
 
   @Override
   public void execute() {
+    yController.setP(strafePID[0].getNumber());
+    yController.setI(strafePID[1].getNumber());
+    yController.setD(strafePID[2].getNumber());
+    yController.setTolerance(strafePID[3].getNumber());
+
+    SmartDashboard.putBoolean("YOLO yatSetpoint", yController.atSetpoint());
+
     m_BranchDetectorCamera.updateByUnreadResults();
 
     if (!m_BranchDetectorCamera.hasTargets()) {

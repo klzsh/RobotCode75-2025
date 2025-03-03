@@ -54,11 +54,11 @@ import java.util.ArrayList;
 // @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  // @Logged(name = "Left Facing Mod Cam")
+  @Logged(name = "Left Facing Mod Cam")
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  // @Logged(name = "Right Facing Mod Cam")
+  @Logged(name = "Right Facing Mod Cam")
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
@@ -69,13 +69,12 @@ public class RobotContainer {
       new ObjectDetetectorCamera("Cage_camera");
 
   // @Logged(name = "Branch Cam")
-    private final ObjectDetetectorCamera m_BranchCamera = new
-  ObjectDetetectorCamera("Branch_Cam");
+  private final ObjectDetetectorCamera m_BranchCamera = new ObjectDetetectorCamera("Branch_Cam");
 
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-  //@Logged(name = "Elevator")
+  // @Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
   @Logged(name = "Coral Intake")
@@ -84,7 +83,7 @@ public class RobotContainer {
   @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
-  //@Logged(name = "Algae Intake")
+  // @Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
   @Logged(name = "Algae Pivot")
@@ -117,7 +116,8 @@ public class RobotContainer {
   private final JoystickButton SimilarFaceRotate =
       new JoystickButton(m_RightStick, rotateToSimilarFaceButton); // left button
 
-  private final JoystickButton CageAlign = new JoystickButton(m_LeftStick, cageAlignButton); // center button
+  private final JoystickButton CageAlign =
+      new JoystickButton(m_LeftStick, cageAlignButton); // center button
 
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
