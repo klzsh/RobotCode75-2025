@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -20,15 +17,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
-import frc.lib.util.FieldPose;
-import frc.lib.util.FieldPose.FieldElement;
-import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Drivetrain.AlignToBranch;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
+import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
@@ -47,7 +41,6 @@ import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
-import frc.robot.subsystems.Util.CANRangeWrapper;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import java.util.ArrayList;
@@ -76,13 +69,13 @@ public class RobotContainer {
       new ObjectDetetectorCamera("Cage_camera");
 
   // @Logged(name = "Branch Cam")
-  //   private final ObjectDetetectorCamera m_BranchCamera = new
-  // ObjectDetetectorCamera("Branch_Cam");
+    private final ObjectDetetectorCamera m_BranchCamera = new
+  ObjectDetetectorCamera("Branch_Cam");
 
   @Logged(name = "Swerve")
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-  //   //@Logged(name = "Elevator")
+  //@Logged(name = "Elevator")
   private final Elevator m_Elevator = new Elevator();
 
   @Logged(name = "Coral Intake")
@@ -91,18 +84,11 @@ public class RobotContainer {
   @Logged(name = "Climber")
   private final Climber m_Climber = new Climber();
 
-  //   //@Logged(name = "Algae Intake")
+  //@Logged(name = "Algae Intake")
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
   @Logged(name = "Algae Pivot")
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
-
-//   private final CANRangeWrapper m_CANRange = new CANRangeWrapper(Inches.of(37)); // ain't this unplugged?
-
-  //   //@Logged(name = "Algae Lidar Sensor")
-  //   private final LidarDistance distanceSensor = new LidarDistance(Inches.of(36));
-
-  // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
 
   // define drivetrain controllers
   @Logged
@@ -122,23 +108,19 @@ public class RobotContainer {
       new JoystickButton(m_RightStick, robotRelativeButton); // center button
   private final JoystickButton resetHeading =
       new JoystickButton(m_LeftStick, resetHeadingButton); // left button
-  private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstance);
+  private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstanceButton);
 
-  private final JoystickButton AlignLeft = new JoystickButton(m_LeftStick, 1); // trigger
-  private final JoystickButton AlignRight = new JoystickButton(m_RightStick, 1); // trigger
+  private final JoystickButton AlignLeft =
+      new JoystickButton(m_LeftStick, autoAlignButton); // trigger
+  private final JoystickButton AlignRight =
+      new JoystickButton(m_RightStick, autoAlignButton); // trigger
   private final JoystickButton SimilarFaceRotate =
-      new JoystickButton(m_RightStick, 3); // left button
+      new JoystickButton(m_RightStick, rotateToSimilarFaceButton); // left button
 
-  private final JoystickButton CageAlign = new JoystickButton(m_LeftStick, 2); // center button
+  private final JoystickButton CageAlign = new JoystickButton(m_LeftStick, cageAlignButton); // center button
 
-  private final JoystickButton holdButton =
-      new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
-
-  // private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
-
-  private final AutoFactory m_Factory =
-      new AutoFactory(
-          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+  //   private final JoystickButton holdButton =
+  //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
 
   private final ActionFactory m_ActionFactory =
       new ActionFactory(
@@ -160,7 +142,8 @@ public class RobotContainer {
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDefaultCommands();
-    configureBindings();
+    configureJoystickBinds();
+    configureControllerBinds();
     configureChooser();
   }
 
@@ -174,7 +157,7 @@ public class RobotContainer {
             () -> -m_LeftStick.getY(),
             () -> -m_LeftStick.getX(),
             () -> -m_RightStick.getX()));
-    // m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
+
     m_Elevator.setDefaultCommand(
         new InstantCommand(() -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
             .repeatedly());
@@ -185,9 +168,6 @@ public class RobotContainer {
         new InstantCommand(() -> m_AlgaeIntake.resetAlgaeState(), m_AlgaeIntake).repeatedly());
     m_AlgaePivot.setDefaultCommand(
         new InstantCommand(() -> m_AlgaePivot.resetPivotState(), m_AlgaePivot).repeatedly());
-    // m_Climber.setDefaultCommand(
-    //     new InstantCommand(() -> m_Climber.setState(ClimberPositions.DEFAULT), m_Climber)
-    //         .repeatedly());
     m_Climber.setDefaultCommand(
         new InstantCommand(
             () -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
@@ -202,32 +182,58 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  private void configureBindings() {
+  private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    // holdButton.whileTrue(
-    // new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
-    // Score L* commands
+    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
+    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
+
+    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
+    robotRelative
+        .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
+        .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
+    // AlignLeft.whileTrue(
+    //     new AlignToBranch(
+    //         m_Swerve,
+    //         m_RightFacingCamera,
+    //         true,
+    //         m_PoseAlignController,
+    //         new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
+
+    // AlignLeft.whileTrue(
+    //   new AlignToBranch(
+    //       m_Swerve,
+    //       m_RightFacingCamera,
+    //       true,
+    //       m_PoseAlignController,
+    //       new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
+
+    // Auto Align commands
+
+  }
+
+  public void configureControllerBinds() {
+    // score L* commands
     m_Controller
         .a()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
         .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
     m_Controller
         .x()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
         .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
     m_Controller
         .y()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
         .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
     m_Controller
         .b()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
         .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
-    // algae ground pickup & scoring
-    // m_Controller.povLeft().onTrue(new InstantCommand(() -> m_Climber.resetPosition()));
+    // algae commands
     m_Controller
         .povRight()
         .whileTrue(
@@ -246,8 +252,6 @@ public class RobotContainer {
                     m_AlgaePivot)
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
-    // m_Controller.rightBumper().whileTrue(new DriveToPose(m_Swerve, m_PoseAlignController, new
-    // FieldPose(DriverStation.getAlliance().get(), FieldElement.D, Offset.MID), false));
     // coral commands
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
@@ -255,48 +259,6 @@ public class RobotContainer {
         .whileTrue(
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
                 .repeatedly());
-
-    // AlignLeft.and(() -> !AlignRight.getAsBoolean())
-    //     .whileTrue(
-    //         new DriveToPose(
-    //             m_Swerve,
-    //             m_PoseAlignController,
-    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.LEFT),
-    //             false));
-    // AlignRight.and(() -> !AlignLeft.getAsBoolean())
-    //     .whileTrue(
-    //         new DriveToPose(
-    //             m_Swerve,
-    //             m_PoseAlignController,
-    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
-    //             false)
-    //         // new DriveVisionAlign(
-    //         //     m_Swerve,
-    //         //     new FieldPose(Alliance.Blue, FieldElement.RL, Offset.RIGHT),
-    //         //     m_PoseAlignController,
-    //         //     m_VisionController));
-    //         );
-    // AlignRight.and(() -> AlignLeft.getAsBoolean())
-    //     .whileTrue(
-    //         new DriveToPose(
-    //             m_Swerve,
-    //             m_PoseAlignController,
-    //             new FieldPose(Alliance.Blue, FieldElement.RL, Offset.MID),
-    //             false));
-
-    AlignLeft.whileTrue(
-        new AlignToBranch(
-            m_Swerve,
-            m_RightFacingCamera,
-            true,
-            m_PoseAlignController,
-            new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
-
-    CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
-
-    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
-    // AlignRight.whileTrue(new TranslateToBranch(m_Swerve, m_LeftFacingCamera,false));
-
     // manual elevator overrides
 
     m_Controller
@@ -340,9 +302,6 @@ public class RobotContainer {
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
-    robotRelative
-        .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
-        .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
   }
 
   private void configureChooser() {
