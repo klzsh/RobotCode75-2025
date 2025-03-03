@@ -35,7 +35,7 @@ public class TeleopSwerve extends Command {
   public void execute() {
     // translation, strafe, rotation is the order
     double[] DriverInput = Joysticks.processJoystick(translationSup, strafeSup, rotationSup);
-    if(!m_Swerve.getFieldRelative()){
+    if (!m_Swerve.getFieldRelative()) {
       DriverInput[0] *= 0.5;
       DriverInput[1] *= 0.5;
       DriverInput[2] *= 0.5;

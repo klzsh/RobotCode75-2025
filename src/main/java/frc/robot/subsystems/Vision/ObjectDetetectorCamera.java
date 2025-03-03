@@ -2,10 +2,9 @@ package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
-import java.util.Optional;
-
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -81,7 +80,8 @@ public class ObjectDetetectorCamera extends SubsystemBase {
 
   public OptionalDouble getTargetXFromCenter(int targetID) {
     if (m_Result.get().hasTargets()) {
-      List<TargetCorner> corners = m_Result.get().getTargets().get(targetID).getMinAreaRectCorners();
+      List<TargetCorner> corners =
+          m_Result.get().getTargets().get(targetID).getMinAreaRectCorners();
       double sum = 0;
       for (TargetCorner corner : corners) {
         sum += corner.x;
