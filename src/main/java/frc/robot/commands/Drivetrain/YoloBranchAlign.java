@@ -10,6 +10,7 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import java.util.OptionalDouble;
 
+
 public class YoloBranchAlign extends Command {
 
   private final TunableNumber[] strafePID = {
@@ -21,7 +22,7 @@ public class YoloBranchAlign extends Command {
 
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
-  private final boolean isLeft;
+  private final boolean isCenterAlign;
 
   // private final PIDController rotationController; // add if needed, poss just pass through a
   // heading or do this as a seperate command
@@ -40,10 +41,10 @@ public class YoloBranchAlign extends Command {
   private final double stallSpeedThreshold = .05;
 
   public YoloBranchAlign(
-      Swerve swerve, ObjectDetetectorCamera brachDetectorCamera, boolean alignLeft) {
+      Swerve swerve, ObjectDetetectorCamera brachDetectorCamera, boolean alignCenter) {
     m_Swerve = swerve;
     m_BranchDetectorCamera = brachDetectorCamera;
-    isLeft = alignLeft;
+    isCenterAlign = alignCenter;
 
     xController = new PIDController(.1, 0, 0);
     yController = new PIDController(.1, 0, 0);
@@ -74,21 +75,35 @@ public class YoloBranchAlign extends Command {
       m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0)); // poss creep
       return;
     }
-    if (!yController.atSetpoint()) {
-      if (isLeft) { // use leftmost for target indexing in photonvision
-        currentYaw = m_BranchDetectorCamera.getTargetYaw(0);
-      } else {
-        currentYaw =
-            m_BranchDetectorCamera.getTargetYaw(
-                m_BranchDetectorCamera.getNumTargets().getAsInt() - 1);
+
+    int targetTagID = 0;
+    double targetYaw = 0;
+    double lowestError = Double.MAX_VALUE;
+    for (int j = 0; j < m_BranchDetectorCamera.getNumTargets().getAsInt(); j++) {
+      double currentYaw = Math.sin(Units.degreesToRadians(m_BranchDetectorCamera.getTargetYaw(j).getAsDouble()));
+      double currentError = Math.abs(currentYaw - Math.sin(Units.degreesToRadians(finalYawSetpoint)));
+
+      if (currentError < lowestError) {
+        lowestError = currentError;
+        targetTagID = j;
+        targetYaw = currentYaw;
       }
+    }
 
-      yCommand = yController.calculate(Math.sin(Units.degreesToRadians(currentYaw.getAsDouble())));
+    yCommand = yController.calculate(targetYaw);
 
+    if (!yController.atSetpoint()) {
+      // if (isLeft) { // use leftmost for target indexing in photonvision
+      //   currentYaw = m_BranchDetectorCamera.getTargetYaw(0);
+      // } else {
+      //   currentYaw =
+      //       m_BranchDetectorCamera.getTargetYaw(
+      //           m_BranchDetectorCamera.getNumTargets().getAsInt() - 1);
+      // }
       desiredSpeeds = new ChassisSpeeds(0, yCommand, 0);
       m_Swerve.setChassisSpeeds(desiredSpeeds); // creep if needed
     } else {
-      desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed, 0, 0);
+      desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0);
       m_Swerve.setChassisSpeeds(desiredSpeeds); // drive into reef once strafe aligned
     }
   }
