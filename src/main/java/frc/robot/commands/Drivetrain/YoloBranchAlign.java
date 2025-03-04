@@ -78,7 +78,9 @@ public class YoloBranchAlign extends Command {
 
     int targetTagID = 0;
     double targetYaw = 0;
+    double secondTargetYaw = 0; // for center align
     double lowestError = Double.MAX_VALUE;
+    double secondLowestError = Double.MAX_VALUE;
     for (int j = 0; j < m_BranchDetectorCamera.getNumTargets().getAsInt(); j++) {
       double currentYaw = Math.sin(Units.degreesToRadians(m_BranchDetectorCamera.getTargetYaw(j).getAsDouble()));
       double currentError = Math.abs(currentYaw - Math.sin(Units.degreesToRadians(finalYawSetpoint)));
@@ -87,7 +89,22 @@ public class YoloBranchAlign extends Command {
         lowestError = currentError;
         targetTagID = j;
         targetYaw = currentYaw;
+
+        if (isCenterAlign) {
+          secondLowestError = lowestError;
+          secondTargetYaw = targetYaw;
+        }
       }
+
+      if (isCenterAlign && currentError < secondLowestError && currentError != lowestError) {
+        secondLowestError = currentError;
+        secondTargetYaw = currentYaw;
+      }
+    }
+
+    if (isCenterAlign) {
+      // basically we are trying to equalize the yaw on either side of the center target
+      targetYaw = (targetYaw + secondTargetYaw); // might need to be negated
     }
 
     yCommand = yController.calculate(targetYaw);
