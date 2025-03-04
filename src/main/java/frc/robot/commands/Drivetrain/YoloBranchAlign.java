@@ -10,14 +10,13 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import java.util.OptionalDouble;
 
-
 public class YoloBranchAlign extends Command {
 
   private final TunableNumber[] strafePID = {
-    new TunableNumber("YOLO Align/P", 0),
+    new TunableNumber("YOLO Align/P", 0.07),
     new TunableNumber("YOLO Align/I", 0),
     new TunableNumber("YOLO Align/D", 0),
-    new TunableNumber("YOLO Align/Tolderance", 0.05)
+    new TunableNumber("YOLO Align/Tolderance", 0.00001)
   };
 
   private final Swerve m_Swerve;
@@ -47,15 +46,14 @@ public class YoloBranchAlign extends Command {
     isCenterAlign = alignCenter;
 
     xController = new PIDController(.1, 0, 0);
-    yController = new PIDController(.1, 0, 0);
-    yController.setTolerance(.01);
-    yController.setSetpoint(Math.sin(Units.degreesToRadians(finalYawSetpoint)));
+    yController = new PIDController(0.07, 0, 0);
+    yController.setTolerance(.00001);
+    yController.setSetpoint(Units.degreesToRadians(finalYawSetpoint));
 
     desiredSpeeds = new ChassisSpeeds();
 
     addRequirements(m_Swerve);
   }
-
 
   @Override
   public void initialize() {}
@@ -67,7 +65,7 @@ public class YoloBranchAlign extends Command {
     yController.setD(strafePID[2].getNumber());
     yController.setTolerance(strafePID[3].getNumber());
 
-    SmartDashboard.putBoolean("YOLO yatSetpoint", yController.atSetpoint());
+    SmartDashboard.putBoolean("YOLO yAtSetpoint", yController.atSetpoint());
 
     m_BranchDetectorCamera.updateByUnreadResults();
 
@@ -76,60 +74,33 @@ public class YoloBranchAlign extends Command {
       return;
     }
 
-    int targetTagID = 0;
-    double targetYaw = 0;
-    double secondTargetYaw = 0; // for center align
-    double lowestError = Double.MAX_VALUE;
-    double secondLowestError = Double.MAX_VALUE;
-    for (int j = 0; j < m_BranchDetectorCamera.getNumTargets().getAsInt(); j++) {
-      double currentYaw = Math.sin(Units.degreesToRadians(m_BranchDetectorCamera.getTargetYaw(j).getAsDouble()));
-      double currentError = Math.abs(currentYaw - Math.sin(Units.degreesToRadians(finalYawSetpoint)));
-
-      if (currentError < lowestError) {
-        lowestError = currentError;
-        targetTagID = j;
-        targetYaw = currentYaw;
-
-        if (isCenterAlign) {
-          secondLowestError = lowestError;
-          secondTargetYaw = targetYaw;
-        }
-      }
-
-      if (isCenterAlign && currentError < secondLowestError && currentError != lowestError) {
-        secondLowestError = currentError;
-        secondTargetYaw = currentYaw;
-      }
-    }
-
-    if (isCenterAlign) {
-      // basically we are trying to equalize the yaw on either side of the center target
-      targetYaw = (targetYaw + secondTargetYaw); // might need to be negated
-    }
+    double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
 
     yCommand = yController.calculate(targetYaw);
 
-    if (!yController.atSetpoint()) {
-      // if (isLeft) { // use leftmost for target indexing in photonvision
-      //   currentYaw = m_BranchDetectorCamera.getTargetYaw(0);
-      // } else {
-      //   currentYaw =
-      //       m_BranchDetectorCamera.getTargetYaw(
-      //           m_BranchDetectorCamera.getNumTargets().getAsInt() - 1);
-      // }
-      desiredSpeeds = new ChassisSpeeds(0, yCommand, 0);
-      m_Swerve.setChassisSpeeds(desiredSpeeds); // creep if needed
-    } else {
-      desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0);
-      m_Swerve.setChassisSpeeds(desiredSpeeds); // drive into reef once strafe aligned
-    }
+    m_Swerve.setChassisSpeeds(new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0));
+    // if (!yController.atSetpoint()) {
+    //   // if (isLeft) { // use leftmost for target indexing in photonvision
+    //   //   currentYaw = m_BranchDetectorCamera.getTargetYaw(0);
+    //   // } else {
+    //   //   currentYaw =
+    //   //       m_BranchDetectorCamera.getTargetYaw(
+    //   //           m_BranchDetectorCamera.getNumTargets().getAsInt() - 1);
+    //   // }
+    //   desiredSpeeds = new ChassisSpeeds(0, yCommand, 0);
+    //   m_Swerve.setChassisSpeeds(desiredSpeeds); // creep if needed
+    // } else {
+    //   desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0);
+    //   m_Swerve.setChassisSpeeds(desiredSpeeds); // drive into reef once strafe aligned
+    // }
   }
 
   @Override
   public boolean isFinished() {
     // should be stalling when driving into reef
     return (m_Swerve.getChassisSpeeds().vxMetersPerSecond < stallSpeedThreshold
-        && desiredSpeeds.vxMetersPerSecond == driveIntoReefSpeed);
+        && desiredSpeeds.vxMetersPerSecond == driveIntoReefSpeed
+        && yController.atSetpoint());
   }
 
   @Override

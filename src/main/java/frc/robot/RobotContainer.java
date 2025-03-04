@@ -7,16 +7,22 @@ package frc.robot;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
+import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
@@ -121,6 +127,9 @@ public class RobotContainer {
 
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
+  // private final AutoFactory m_factory =
+  //     new AutoFactory(
+  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   private final ActionFactory m_ActionFactory =
       new ActionFactory(
@@ -321,6 +330,17 @@ public class RobotContainer {
     // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
     m_AutoSelector.generatePaths(); // TODO: move to robot or smth due to the delay
     return m_AutoSelector.getAutoCommand();
+
+    // return new SequentialCommandGroup(
+    //   m_factory.resetOdometry("st-bl-1"),
+    //     m_factory.trajectoryCmd("st-bl-1", 0),
+    //     new YoloBranchAlign(m_Swerve, m_BranchCamera, false),
+    //     new ScoreL4(m_Elevator, m_CoralIntake),
+    //     m_factory.trajectoryCmd("st-bl-1", 1),
+    //     new ParallelRaceGroup(new WaitCommand(0.5), new IntakeCoral(m_CoralIntake)),
+    //     new ParallelCommandGroup(
+    //         m_factory.trajectoryCmd("st-bl-1", 2), new IntakeCoral(m_CoralIntake)),
+    //     new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake));
     // return new TestAuto(
     //     m_Factory,
     //     m_CoralIntake,
