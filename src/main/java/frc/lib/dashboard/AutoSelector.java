@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -87,6 +88,8 @@ public class AutoSelector {
   private GenericEntry feedbackEntry;
   // private GenericEntry safetyEntry;
 
+  private final SendableChooser<String> presetChooser;
+
   private final AutoFactory factory;
 
   public AutoSelector(
@@ -105,6 +108,13 @@ public class AutoSelector {
     m_swerve = swerve;
     m_startCommands = startCommands;
     m_endCommands = endCommands;
+
+    presetChooser =  new SendableChooser<>();
+
+    presetChooser.setDefaultOption("Custom", "");
+    presetChooser.addOption("Left Side Two Piece", "st cr 3 ht 5 bl 3");
+    presetChooser.addOption("Right Side Two Piece", "sb er 3 hb 5 fl 3");
+    presetChooser.addOption("Middle Coral Algae", "sm dl 3 2 p 4 hb");
 
     // define auto factory for autos
     factory =
@@ -163,18 +173,22 @@ public class AutoSelector {
 
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
-    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
+
+    autoTab.add(presetChooser).withSize(4, 1).withPosition(0, 1);
+
+    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 2);
 
     autoTab
         .add("Generate", true)
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
-        .withPosition(0, 2);
+        .withPosition(0, 3);
     autoTab
         .add("Reset", true)
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
-        .withPosition(1, 2);
+        .withPosition(1, 3);
+
 
     ntTable.addListener(
         "Generate",
@@ -198,6 +212,11 @@ public class AutoSelector {
 
   public void generatePaths() {
     setFeedback("Generating paths...");
+
+    if (presetChooser.getSelected() != "") {
+      autoStringEntry.setString(presetChooser.getSelected());
+    }
+
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
 
