@@ -8,7 +8,6 @@ import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
@@ -22,7 +21,6 @@ public class ActionFactory {
   private AlgaePivot m_AlgaePivot;
   private AlgaeIntake m_AlgaeIntake;
   private PoseAlignController m_PoseAlignController;
-  private VisionTranslationController m_VisionController;
   private AprilTagCamera m_LeftFacingCamera;
   private AprilTagCamera m_RightFacingCamera;
 
@@ -33,7 +31,6 @@ public class ActionFactory {
       AlgaePivot pivot,
       AlgaeIntake algaeIntake,
       PoseAlignController poseAlignController,
-      VisionTranslationController visionController,
       AprilTagCamera leftCamera,
       AprilTagCamera rightCamera) {
     m_Swerve = swerve;
@@ -42,7 +39,6 @@ public class ActionFactory {
     m_AlgaePivot = pivot;
     m_AlgaeIntake = algaeIntake;
     m_PoseAlignController = poseAlignController;
-    m_VisionController = visionController;
     m_LeftFacingCamera = leftCamera;
     m_RightFacingCamera = rightCamera;
   }
@@ -51,14 +47,13 @@ public class ActionFactory {
     switch (action) {
       case 1:
         return new AutoScoreL1(
-            m_Swerve, m_Elevator, m_CoralIntake, m_VisionController, m_PoseAlignController);
+            m_Swerve, m_Elevator, m_CoralIntake, m_PoseAlignController);
       case 2:
         return new AutoDealgaefy(
             m_Swerve,
             m_Elevator,
             m_AlgaeIntake,
             m_AlgaePivot,
-            m_VisionController,
             m_PoseAlignController);
       case 3:
         return new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake);

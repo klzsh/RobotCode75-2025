@@ -11,6 +11,8 @@ import static frc.robot.Constants.EndEffectorConstants.*;
 import static frc.robot.Constants.EndEffectorConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -20,6 +22,7 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Coral Intake", strategy = Strategy.OPT_IN)
 public class CoralIntake extends SubsystemBase {
@@ -39,10 +42,29 @@ public class CoralIntake extends SubsystemBase {
   private TalonFXS m_CoralMotor;
 
   private DigitalInput m_CoralBeamBreak;
+  private boolean m_isL1 = false;
 
   private final VoltageOut m_CharacterizationRequest;
   private final VelocityVoltage m_VelocityRequest;
   private final PositionVoltage m_PositionRequest;
+
+  // private final TunableNumber coralScoreSpeed1;
+  // private final TunableNumber coralIntakeSpeed1;
+
+  // private final TunableNumber coralVelocitykP;
+  // private final TunableNumber coralVelocitykI;
+  // private final TunableNumber coralVelocitykD;
+  // private final TunableNumber coralVelocitykS;
+
+  // private final TunableNumber coralPositionkP;
+  // private final TunableNumber coralPositionkI;
+  // private final TunableNumber coralPositionkD;
+
+  // private Slot0Configs velocityConfig = new Slot0Configs();
+  // private Slot1Configs positionConfig = new Slot1Configs();
+
+
+
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
@@ -67,10 +89,27 @@ public class CoralIntake extends SubsystemBase {
     m_PositionRequest.UseTimesync = true;
 
     m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
+
+    // coralScoreSpeed1 = new TunableNumber("Coral Intake/Score Speed", coralScoreSpeed.in(RotationsPerSecond));
+    // coralIntakeSpeed1 = new TunableNumber("Coral Intake/Intake Speed", coralIntakeSpeed.in(RotationsPerSecond));
+
+    // coralVelocitykP = new TunableNumber("Coral Intake/Velocity Kp", coralVelocityKP);
+    // coralVelocitykI = new TunableNumber("Coral Intake/Velocity Ki", coralVelocityKI);
+    // coralVelocitykD = new TunableNumber("Coral Intake/Velocity Kd", coralVelocityKD);
+    // coralVelocitykS = new TunableNumber("Coral Intake/Velocity Ks", coralVelocityKS);
+
+    // coralPositionkP = new TunableNumber("Coral Intake/Position Kp", coralPositionKP);
+    // coralPositionkI = new TunableNumber("Coral Intake/Position Ki", coralPositionKI);
+    // coralPositionkD = new TunableNumber("Coral Intake/Position Kd", coralPositionKD);
+
+
   }
 
   public void setState(CoralStates state) {
     m_CoralIntakeState = state;
+  }
+  public void setL1(boolean isL1){
+    m_isL1 = isL1;
   }
 
   // @Logged(name = "Coral State", importance = Importance.CRITICAL)
@@ -103,6 +142,27 @@ public class CoralIntake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
+//     if (coralVelocitykP.getNumber() != velocityConfig.kP
+//     || coralVelocitykI.getNumber() != velocityConfig.kI
+//     || coralVelocitykD.getNumber() != velocityConfig.kD
+//     || coralVelocitykS.getNumber() != velocityConfig.kS) {
+//       velocityConfig.kP = coralVelocitykP.getNumber();
+//       velocityConfig.kD = coralVelocitykD.getNumber();
+//       velocityConfig.kS = coralVelocitykS.getNumber();
+
+//   m_CoralMotor.getConfigurator().apply(velocityConfig);
+// }
+
+// if (coralPositionkP.getNumber() != positionConfig.kP
+// || coralPositionkI.getNumber() != positionConfig.kI
+// || coralPositionkD.getNumber() != positionConfig.kD) {
+//   positionConfig.kP = coralPositionkP.getNumber();
+//   positionConfig.kI = coralPositionkI.getNumber();
+//   positionConfig.kD = coralPositionkD.getNumber();
+
+// m_CoralMotor.getConfigurator().apply(positionConfig);
+// }
+
     if (getBeamBreak() && m_CoralIntakeState == CoralStates.INTAKING) {
       m_CoralIntakeState = CoralStates.POSITIONING;
       m_CoralMotor.setPosition(Rotations.of(0));
@@ -125,7 +185,12 @@ public class CoralIntake extends SubsystemBase {
         m_CoralMotor.setControl(m_CharacterizationRequest.withOutput(0));
       }
       case SCORING -> {
-        m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
+        if(m_isL1){
+          m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeedL1).withSlot(0));
+        } else {
+          m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
+
+        }
       }
       case INTAKING -> {
         m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralIntakeSpeed).withSlot(0));

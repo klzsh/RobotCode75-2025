@@ -64,12 +64,12 @@ public class Swerve extends SubsystemBase {
   // @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
-  private final TunableNumber driveKP;
-  private final TunableNumber driveKI;
-  private final TunableNumber driveKD;
-  private final TunableNumber driveKS;
+  // private final TunableNumber driveKP;
+  // private final TunableNumber driveKI;
+  // private final TunableNumber driveKD;
+  // private final TunableNumber driveKS;
 
-  private final Slot0Configs drivePIDS;
+  // private final Slot0Configs drivePIDS;
 
   // controllers for autos
   private final PIDController xController;
@@ -144,10 +144,10 @@ public class Swerve extends SubsystemBase {
             moduleMatrix,
             visionMatrix);
     // init tunable numbers
-    driveKP = new TunableNumber("Swerve/DriveMotor/kP", driveTorqueKP);
-    driveKI = new TunableNumber("Swerve/DriveMotor/kI", driveTorqueKI);
-    driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
-    driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
+    // driveKP = new TunableNumber("Swerve/DriveMotor/kP", driveTorqueKP);
+    // driveKI = new TunableNumber("Swerve/DriveMotor/kI", driveTorqueKI);
+    // driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
+    // driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
 
     xKP = new TunableNumber("Autos/X-KP", 2.65);
     xKI = new TunableNumber("Autos/X-KI", 0);
@@ -162,12 +162,12 @@ public class Swerve extends SubsystemBase {
 
     maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
 
-    drivePIDS =
-        new Slot0Configs()
-            .withKP(driveTorqueKP)
-            .withKI(0)
-            .withKD(driveTorqueKD)
-            .withKS(driveTorqueKS);
+    // drivePIDS =
+    //     new Slot0Configs()
+    //         .withKP(driveTorqueKP)
+    //         .withKI(0)
+    //         .withKD(driveTorqueKD)
+    //         .withKS(driveTorqueKS);
     // setPoseByVision(m_LeftFacingCamera);
   }
 
@@ -443,20 +443,20 @@ public class Swerve extends SubsystemBase {
     //     setPoseByVision(m_HPCamera);
     //   }
     // }
-    if (driveKP.getNumber() != drivePIDS.kP
-        || driveKI.getNumber() != drivePIDS.kI
-        || driveKD.getNumber() != drivePIDS.kD
-        || driveKS.getNumber() != drivePIDS.kS) {
+    // if (driveKP.getNumber() != drivePIDS.kP
+    //     || driveKI.getNumber() != drivePIDS.kI
+    //     || driveKD.getNumber() != drivePIDS.kD
+    //     || driveKS.getNumber() != drivePIDS.kS) {
 
-      drivePIDS.kP = driveKP.getNumber();
-      drivePIDS.kI = driveKI.getNumber();
-      drivePIDS.kD = driveKI.getNumber();
-      drivePIDS.kS = driveKD.getNumber();
+    //   drivePIDS.kP = driveKP.getNumber();
+    //   drivePIDS.kI = driveKI.getNumber();
+    //   drivePIDS.kD = driveKI.getNumber();
+    //   drivePIDS.kS = driveKD.getNumber();
 
-      for (TalonFXSwerveModule mod : m_SwerveModules) {
-        mod.setDrivePIDS(drivePIDS);
-      }
-    }
+    //   for (TalonFXSwerveModule mod : m_SwerveModules) {
+    //     mod.setDrivePIDS(drivePIDS);
+    //   }
+    // }
     if (xKP.getNumber() != xController.getP()
         || xKI.getNumber() != xController.getI()
         || xKD.getNumber() != xController.getD()) {

@@ -17,7 +17,6 @@ import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -35,7 +34,6 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       Elevator elevator,
       AlgaeIntake intake,
       AlgaePivot pivot,
-      VisionTranslationController visionController,
       PoseAlignController poseController) {
     addRequirements(swerve, elevator, intake, pivot);
     FieldElement elem = CheckBounds.nearestElement(swerve.getPose());

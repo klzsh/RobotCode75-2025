@@ -37,7 +37,6 @@ import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -99,10 +98,6 @@ public class RobotContainer {
   @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
 
-  //   //@Logged
-  private final VisionTranslationController m_VisionController =
-      new VisionTranslationController(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera);
-
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
   private final Joystick m_RightStick = new Joystick(rightStickPort);
@@ -139,7 +134,6 @@ public class RobotContainer {
           m_AlgaePivot,
           m_AlgaeIntake,
           m_PoseAlignController,
-          m_VisionController,
           m_LeftFacingCamera,
           m_RightFacingCamera);
 

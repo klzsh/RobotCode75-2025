@@ -20,6 +20,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -69,6 +70,14 @@ public class Elevator extends SubsystemBase {
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
 
+  private final TunableNumber mmVelocityUp;
+  private final TunableNumber mmAccelerationUp;
+  private final TunableNumber mmJerkUp;
+
+  private final TunableNumber mmVelocityDown;
+  private final TunableNumber mmAccelerationDown;
+  private final TunableNumber mmJerkDown;
+
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
     m_ElevatorMotor1 = new TalonFX(elevatorMotor1CANID, superstructureCANBusName);
@@ -93,6 +102,15 @@ public class Elevator extends SubsystemBase {
 
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
+
+    mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
+    mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
+    mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
+
+    mmVelocityDown = new TunableNumber("Elevator/MM Velocity Dowbn", MotionMagicProfileDown[0]);
+    mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Dowbn", MotionMagicProfileDown[1]);
+    mmJerkDown = new TunableNumber("Elevator/MM Jerk Dowbn", MotionMagicProfileDown[2]);
+
   }
 
   /**
@@ -186,13 +204,20 @@ public class Elevator extends SubsystemBase {
     double targetRotations = currentPosition + algaeOffset;
 
     if (getPosition().in(Rotations) < targetRotations) {
-      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
-      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
-      m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+      // m_PositionRequest.Velocity = MotionMagicProfileUp[0];
+      // m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
+      // m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+
+      m_PositionRequest.Velocity = mmVelocityUp.getNumber();
+      m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
+      m_PositionRequest.Jerk = mmJerkUp.getNumber();
     } else {
-      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
-      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
-      m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+      // m_PositionRequest.Velocity = MotionMagicProfileDown[0];
+      // m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
+      // m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+      m_PositionRequest.Velocity = mmVelocityDown.getNumber();
+      m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
+      m_PositionRequest.Jerk = mmJerkDown.getNumber();
     }
 
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {

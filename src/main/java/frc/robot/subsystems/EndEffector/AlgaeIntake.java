@@ -34,10 +34,10 @@ public class AlgaeIntake extends SubsystemBase {
   // @Logged(name = "Algae Intake Motor", importance = Importance.INFO)
   private TalonFX m_AlgaeMotor;
 
-  private Slot0Configs IntakePIDConfig = new Slot0Configs();
-  private final TunableNumber algaeIntakeKp;
-  private final TunableNumber algaeIntakeKd;
-  private final TunableNumber algaeIntakeKs;
+  // private Slot0Configs IntakePIDConfig = new Slot0Configs();
+  // private final TunableNumber algaeIntakeKp;
+  // private final TunableNumber algaeIntakeKd;
+  // private final TunableNumber algaeIntakeKs;
 
   // private final DigitalInput m_AlgaeIntakeLimit;
   // @Logged
@@ -64,15 +64,15 @@ public class AlgaeIntake extends SubsystemBase {
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;
 
-    IntakePIDConfig.withKA(0)
-        .withKS(algaeKS)
-        .withKP(algaeKP)
-        .withKD(algaeKD)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+    // IntakePIDConfig.withKA(0)
+    //     .withKS(algaeKS)
+    //     .withKP(algaeKP)
+    //     .withKD(algaeKD)
+    //     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    algaeIntakeKp = new TunableNumber("Algae Intake/kP", algaeKP);
-    algaeIntakeKd = new TunableNumber("Algae Intake/kD", algaeKD);
-    algaeIntakeKs = new TunableNumber("Algae Intake/kS", algaeKS);
+    // algaeIntakeKp = new TunableNumber("Algae Intake/kP", algaeKP);
+    // algaeIntakeKd = new TunableNumber("Algae Intake/kD", algaeKD);
+    // algaeIntakeKs = new TunableNumber("Algae Intake/kS", algaeKS);
   }
 
   public void setAlgaeState(AlgaeStates state) {
@@ -99,15 +99,15 @@ public class AlgaeIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
-        || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
-        || algaeIntakeKs.getNumber() != IntakePIDConfig.kS) {
-      IntakePIDConfig.kP = algaeIntakeKp.getNumber();
-      IntakePIDConfig.kD = algaeIntakeKd.getNumber();
-      IntakePIDConfig.kS = algaeIntakeKs.getNumber();
+    // if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
+    //     || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
+    //     || algaeIntakeKs.getNumber() != IntakePIDConfig.kS) {
+    //   IntakePIDConfig.kP = algaeIntakeKp.getNumber();
+    //   IntakePIDConfig.kD = algaeIntakeKd.getNumber();
+    //   IntakePIDConfig.kS = algaeIntakeKs.getNumber();
 
-      m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
-    }
+    //   m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
+    // }
 
     if (algaeInIntake() && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;

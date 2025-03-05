@@ -41,19 +41,21 @@ public class EndEffectorConstants {
   public static final Angle algaePivotZeroPoint = Rotations.of(0);
   public static final Angle algaeEncoderOffset = Rotations.of(0);
 
-  public static final double coralMotorGearRatio = 16.0;
+  public static final double coralMotorGearRatio = 5.0;
   public static final double algaeMotorGearRatio = 25.0;
   public static final double pivotMotorGearRatio = (25.0 * 50.0) / 26.0; // ~48.076
 
-  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(1000);
-  public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(100);
-  public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-100);
+  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(30);
+  public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(50);
+  public static final AngularVelocity coralScoreSpeedL1 = RotationsPerSecond.of(7);
+  public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-50);
   public static final Angle coralRotationsAfterIntake = Rotations.of(0.5);
   public static final double coralScoreDelay = 0.3;
 
   public static final Angle pivotHomePosition = Rotations.of(12.8);
   public static final Angle pivotGroundIntakePosition = Rotations.of(4);
   public static final Angle pivotDeAlgifyPosition = Rotations.of(6);
+  public static final Angle pivotEncoderOffset = Rotations.of(0.135);
 
   public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(150);
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(-20);
@@ -112,12 +114,12 @@ public class EndEffectorConstants {
 
     /* Torque PID */
     public static final double openLoopRamp = 0.1;
-    public static final double closedLoopRamp = 0.0;
+    public static final double closedLoopRamp = 0.1;
 
-    public static final double coralVelocityKP = 3;
+    public static final double coralVelocityKP = 0.3;
     public static final double coralVelocityKI = 0.0;
     public static final double coralVelocityKD = 0.0;
-    public static final double coralVelocityKS = 25;
+    public static final double coralVelocityKS = 4.9;
 
     public static final double coralPositionKP = 0.75;
     public static final double coralPositionKI = 0.0;

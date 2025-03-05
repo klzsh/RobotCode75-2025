@@ -14,7 +14,6 @@ import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
@@ -32,7 +31,6 @@ public class TestAuto extends SequentialCommandGroup {
       Elevator elevator,
       AprilTagCamera leftCamera,
       AprilTagCamera rightCamera,
-      VisionTranslationController visionController,
       PoseAlignController poseAlignController) {
     m_Factory = factory;
     // Add your commands in the addCommands() call, e.g.

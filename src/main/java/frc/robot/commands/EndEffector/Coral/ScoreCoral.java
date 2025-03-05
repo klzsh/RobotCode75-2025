@@ -12,8 +12,10 @@ import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 public class ScoreCoral extends Command {
   /** Creates a new ScoreCoral. */
   private final CoralIntake m_Intake;
+  private final boolean isL1;
 
-  public ScoreCoral(CoralIntake intake) {
+  public ScoreCoral(CoralIntake intake, boolean isL1) {
+    this.isL1 = isL1;
     m_Intake = intake;
     addRequirements(m_Intake);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -26,6 +28,7 @@ public class ScoreCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_Intake.setL1(isL1);
     m_Intake.setState(CoralStates.SCORING);
   }
 

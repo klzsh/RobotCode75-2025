@@ -18,7 +18,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN)
 public class AlgaePivot extends SubsystemBase {
@@ -41,7 +40,6 @@ public class AlgaePivot extends SubsystemBase {
   @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
   private TalonFX m_AlgaePivot;
 
-  public final TunableNumber absoluteEncoderOffset;
 
   private final MotionMagicExpoTorqueCurrentFOC pivotRequest =
       new MotionMagicExpoTorqueCurrentFOC(Rotations.of(0));
@@ -56,13 +54,11 @@ public class AlgaePivot extends SubsystemBase {
     pivotRequest.UpdateFreqHz = 0;
     pivotRequest.UseTimesync = true;
 
-    absoluteEncoderOffset =
-        new TunableNumber("Algae Encoder/Offset", algaeEncoderOffset.in(Rotations));
 
     m_absoluteEncoder =
         new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.in(Rotations));
     Timer.delay(5);
-    m_AlgaePivot.setPosition((getAbsolutePosition() - 0.135) * pivotMotorGearRatio);
+    m_AlgaePivot.setPosition((getAbsolutePosition() - pivotEncoderOffset.in(Rotations)) * pivotMotorGearRatio);
   }
 
   public void setPivotState(PivotState state) {
@@ -71,29 +67,6 @@ public class AlgaePivot extends SubsystemBase {
 
   public PivotState getPivotState() {
     return m_PivotState;
-  }
-
-  public void homePivotToAbsoluteEncoder() {
-    double absoluteRotations = m_absoluteEncoder.get();
-    double offset = absoluteEncoderOffset.getNumber();
-    double relativeRotationsAxleCandidate1 = offset - absoluteRotations;
-    double relativeRotationsAxleCandidate2 = offset - (absoluteRotations + 1);
-    double relativeRotationsAxleCandidate3 = offset - (absoluteRotations - 1);
-
-    double relativeRotationsAxle =
-        Math.min(
-            Math.abs(relativeRotationsAxleCandidate1),
-            Math.min(
-                Math.abs(relativeRotationsAxleCandidate2),
-                Math.abs(relativeRotationsAxleCandidate3)));
-
-    double relativeRotationsMotor = relativeRotationsAxle * pivotMotorGearRatio;
-
-    // find rotations from current relative position to home
-    double totalRotations =
-        m_AlgaePivot.getPosition().getValue().in(Rotations) - relativeRotationsMotor;
-
-    m_AlgaePivot.setControl(pivotRequest.withPosition(Rotations.of(totalRotations)));
   }
 
   public void resetPivotState() {
