@@ -174,20 +174,20 @@ public class AutoSelector {
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
 
-    autoTab.add(presetChooser).withSize(4, 1).withPosition(0, 1);
+    autoTab.add(presetChooser).withSize(2, 1).withPosition(2, 2);
 
-    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 2);
+    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
 
     autoTab
         .add("Generate", true)
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
-        .withPosition(0, 3);
+        .withPosition(0, 2);
     autoTab
         .add("Reset", true)
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
-        .withPosition(1, 3);
+        .withPosition(1, 2);
 
 
     ntTable.addListener(
