@@ -129,8 +129,7 @@ public class RobotContainer {
           m_AlgaePivot,
           m_AlgaeIntake,
           m_PoseAlignController,
-          m_LeftFacingCamera,
-          m_RightFacingCamera);
+          m_BranchCamera);
 
   private final AutoSelector m_AutoSelector =
       new AutoSelector(

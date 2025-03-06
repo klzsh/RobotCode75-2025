@@ -141,6 +141,6 @@ public class VisionConstants {
   public static final double finalYawSetpointRight = -7.97;
   public static final double finalPitchSetpointRight = -7.88;
 
-  public static final double minTagAreaThreshold = 0.1;
-  public static final double maxTagDistanceThreshold = 5;
+  public static final double minTagAreaThreshold = 0.15;
+  public static final double maxTagDistanceThreshold = 3;
 }

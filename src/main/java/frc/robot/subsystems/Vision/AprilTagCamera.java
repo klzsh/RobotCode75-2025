@@ -276,9 +276,9 @@ public class AprilTagCamera extends SubsystemBase {
   }
 
   public EstimatedRobotPose getEstimatedPose(Pose2d currentPose) {
-    if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
-      return null;
-    }
+    // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
+    //   return null;
+    // }
     if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
       return null;
     }
@@ -286,9 +286,9 @@ public class AprilTagCamera extends SubsystemBase {
   }
 
   public Pose2d getEstimatedPose2d(Pose2d currentPose) {
-    if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
-      return null;
-    }
+    // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
+    //   return null;
+    // }
     if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
       return null;
     }
