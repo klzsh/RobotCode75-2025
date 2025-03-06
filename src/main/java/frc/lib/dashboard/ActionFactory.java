@@ -1,7 +1,6 @@
 package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.Autonomous.AutoDealgaefy;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
@@ -47,9 +46,9 @@ public class ActionFactory {
     switch (action) {
       case 1:
         return new AutoScoreL1(m_Swerve, m_Elevator, m_CoralIntake, m_PoseAlignController);
-      // case 2:
-      //   return new AutoDealgaefy(
-      //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_PoseAlignController);
+        // case 2:
+        //   return new AutoDealgaefy(
+        //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_PoseAlignController);
       case 3:
         return new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake);
       case 4:
@@ -64,8 +63,8 @@ public class ActionFactory {
     switch (action) {
       case 1:
         return "L1";
-      // case 2:
-      //   return "Dealgaefy";
+        // case 2:
+        //   return "Dealgaefy";
       case 3:
         return "L4";
       case 4:

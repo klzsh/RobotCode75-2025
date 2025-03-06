@@ -40,7 +40,6 @@ public final class DrivetrainConstants {
 
     public static final class RotationAlign {
 
-      // TODO: tune
       public static final double kp = 0.08;
       public static final double kd = 0.03;
       public static final double maxVelocityMultiplier = 0.8;

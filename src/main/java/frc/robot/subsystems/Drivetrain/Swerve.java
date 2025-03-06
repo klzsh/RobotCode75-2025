@@ -3,7 +3,6 @@ package frc.robot.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.DrivetrainConstants.*;
-import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
@@ -49,7 +48,6 @@ public class Swerve extends SubsystemBase {
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
-  // TODO: tunable numebr for PIDs + current limits
   // @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
@@ -256,9 +254,7 @@ public class Swerve extends SubsystemBase {
    * @param desiredStates The desired module state to set the wheels
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates,
-        maxSpeed.in(MetersPerSecond)); // 4.7 // TODO: change this back to controller constants
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed.in(MetersPerSecond));
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
