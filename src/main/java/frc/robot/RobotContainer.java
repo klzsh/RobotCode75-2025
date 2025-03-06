@@ -183,7 +183,8 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    AlignLeft.whileTrue(new RotateToSimilarFace(m_Swerve).andThen(new YoloBranchAlign(m_Swerve, m_BranchCamera, false))); // rotate then translate on left trigger
+    // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
     AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
