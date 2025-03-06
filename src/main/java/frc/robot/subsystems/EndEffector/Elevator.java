@@ -13,6 +13,9 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
@@ -21,15 +24,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
+import edu.wpi.first.epilogue.Logged.Strategy;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
  * 2 stage WCP GreyT elevator
- * Uses motion magic to honor a target cruise velocity and acceleration
+ * Uses motion magic to honor a target \ and acceleration
  *  Motion magic is used to prevent the elevator from destroying itself by moving too fast
  *
  */
-// @Logged(strategy = Strategy.OPT_IN, name = "Elevator")
+@Logged(strategy = Strategy.OPT_IN, name = "Elevator", importance = Importance.CRITICAL)
 public class Elevator extends SubsystemBase {
 
   // we only have a certain number of states the elevator will be in at any given time
@@ -48,7 +52,7 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  // @Logged(name = "Current Position", importance = Importance.INFO)
+  @Logged(name = "Current Position", importance = Importance.CRITICAL)
   private ElevatorPositions m_SetpointPosition = ElevatorPositions.HOME;
 
   // @Logged
@@ -70,13 +74,13 @@ public class Elevator extends SubsystemBase {
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
 
-  private final TunableNumber mmVelocityUp;
-  private final TunableNumber mmAccelerationUp;
-  private final TunableNumber mmJerkUp;
+  // private final TunableNumber mmVelocityUp;
+  // private final TunableNumber mmAccelerationUp;
+  // private final TunableNumber mmJerkUp;
 
-  private final TunableNumber mmVelocityDown;
-  private final TunableNumber mmAccelerationDown;
-  private final TunableNumber mmJerkDown;
+  // private final TunableNumber mmVelocityDown;
+  // private final TunableNumber mmAccelerationDown;
+  // private final TunableNumber mmJerkDown;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -103,13 +107,13 @@ public class Elevator extends SubsystemBase {
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
 
-    mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
-    mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
-    mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
+    // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
+    // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
+    // mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
 
-    mmVelocityDown = new TunableNumber("Elevator/MM Velocity Dowbn", MotionMagicProfileDown[0]);
-    mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Dowbn", MotionMagicProfileDown[1]);
-    mmJerkDown = new TunableNumber("Elevator/MM Jerk Dowbn", MotionMagicProfileDown[2]);
+    // mmVelocityDown = new TunableNumber("Elevator/MM Velocity Dowbn", MotionMagicProfileDown[0]);
+    // mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Dowbn", MotionMagicProfileDown[1]);
+    // mmJerkDown = new TunableNumber("Elevator/MM Jerk Dowbn", MotionMagicProfileDown[2]);
 
   }
 
@@ -145,7 +149,7 @@ public class Elevator extends SubsystemBase {
    *
    * @return the position in rotations of the elevator
    */
-  // @Logged(name = "Elevator Position")
+  @Logged(name = "Elevator Position", importance = Importance.CRITICAL)
   public double logPosition() {
     return getPosition().in(Rotations);
   }
@@ -204,20 +208,20 @@ public class Elevator extends SubsystemBase {
     double targetRotations = currentPosition + algaeOffset;
 
     if (getPosition().in(Rotations) < targetRotations) {
-      // m_PositionRequest.Velocity = MotionMagicProfileUp[0];
-      // m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
-      // m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
+      m_PositionRequest.Jerk = MotionMagicProfileUp[2];
 
-      m_PositionRequest.Velocity = mmVelocityUp.getNumber();
-      m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
-      m_PositionRequest.Jerk = mmJerkUp.getNumber();
+      // m_PositionRequest.Velocity = mmVelocityUp.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
+      // m_PositionRequest.Jerk = mmJerkUp.getNumber();
     } else {
-      // m_PositionRequest.Velocity = MotionMagicProfileDown[0];
-      // m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
-      // m_PositionRequest.Jerk = MotionMagicProfileDown[2];
-      m_PositionRequest.Velocity = mmVelocityDown.getNumber();
-      m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
-      m_PositionRequest.Jerk = mmJerkDown.getNumber();
+      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
+      m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+      // m_PositionRequest.Velocity = mmVelocityDown.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
+      // m_PositionRequest.Jerk = mmJerkDown.getNumber();
     }
 
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {

@@ -40,13 +40,13 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * has methods to get and set individual module positions (for autos or X-Stance) and for teleop driving
  * also contains most of the logging for the chassis (voltage/current, speed, etc)
  */
-@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain")
+@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain", importance = Importance.CRITICAL)
 public class Swerve extends SubsystemBase {
   private SwerveDrivePoseEstimator swerveOdometry;
 
   public TalonFXSwerveModule[] m_SwerveModules;
 
-  @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
+  // @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
@@ -81,24 +81,24 @@ public class Swerve extends SubsystemBase {
   private final AprilTagCamera m_HPCamera;
 
   // do this later
-  private final TunableNumber xKP;
-  private final TunableNumber xKI;
-  private final TunableNumber xKD;
+  // private final TunableNumber xKP;
+  // private final TunableNumber xKI;
+  // private final TunableNumber xKD;
 
-  private final TunableNumber yKP;
-  private final TunableNumber yKI;
-  private final TunableNumber yKD;
+  // private final TunableNumber yKP;
+  // private final TunableNumber yKI;
+  // private final TunableNumber yKD;
 
-  private final TunableNumber rotationKP;
-  private final TunableNumber rotationKI;
-  private final TunableNumber rotationKD;
+  // private final TunableNumber rotationKP;
+  // private final TunableNumber rotationKI;
+  // private final TunableNumber rotationKD;
 
-  private final TunableNumber maxAutosSpeed;
+  // private final TunableNumber maxAutosSpeed;
 
   private double lastUpdatedTime = 0;
   private boolean m_FieldRelative = true;
 
-  @Logged(name = "Swerve/Sample Pose", importance = Importance.CRITICAL)
+  @Logged(name = "Sample Pose", importance = Importance.CRITICAL)
   private Pose2d sample;
 
   // gyro
@@ -149,18 +149,18 @@ public class Swerve extends SubsystemBase {
     // driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
     // driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
 
-    xKP = new TunableNumber("Autos/X-KP", 2.65);
-    xKI = new TunableNumber("Autos/X-KI", 0);
-    xKD = new TunableNumber("Autos/X-KD", 0);
+    // xKP = new TunableNumber("Autos/X-KP", 2.65);
+    // xKI = new TunableNumber("Autos/X-KI", 0);
+    // xKD = new TunableNumber("Autos/X-KD", 0);
 
-    yKP = new TunableNumber("Autos/Y-KP", 3.9);
-    yKI = new TunableNumber("Autos/Y-KI", 0);
-    yKD = new TunableNumber("Autos/Y-KD", 0);
-    rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
-    rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
-    rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
+    // yKP = new TunableNumber("Autos/Y-KP", 3.9);
+    // yKI = new TunableNumber("Autos/Y-KI", 0);
+    // yKD = new TunableNumber("Autos/Y-KD", 0);
+    // rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
+    // rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
+    // rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
 
-    maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
+    // maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
 
     // drivePIDS =
     //     new Slot0Configs()
@@ -259,7 +259,7 @@ public class Swerve extends SubsystemBase {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, 3.5); // 4.7 // TODO: change this back to controller constants
+        desiredStates, maxSpeed.in(MetersPerSecond)); // 4.7 // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -334,7 +334,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the state of all swerve modules
    */
-  // @Logged(name = "Module States", importance = Importance.CRITICAL)
+  @Logged(name = "Module States", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -349,7 +349,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return the setpoint a module has been set to
    */
-  // @Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
+  @Logged(name = "Module Setpoints", importance = Importance.CRITICAL)
   public SwerveModuleState[] getModuleSetpoints() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -390,9 +390,6 @@ public class Swerve extends SubsystemBase {
   public double getRotationDegrees() {
     return m_gyro.getYaw(true).getValue().in(Degrees);
   }
-
-  // @Logged(name = "Pose to Drive", importance = Importance.CRITICAL)
-  private Pose2d poseToDrive;
 
   @Override
   public void periodic() {
@@ -457,26 +454,26 @@ public class Swerve extends SubsystemBase {
     //     mod.setDrivePIDS(drivePIDS);
     //   }
     // }
-    if (xKP.getNumber() != xController.getP()
-        || xKI.getNumber() != xController.getI()
-        || xKD.getNumber() != xController.getD()) {
-      xController.setP(xKP.getNumber());
-      xController.setI(xKI.getNumber());
-      xController.setD(xKD.getNumber());
-    }
-    if (yKP.getNumber() != yController.getP()
-        || yKI.getNumber() != yController.getI()
-        || yKD.getNumber() != yController.getD()) {
-      yController.setP(yKP.getNumber());
-      yController.setI(yKI.getNumber());
-      yController.setD(yKD.getNumber());
-    }
-    if (rotationKP.getNumber() != rController.getP()
-        || rotationKI.getNumber() != rController.getI()
-        || rotationKD.getNumber() != rController.getD()) {
-      rController.setP(rotationKP.getNumber());
-      rController.setI(rotationKI.getNumber());
-      rController.setD(rotationKD.getNumber());
-    }
+    // if (xKP.getNumber() != xController.getP()
+    //     || xKI.getNumber() != xController.getI()
+    //     || xKD.getNumber() != xController.getD()) {
+    //   xController.setP(xKP.getNumber());
+    //   xController.setI(xKI.getNumber());
+    //   xController.setD(xKD.getNumber());
+    // }
+    // if (yKP.getNumber() != yController.getP()
+    //     || yKI.getNumber() != yController.getI()
+    //     || yKD.getNumber() != yController.getD()) {
+    //   yController.setP(yKP.getNumber());
+    //   yController.setI(yKI.getNumber());
+    //   yController.setD(yKD.getNumber());
+    // }
+    // if (rotationKP.getNumber() != rController.getP()
+    //     || rotationKI.getNumber() != rController.getI()
+    //     || rotationKD.getNumber() != rController.getD()) {
+    //   rController.setP(rotationKP.getNumber());
+    //   rController.setI(rotationKI.getNumber());
+    //   rController.setD(rotationKD.getNumber());
+    // }
   }
 }

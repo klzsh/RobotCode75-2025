@@ -35,17 +35,17 @@ public class PoseAlignController {
 
   private final Swerve m_Swerve;
 
-  private final TunableNumber[] translationPID = {
-    new TunableNumber("AutoAlign/Ptr", xP),
-    new TunableNumber("AutoAlign/Itr", xI),
-    new TunableNumber("AutoAlign/Dtr", xD)
-  };
+  // private final TunableNumber[] translationPID = {
+  //   new TunableNumber("AutoAlign/Ptr", xP),
+  //   new TunableNumber("AutoAlign/Itr", xI),
+  //   new TunableNumber("AutoAlign/Dtr", xD)
+  // };
 
-  private final TunableNumber[] thetaPID = {
-    new TunableNumber("AutoAlign/Pt", tP),
-    new TunableNumber("AutoAlign/It", tI),
-    new TunableNumber("AutoAlign/Dt", tD)
-  };
+  // private final TunableNumber[] thetaPID = {
+  //   new TunableNumber("AutoAlign/Pt", tP),
+  //   new TunableNumber("AutoAlign/It", tI),
+  //   new TunableNumber("AutoAlign/Dt", tD)
+  // };
 
   public PoseAlignController(Swerve swerve) {
     m_Swerve = swerve;
@@ -85,10 +85,12 @@ public class PoseAlignController {
    */
   public ChassisSpeeds update(Pose2d currentPose, Pose2d targetPose) {
     // Update translation PID gains
-    translationController.setPID(
-        translationPID[0].getNumber(),
-        translationPID[1].getNumber(),
-        translationPID[2].getNumber());
+    // translationController.setPID(
+    //     translationPID[0].getNumber(),
+    //     translationPID[1].getNumber(),
+    //     translationPID[2].getNumber());
+    translationController.setPID(xP, xI, xD);
+
     // (Optionally update theta PID gains as needed.)
 
     this.targetPose = targetPose;
@@ -121,8 +123,9 @@ public class PoseAlignController {
 
     // Compute the rotation error and update the rotation controller.
     // Rotation2d rotationError = targetPose.getRotation().minus(currentPose.getRotation());
-    thetaController.update(
-        targetPose.getRotation(), thetaPID[0].getNumber(), thetaPID[2].getNumber());
+    // thetaController.update(
+        // targetPose.getRotation(), thetaPID[0].getNumber(), thetaPID[2].getNumber());
+    thetaController.update(targetPose.getRotation(), tP, tD);
     double rotationalCommand = thetaController.getOutput();
 
     // Generate chassis speeds in the robot-relative coordinate system.

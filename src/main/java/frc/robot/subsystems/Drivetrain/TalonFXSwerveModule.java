@@ -14,6 +14,9 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -22,6 +25,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import frc.lib.util.SwerveModuleConstants;
+import edu.wpi.first.epilogue.Logged.Strategy;
 
 /*
  * OVERVIEW OF A SWERVE MODULE
@@ -35,7 +39,7 @@ import frc.lib.util.SwerveModuleConstants;
  * and swerve module position (distance drive motor has gone (meters) / angle (rotation2d) )
  * mainly used as an abstraction layer
  */
-// @Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class TalonFXSwerveModule {
   public int moduleNumber;
   private Rotation2d angleOffset;

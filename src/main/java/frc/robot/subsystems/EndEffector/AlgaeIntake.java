@@ -14,11 +14,15 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Util.LidarDistanceSensor;
+import edu.wpi.first.epilogue.Logged.Strategy;
 
-// @Logged(name = "Algae Intake", strategy = Strategy.OPT_IN)
+@Logged(name = "Algae Intake", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaeIntake extends SubsystemBase {
   public static enum AlgaeStates {
     NONE,
@@ -28,7 +32,7 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   // TODO: add tunable numbers for PIDS, velocity, Position, CURRENT LIMITS
-  // @Logged(name = "Intake State")
+  @Logged(name = "Intake State", importance = Importance.CRITICAL)
   private AlgaeStates m_AlgaeIntakeState;
 
   // @Logged(name = "Algae Intake Motor", importance = Importance.INFO)
@@ -83,7 +87,7 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
-  // @Logged
+  @Logged(name = "Algae In Inake", importance = Importance.CRITICAL)
   public boolean algaeInIntake() {
     return m_AlgaeDetector.belowThreshold();
     // return !m_AlgaeIntakeLimit.get();

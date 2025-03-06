@@ -18,6 +18,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
@@ -30,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
 
-@Logged(name = "Climber", strategy = Strategy.OPT_IN)
+@Logged(name = "Climber", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class Climber extends SubsystemBase {
 
   public static enum ClimberPositions {
@@ -46,24 +47,24 @@ public class Climber extends SubsystemBase {
 
   private final DutyCycleEncoder m_ClimberEncoder;
 
-  // @Logged(name = "Climber State", importance = Importance.CRITICAL)
+  @Logged(name = "Climber State", importance = Importance.CRITICAL)
   private ClimberPositions m_ClimberState = ClimberPositions.DEFAULT;
 
-  private Slot0Configs PIDConfig = new Slot0Configs();
-  private final TunableNumber climberKp;
-  private final TunableNumber climberKd;
-  private final TunableNumber climberKg;
-  private final TunableNumber climberKs;
-  private final TunableNumber climberKa;
-  private final TunableNumber climberKv;
+  // private Slot0Configs PIDConfig = new Slot0Configs();
+  // private final TunableNumber climberKp;
+  // private final TunableNumber climberKd;
+  // private final TunableNumber climberKg;
+  // private final TunableNumber climberKs;
+  // private final TunableNumber climberKa;
+  // private final TunableNumber climberKv;
 
-  private MotionMagicConfigs MMConfig = new MotionMagicConfigs();
-  private final TunableNumber climberMMCruiseVelocity;
-  private final TunableNumber climberMMCruiseAcceleration;
-  private final TunableNumber climberMMKv;
-  private final TunableNumber climberMMKa;
+  // private MotionMagicConfigs MMConfig = new MotionMagicConfigs();
+  // private final TunableNumber climberMMCruiseVelocity;
+  // private final TunableNumber climberMMCruiseAcceleration;
+  // private final TunableNumber climberMMKv;
+  // private final TunableNumber climberMMKa;
 
-  private final TunableNumber zeroPoint;
+  // private final TunableNumber zeroPoint;
 
   private final MotionMagicExpoTorqueCurrentFOC m_PositionRequest;
 
@@ -75,36 +76,36 @@ public class Climber extends SubsystemBase {
 
     m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
 
-    climberMMCruiseVelocity =
-        new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
-    climberMMCruiseAcceleration =
-        new TunableNumber("Climber/Cruise Acceleration", motionMagicCruiseAcceleration);
-    climberMMKv = new TunableNumber("Climber/MM kV", motionMagickV);
-    climberMMKa = new TunableNumber("Climber/MM kA", motionMagickA);
+    // climberMMCruiseVelocity =
+    //     new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
+    // climberMMCruiseAcceleration =
+    //     new TunableNumber("Climber/Cruise Acceleration", motionMagicCruiseAcceleration);
+    // climberMMKv = new TunableNumber("Climber/MM kV", motionMagickV);
+    // climberMMKa = new TunableNumber("Climber/MM kA", motionMagickA);
 
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
     m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
 
-    PIDConfig.withKA(kA)
-        .withKS(kS)
-        .withKV(kV)
-        .withKG(kG)
-        .withKP(kP)
-        .withKD(kD)
-        .withGravityType(GravityTypeValue.Arm_Cosine)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+    // PIDConfig.withKA(kA)
+    //     .withKS(kS)
+    //     .withKV(kV)
+    //     .withKG(kG)
+    //     .withKP(kP)
+    //     .withKD(kD)
+    //     .withGravityType(GravityTypeValue.Arm_Cosine)
+    //     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    climberKp = new TunableNumber("Climber/kP", kP);
-    climberKd = new TunableNumber("Climber/kD", kD);
-    climberKg = new TunableNumber("Climber/kG", kG);
-    climberKs = new TunableNumber("Climber/kS", kS);
-    climberKa = new TunableNumber("Climber/kA", kA);
-    climberKv = new TunableNumber("Climber/kV", kV);
+    // climberKp = new TunableNumber("Climber/kP", kP);
+    // climberKd = new TunableNumber("Climber/kD", kD);
+    // climberKg = new TunableNumber("Climber/kG", kG);
+    // climberKs = new TunableNumber("Climber/kS", kS);
+    // climberKa = new TunableNumber("Climber/kA", kA);
+    // climberKv = new TunableNumber("Climber/kV", kV);
 
     m_ClimberMotor1.getConfigurator().apply(getClimberMotorConfig());
     m_ClimberMotor2.getConfigurator().apply(getClimberMotorConfig());
 
-    zeroPoint = new TunableNumber("Climber/Encoder Offset", 0);
+    // zeroPoint = new TunableNumber("Climber/Encoder Offset", 0);
     Timer.delay(5);
     resetPosition();
   }
@@ -150,7 +151,7 @@ public class Climber extends SubsystemBase {
     return m_ClimberEncoder.get();
   }
 
-  // @Logged(name = "Climber Position", importance = Importance.CRITICAL)
+  @Logged(name = "Climber Position", importance = Importance.CRITICAL)
   public double getPositionRotations() {
     return getPosition().in(Rotations);
   }
@@ -188,35 +189,35 @@ public class Climber extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (climberKp.getNumber() != PIDConfig.kP
-        || climberKd.getNumber() != PIDConfig.kD
-        || climberKs.getNumber() != PIDConfig.kS
-        || climberKg.getNumber() != PIDConfig.kG
-        || climberKa.getNumber() != PIDConfig.kA
-        || climberKv.getNumber() != PIDConfig.kV) {
-      PIDConfig.kP = climberKp.getNumber();
-      PIDConfig.kD = climberKd.getNumber();
-      PIDConfig.kS = climberKs.getNumber();
-      PIDConfig.kG = climberKg.getNumber();
-      PIDConfig.kA = climberKa.getNumber();
-      PIDConfig.kV = climberKv.getNumber();
+    // if (climberKp.getNumber() != PIDConfig.kP
+    //     || climberKd.getNumber() != PIDConfig.kD
+    //     || climberKs.getNumber() != PIDConfig.kS
+    //     || climberKg.getNumber() != PIDConfig.kG
+    //     || climberKa.getNumber() != PIDConfig.kA
+    //     || climberKv.getNumber() != PIDConfig.kV) {
+    //   PIDConfig.kP = climberKp.getNumber();
+    //   PIDConfig.kD = climberKd.getNumber();
+    //   PIDConfig.kS = climberKs.getNumber();
+    //   PIDConfig.kG = climberKg.getNumber();
+    //   PIDConfig.kA = climberKa.getNumber();
+    //   PIDConfig.kV = climberKv.getNumber();
 
-      m_ClimberMotor1.getConfigurator().apply(PIDConfig);
-      m_ClimberMotor2.getConfigurator().apply(PIDConfig);
-    }
-    if (climberMMCruiseVelocity.getNumber() != MMConfig.MotionMagicCruiseVelocity
-        || climberMMCruiseAcceleration.getNumber() != MMConfig.MotionMagicAcceleration
-        || climberMMKv.getNumber() != MMConfig.MotionMagicExpo_kV
-        || climberMMKa.getNumber() != MMConfig.MotionMagicExpo_kA) {
+    //   m_ClimberMotor1.getConfigurator().apply(PIDConfig);
+    //   m_ClimberMotor2.getConfigurator().apply(PIDConfig);
+    // }
+    // if (climberMMCruiseVelocity.getNumber() != MMConfig.MotionMagicCruiseVelocity
+    //     || climberMMCruiseAcceleration.getNumber() != MMConfig.MotionMagicAcceleration
+    //     || climberMMKv.getNumber() != MMConfig.MotionMagicExpo_kV
+    //     || climberMMKa.getNumber() != MMConfig.MotionMagicExpo_kA) {
 
-      MMConfig.MotionMagicCruiseVelocity = climberMMCruiseVelocity.getNumber();
-      MMConfig.MotionMagicAcceleration = climberMMCruiseAcceleration.getNumber();
-      MMConfig.MotionMagicExpo_kV = climberMMKv.getNumber();
-      MMConfig.MotionMagicExpo_kA = climberMMKa.getNumber();
+    //   MMConfig.MotionMagicCruiseVelocity = climberMMCruiseVelocity.getNumber();
+    //   MMConfig.MotionMagicAcceleration = climberMMCruiseAcceleration.getNumber();
+    //   MMConfig.MotionMagicExpo_kV = climberMMKv.getNumber();
+    //   MMConfig.MotionMagicExpo_kA = climberMMKa.getNumber();
 
-      m_ClimberMotor1.getConfigurator().apply(MMConfig);
-      m_ClimberMotor2.getConfigurator().apply(MMConfig);
-    }
+    //   m_ClimberMotor1.getConfigurator().apply(MMConfig);
+    //   m_ClimberMotor2.getConfigurator().apply(MMConfig);
+    // }
 
     // switch (m_ClimberState) {
     //   case DEFAULT -> {

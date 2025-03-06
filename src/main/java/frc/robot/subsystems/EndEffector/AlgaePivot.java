@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-@Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN)
+@Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaePivot extends SubsystemBase {
 
   public static enum PivotState {
@@ -37,7 +37,7 @@ public class AlgaePivot extends SubsystemBase {
 
   private PivotState m_PivotState;
 
-  @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
+  // @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
   private TalonFX m_AlgaePivot;
 
 
@@ -64,7 +64,7 @@ public class AlgaePivot extends SubsystemBase {
   public void setPivotState(PivotState state) {
     m_PivotState = state;
   }
-
+  @Logged(name = "Pivot State", importance = Importance.CRITICAL )
   public PivotState getPivotState() {
     return m_PivotState;
   }
@@ -92,7 +92,7 @@ public class AlgaePivot extends SubsystemBase {
     return m_absoluteEncoder.get();
   }
 
-  @Logged(name = "Pivot Position")
+  @Logged(name = "Pivot Position", importance = Importance.CRITICAL)
   public double getPivotPosition() {
     return m_AlgaePivot.getPosition().refresh().getValue().in(Rotations);
   }

@@ -23,11 +23,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-@Logged(strategy = Strategy.OPT_IN)
+@Logged(strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  @Logged(strategy = Strategy.OPT_IN)
+  @Logged(strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
   private final RobotContainer m_robotContainer;
 
   /**
@@ -72,7 +72,7 @@ public class Robot extends TimedRobot {
           //   DriverStation.startDataLog(DataLogManager.getLog(), false);
           //   config.backend = new FileBackend(DataLogManager.getLog());
           // at home
-          config.minimumImportance = Importance.DEBUG;
+          config.minimumImportance = Importance.CRITICAL;
         });
     Epilogue.bind(this);
     PortForwarder.add(5800, "photon-frontcams.local", 5800);
