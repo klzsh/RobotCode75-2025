@@ -11,7 +11,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 
 public class ObjectDetetectorCamera extends SubsystemBase {
-  // TODO: fix this mess
   private PhotonCamera m_Camera;
   private Optional<PhotonPipelineResult> m_Result;
   private List<PhotonTrackedTarget> m_Targets;
