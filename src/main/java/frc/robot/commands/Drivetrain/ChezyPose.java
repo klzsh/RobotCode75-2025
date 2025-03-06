@@ -94,7 +94,7 @@ public class ChezyPose extends Command {
     double currentDistance =
         currentPose.getTranslation().getDistance(targetPose2d.getTranslation());
     double ffScaler =
-        MathUtil.clamp((currentDistance - ffMinRadius) / (ffMaxRadius - ffMinRadius), 0.0, 1.0);
+        MathUtil.clamp((currentDistance - ffMinRadius) / (ffMaxRadius - ffMinRadius), 0.0, 0.5);
     driveErrorAbs = currentDistance;
     driveController.reset(
         lastSetpointTranslation.getDistance(targetPose2d.getTranslation()),
@@ -115,7 +115,7 @@ public class ChezyPose extends Command {
 
     // Calculate theta speed
     double thetaVelocity =
-        thetaController.getSetpoint().velocity * ffScaler
+        thetaController.getSetpoint().velocity * ffScaler * 0.7
             + thetaController.calculate(
                 currentPose.getRotation().getRadians(), targetPose2d.getRotation().getRadians());
     thetaErrorAbs =
