@@ -114,7 +114,7 @@ public class AutoSelector {
     presetChooser.setDefaultOption("Custom", "");
     presetChooser.addOption("Left Side Two Piece", "st cr 3 ht 5 bl 3");
     presetChooser.addOption("Right Side Two Piece", "sb er 3 hb 5 fl 3");
-    presetChooser.addOption("Middle Coral Algae", "sm dl 3 2 p 4 hb");
+    presetChooser.addOption("Middle One Piece", "sm dl 3");
 
     // define auto factory for autos
     factory =
