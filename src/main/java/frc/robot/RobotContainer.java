@@ -191,24 +191,6 @@ public class RobotContainer {
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
         .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
-    // AlignLeft.whileTrue(
-    //     new AlignToBranch(
-    //         m_Swerve,
-    //         m_RightFacingCamera,
-    //         true,
-    //         m_PoseAlignController,
-    //         new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
-
-    // AlignLeft.whileTrue(
-    //   new AlignToBranch(
-    //       m_Swerve,
-    //       m_RightFacingCamera,
-    //       true,
-    //       m_PoseAlignController,
-    //       new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
-
-    // Auto Align commands
-
   }
 
   public void configureControllerBinds() {
@@ -313,11 +295,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return m_AutoChooser.getSelected();
-    // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
-
-    // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    m_AutoSelector.generatePaths(); // TODO: move to robot or smth due to the delay
+    m_AutoSelector.generatePaths();
     return m_AutoSelector.getAutoCommand();
 
     // return new SequentialCommandGroup(
@@ -330,15 +308,5 @@ public class RobotContainer {
     //     new ParallelCommandGroup(
     //         m_factory.trajectoryCmd("st-bl-1", 2), new IntakeCoral(m_CoralIntake)),
     //     new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake));
-    // return new TestAuto(
-    //     m_Factory,
-    //     m_CoralIntake,
-    //     m_Swerve,
-    //     m_Elevator,
-    //     m_LeftFacingCamera,
-    //     m_RightFacingCamera,
-    //     m_VisionController,
-    //     m_PoseAlignController);
-    // return null;
   }
 }
