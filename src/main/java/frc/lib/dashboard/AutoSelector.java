@@ -38,6 +38,7 @@ import java.util.Map;
  * Feedback - displays errors, shows completed path
  * Generate - checks paths for errors, displays trajectories on field, sets auto command
  * Reset - reset trajectories, string, and auto command
+ * Presets - sendable chooser of preset autos (must click generate after selecting)
  *
  * FORMAT FOR AUTO STRING
  * Separated into words by spaces - commands in the same word are executed simultaneously
@@ -49,16 +50,15 @@ import java.util.Map;
  */
 
 /* ACTIONS
- * 1 for align + score L1
+ * 1 for align + elevator movement & score L1
  * 2 for align + elevator movement & dealgify (decide level by last point or apriltag)
  * 3 for align + elevator movement & score L4
- * 4 for align + elevator movement & processor
- * 5 for align to left/middle/right coral station + wait set time
+ * 4 for align + score processor
+ * 5 for intake coral + wait set time
  */
 
 /* POINTS
  * ST, SM, SB - top/middle/bottom starting positions
- * L - arbitrary leave point
  * P - processor
  * A, B, C, D, E, F - reef points, followed by L/M/R for offset (M for algae)
  * HT, HB - human player stations
