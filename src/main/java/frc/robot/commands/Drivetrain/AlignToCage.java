@@ -63,7 +63,10 @@ public class AlignToCage extends Command {
     rotationCommand =
         rotationController.calculate(
             m_Swerve.getRotation2D().getDegrees(),
-            180);
+            // this line is needed because the heading of the cage differs based on which alliance
+            // you are on. Since the Gyro is field relative with 0 being facing away from the blue
+            // driver station wall
+            DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0);
 
     if (currentYaw.isPresent() && currentPitch.isPresent()) {
       if (!yController.atSetpoint()) {
