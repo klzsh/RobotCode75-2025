@@ -38,7 +38,9 @@ public class AlignToCage extends Command {
     m_CageDetector = cageDetector;
 
     xController = new PIDController(0.05, 0.0, 0.0);
+    xController.setTolerance(.3);
     yController = new PIDController(0.05, 0.0, 0.0);
+    yController.setTolerance(.3);
     rotationController = new PIDController(0.05, 0.0, 0.0);
     rotationController.setTolerance(1.5);
 
@@ -61,10 +63,10 @@ public class AlignToCage extends Command {
     rotationCommand =
         rotationController.calculate(
             m_Swerve.getRotation2D().getDegrees(),
-            DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0);
+            180);
 
     if (currentYaw.isPresent() && currentPitch.isPresent()) {
-      if (Math.abs(currentYaw.getAsDouble() - finalYawSetpoint) >= .1) {
+      if (!yController.atSetpoint()) {
         xCommand = xController.calculate(currentPitch.getAsDouble(), intermediatePitchSetpoint);
       } else {
         xCommand = -1; // drive forward after aligned
@@ -83,7 +85,9 @@ public class AlignToCage extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_Swerve.stopModules();
+  }
 
   @Override
   public boolean isFinished() {
