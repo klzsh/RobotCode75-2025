@@ -163,7 +163,6 @@ public class AutoSelector {
   }
 
   public void setupAutoTab() {
-    System.out.println("setting up auto tab");
     NetworkTableInstance nt = NetworkTableInstance.getDefault();
     NetworkTable ntTable = nt.getTable("Shuffleboard").getSubTable("Auto");
 
@@ -219,7 +218,6 @@ public class AutoSelector {
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
 
-    System.out.println(autoString.length());
     if (!m_startPositions.containsKey(words[0].toLowerCase())) {
       setFeedback("Invalid start position");
       return;
