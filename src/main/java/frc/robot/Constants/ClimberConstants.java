@@ -14,7 +14,6 @@ import edu.wpi.first.units.measure.Time;
 
 public final class ClimberConstants {
   public static final double climberGearRatio = 39.6 / 1.0;
-  // TODO: tune
   public static final Angle climbPosition = Rotations.of(0);
   public static final Angle climbExtendPosition = Rotations.of(100);
   public static final double climbDeadband = 0.5;
@@ -23,9 +22,8 @@ public final class ClimberConstants {
   public static final int climberMotor1CANID = 46;
 
   public static final int climberEncoderPort = 6;
-  // public static final Angle climberStartPosition = Rotations.of(0.015); // TODO tune
   public static final Angle climbPositionAbsoluteStart = Rotations.of(0.288);
-  public static final Angle climbPositionAbsoluteFinish = Rotations.of(0.2); // TODO tune
+  public static final Angle climbPositionAbsoluteFinish = Rotations.of(0.2);
   public static final double climbDeadbandAbsolute = 0.25;
 
   public static final class MotorConfigs {
