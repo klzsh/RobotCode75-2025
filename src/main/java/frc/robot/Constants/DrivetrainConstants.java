@@ -118,7 +118,7 @@ public final class DrivetrainConstants {
   public static final double angleGearRatio = 150.0 / 7.0; // ~21:1 ratio
 
   /** Meters per Second */
-  public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.49);
+  public static final LinearVelocity maxSpeed = MetersPerSecond.of(3.5);
 
   public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
 

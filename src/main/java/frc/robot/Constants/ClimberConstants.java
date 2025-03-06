@@ -53,7 +53,7 @@ public final class ClimberConstants {
     public static final double kI = 0;
     public static final double kD = 5;
 
-    public static final double motionMagicCruiseVelocity = 25;
+    public static final double motionMagicCruiseVelocity = 50;
     public static final double motionMagicCruiseAcceleration = 10;
     public static final double motionMagickV = 0.12;
     public static final double motionMagickA = 0.1;
