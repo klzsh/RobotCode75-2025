@@ -13,12 +13,12 @@ import java.util.OptionalDouble;
 
 public class YoloBranchAlign extends Command {
 
-  private final TunableNumber[] strafePID = {
-    new TunableNumber("YOLO Align/P", 0.07),
-    new TunableNumber("YOLO Align/I", 0),
-    new TunableNumber("YOLO Align/D", 0),
-    new TunableNumber("YOLO Align/Tolerance", 0.2)
-  };
+  // private final TunableNumber[] strafePID = {
+  //   new TunableNumber("YOLO Align/P", 0.07),
+  //   new TunableNumber("YOLO Align/I", 0),
+  //   new TunableNumber("YOLO Align/D", 0),
+  //   new TunableNumber("YOLO Align/Tolerance", 0.2)
+  // };
 
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
@@ -38,7 +38,7 @@ public class YoloBranchAlign extends Command {
 
   private final double finalYawSetpoint = -2.2;
   private final double driveIntoReefSpeed = .5;
-  private final double stallSpeedThreshold = .1;
+  private final double stallSpeedThreshold = .05;
   double startTime = 0;
 
   public YoloBranchAlign(
@@ -64,10 +64,12 @@ public class YoloBranchAlign extends Command {
 
   @Override
   public void execute() {
-    yController.setP(strafePID[0].getNumber());
-    yController.setI(strafePID[1].getNumber());
-    yController.setD(strafePID[2].getNumber());
-    yController.setTolerance(strafePID[3].getNumber());
+    // yController.setP(strafePID[0].getNumber());
+    // yController.setI(strafePID[1].getNumber());
+    // yController.setD(strafePID[2].getNumber());
+    // yController.setTolerance(strafePID[3].getNumber());
+    yController.setP(0.07);
+    yController.setTolerance(0.2);
 
     SmartDashboard.putBoolean("YOLO yAtSetpoint", yController.atSetpoint());
 
@@ -122,11 +124,23 @@ public class YoloBranchAlign extends Command {
   public boolean isFinished() {
     // should be stalling when driving into reef
     // return Timer.getFPGATimestamp() - startTime >= 3;
-    return false;
+    // actual vx less than stall speed
+    // 
+    if (!isAlignInPlace) {
+    return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold && Timer.getFPGATimestamp() - startTime >= 0.5;
+    }
+    else {
+      return yController.atSetpoint();
+    }
   }
 
   @Override
   public void end(boolean interrupted) {
+    if(interrupted){
+      System.out.println("Ended, interrupted");
+    } else {
+      System.out.println("ended, not interrupted");
+    }
     m_Swerve.stopModules();
   }
 }

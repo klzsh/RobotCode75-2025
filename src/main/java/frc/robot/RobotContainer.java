@@ -9,6 +9,7 @@ import static frc.robot.Constants.VisionConstants.*;
 
 import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,22 +77,22 @@ public class RobotContainer {
   // @Logged(name = "Branch Cam")
   private final ObjectDetetectorCamera m_BranchCamera = new ObjectDetetectorCamera("Branch_Cam");
 
-  @Logged(name = "Swerve")
+  @Logged(name = "Swerve", importance = Importance.CRITICAL)
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-  // @Logged(name = "Elevator")
+  @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
-  @Logged(name = "Coral Intake")
+  @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
-  @Logged(name = "Climber")
+  @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-  // @Logged(name = "Algae Intake")
+  @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  @Logged(name = "Algae Pivot")
+  @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
@@ -189,7 +190,7 @@ public class RobotContainer {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
     AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
-    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
