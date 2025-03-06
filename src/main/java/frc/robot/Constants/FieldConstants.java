@@ -1,13 +1,11 @@
 package frc.robot.Constants;
 
+import static edu.wpi.first.units.Units.*;
 import static java.util.Map.entry;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import frc.lib.util.FieldPose;
+import edu.wpi.first.units.measure.Distance;
 import frc.lib.util.FieldPose.FieldElement;
-import frc.lib.util.FieldPose.Offset;
-import frc.lib.util.FieldPose.Side;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import java.util.Map;
 
 public class FieldConstants {
@@ -18,153 +16,60 @@ public class FieldConstants {
   // total
   // Processor --> red/blue, 1 position --> 2 total
 
-  // TODO: change to entries bc im a dumdum
-  public static final Map<FieldPose, Pose2d> fieldPoses =
+  public static final Map<String, ElevatorPositions> algaeHeights =
       Map.ofEntries(
-          // processor
-          entry(
-              new FieldPose(Side.RED, FieldElement.PROCESSOR, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          // sideload
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.SIDELOADMID),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.SIDELOADMID),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          // frontload top station
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.LEFT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.TOPHPSTATION, Offset.RIGHT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          // frontload bottom station
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.LEFT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT1),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT2),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT3),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.BOTTOMHPSTATION, Offset.RIGHT4),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          // Reef positions
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFA, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFB, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFB, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFB, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFC, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFC, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFC, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFD, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFD, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFD, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFE, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFE, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFE, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFF, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFF, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFF, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFG, Offset.NONE),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFG, Offset.LEFT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0))),
-          entry(
-              new FieldPose(Side.RED, FieldElement.REEFG, Offset.RIGHT),
-              new Pose2d(0.0, 0.0, new Rotation2d(0.0)))
+          entry("a", ElevatorPositions.L3),
+          entry("b", ElevatorPositions.L2),
+          entry("c", ElevatorPositions.L3),
+          entry("d", ElevatorPositions.L2),
+          entry("e", ElevatorPositions.L3),
+          entry("f", ElevatorPositions.L2),
+          entry("A", ElevatorPositions.L3),
+          entry("B", ElevatorPositions.L2),
+          entry("C", ElevatorPositions.L3),
+          entry("D", ElevatorPositions.L2),
+          entry("E", ElevatorPositions.L3),
+          entry("F", ElevatorPositions.L2));
 
-          // TODO: Auto field flipping for blue side (or red side ig)
-          );
+  public static final Map<Integer, Double> tagToHeadingMap =
+      Map.ofEntries(
+          entry(6, 300.0),
+          entry(7, 0.0),
+          entry(8, 60.0),
+          entry(9, 120.0),
+          entry(10, 180.0),
+          entry(11, 240.0),
+          entry(17, 60.0),
+          entry(18, 0.0),
+          entry(19, 300.0),
+          entry(20, 240.0),
+          entry(21, 180.0),
+          entry(22, 120.0));
+
+  public static final Map<FieldElement, Integer> blueTags =
+      Map.ofEntries(
+          entry(FieldElement.A, 18),
+          entry(FieldElement.B, 19),
+          entry(FieldElement.C, 20),
+          entry(FieldElement.D, 21),
+          entry(FieldElement.E, 22),
+          entry(FieldElement.F, 17),
+          entry(FieldElement.HT, 13),
+          entry(FieldElement.HB, 14),
+          entry(FieldElement.P, 16));
+
+  public static final Map<FieldElement, Integer> redTags =
+      Map.ofEntries(
+          entry(FieldElement.A, 7),
+          entry(FieldElement.B, 6),
+          entry(FieldElement.C, 11),
+          entry(FieldElement.D, 10),
+          entry(FieldElement.E, 9),
+          entry(FieldElement.F, 8),
+          entry(FieldElement.P, 3),
+          entry(FieldElement.HT, 1),
+          entry(FieldElement.HB, 2));
+
+  public static final Distance reefLeftPoseOffset = Meters.of(0.14);
+  public static final Distance reefRightPoseOffset = Meters.of(0.5);
 }

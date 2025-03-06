@@ -11,9 +11,11 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,8 @@ public class AprilTagCamera extends SubsystemBase {
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
   private AprilTagFieldLayout m_tagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      // FMA uses welded field layout
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   private PhotonPoseEstimator m_poseEstimator;
   private EstimatedRobotPose m_pose;
   private Transform3d cameraToRobotPose;
@@ -45,7 +48,7 @@ public class AprilTagCamera extends SubsystemBase {
 
     m_poseEstimator =
         new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
-    m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
   }
 
   public boolean hasTarget() {
@@ -123,6 +126,13 @@ public class AprilTagCamera extends SubsystemBase {
     return Optional.empty();
   }
 
+  public Optional<PhotonTrackedTarget> getBestTarget() {
+    if (m_result.getBestTarget() == null) {
+      return Optional.empty();
+    }
+    return Optional.of(m_result.getBestTarget());
+  }
+
   public OptionalDouble getRange(int id) {
     PhotonTrackedTarget target = getTarget(id).isPresent() ? getTarget(id).get() : null;
     if (target == null) {
@@ -143,6 +153,16 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
+  // @Logged
+  public double getXSin() {
+    if (getTarget(18).isEmpty()) {
+      return 0;
+    } else {
+      PhotonTrackedTarget target = getTarget(18).get();
+      return Math.sin(Units.degreesToRadians(target.getYaw()));
+    }
+  }
+
   public OptionalDouble getY(int id) {
     if (getTarget(id).isEmpty()) {
       return OptionalDouble.empty();
@@ -152,12 +172,22 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  public OptionalDouble getYaw(int id) {
+  // @Logged
+  public double getYSin() {
+    if (getTarget(18).isEmpty()) {
+      return 0;
+    } else {
+      PhotonTrackedTarget target = getTarget(18).get();
+      return Math.sin(Units.degreesToRadians(target.getPitch()));
+    }
+  }
+
+  public OptionalDouble getSkew(int id) {
     if (getTarget(id).isEmpty()) {
       return OptionalDouble.empty();
     } else {
       PhotonTrackedTarget target = getTarget(id).get();
-      return OptionalDouble.of(target.getYaw());
+      return OptionalDouble.of(target.getSkew());
     }
   }
 
@@ -170,8 +200,71 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
+  public OptionalDouble getArea(int id) {
+    if (getTarget(id).isEmpty()) {
+      return OptionalDouble.empty();
+    } else {
+      PhotonTrackedTarget target = getTarget(id).get();
+      return OptionalDouble.of(target.getArea());
+    }
+  }
+
+  public OptionalDouble minTagArea() {
+    double minArea = Double.MAX_VALUE;
+    for (PhotonTrackedTarget target : m_result.getTargets()) {
+      if (target.getArea() < minArea) {
+        minArea = target.getArea();
+      }
+    }
+
+    if (minArea == Double.MAX_VALUE) {
+      return OptionalDouble.empty();
+    } else {
+      return OptionalDouble.of(minArea);
+    }
+  }
+
+  // @Logged
+  public double getPrimaryTagX() {
+    if (m_result.getTargets().size() >= 1) {
+      return m_result.getBestTarget().getYaw();
+    } else {
+      return -1;
+    }
+  }
+
+  // @Logged
+  public double getPrimaryTagY() {
+    if (m_result.getTargets().size() >= 1) {
+      return m_result.getBestTarget().getPitch();
+    } else {
+      return -1;
+    }
+  }
+
+  // @Logged
+  public double getPrimaryTagTheta() {
+    if (m_result.getTargets().size() >= 1) {
+      return m_result.getBestTarget().getSkew();
+    } else {
+      return -1;
+    }
+  }
+
   public EstimatedRobotPose getEstimatedPose() {
+    if (minTagArea().isPresent() && minTagArea().getAsDouble() < 0) {
+      return null;
+    }
     return m_pose;
+  }
+
+  @Logged(name = "Estimated Pose", importance = Importance.DEBUG)
+  public Pose2d getEstimatedPose2d() {
+    if (m_pose != null) {
+      return m_pose.estimatedPose.toPose2d();
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -213,7 +306,7 @@ public class AprilTagCamera extends SubsystemBase {
    *
    * @return poses of seen april tags
    */
-  @Logged(name = "Seen Tag Poses", importance = Importance.DEBUG)
+  // @Logged(name = "Seen Tag Poses", importance = Importance.DEBUG)
   public Pose3d[] getSeenTags() {
     List<Pose3d> targets = new ArrayList<>();
     if (getAllTagIds().isPresent()) {
@@ -229,13 +322,17 @@ public class AprilTagCamera extends SubsystemBase {
    *
    * @return
    */
-  @Logged(name = "Camera Estimated Pose", importance = Importance.DEBUG)
+  // @Logged(name = "Camera Estimated Pose", importance = Importance.DEBUG)
   public Pose2d getVisionPose() {
     if (m_pose != null) {
       return m_pose.estimatedPose.toPose2d();
     } else {
       return null;
     }
+  }
+
+  public void updateHeading(Rotation2d heading) {
+    m_poseEstimator.addHeadingData(Timer.getFPGATimestamp(), heading);
   }
 
   // public double getLatency() {  // This dont exist in 2025 either ig

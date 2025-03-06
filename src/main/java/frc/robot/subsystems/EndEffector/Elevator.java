@@ -6,8 +6,8 @@ package frc.robot.subsystems.EndEffector;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.ElevatorConstants.*;
-import static frc.robot.Constants.HardwareConstants.Elevator.*;
-import static frc.robot.Constants.HardwareConstants.superstructureCANBusName;
+import static frc.robot.Constants.ElevatorConstants.MotorConfigs.*;
+import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
@@ -22,18 +22,16 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
  * 2 stage WCP GreyT elevator
- * Uses motion magic to honor a target cruise velocity and acceleration
+ * Uses motion magic to honor a target \ and acceleration
  *  Motion magic is used to prevent the elevator from destroying itself by moving too fast
  *
  */
-@Logged(strategy = Strategy.OPT_IN, name = "Elevator")
+@Logged(strategy = Strategy.OPT_IN, name = "Elevator", importance = Importance.CRITICAL)
 public class Elevator extends SubsystemBase {
 
   // we only have a certain number of states the elevator will be in at any given time
@@ -52,31 +50,35 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  @Logged(name = "Current Position", importance = Importance.INFO)
+  @Logged(name = "Current Position", importance = Importance.CRITICAL)
   private ElevatorPositions m_SetpointPosition = ElevatorPositions.HOME;
 
+  // @Logged
   private boolean m_IsAlgae = false;
 
   // define motors
-  @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
+  // @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
   private final TalonFX m_ElevatorMotor1;
 
-  @Logged(name = "Right Elevator Motor", importance = Importance.DEBUG)
+  // @Logged(name = "Right Elevator Motor", importance = Importance.DEBUG)
   private final TalonFX m_ElevatorMotor2;
 
   // sensors
   private final DigitalInput m_lowerLimitSwitch;
   private final DigitalInput m_upperLimitSwitch;
   private final DigitalInput m_backupLimitSwitch;
-  // this is probably not going to be used for homing the elevator
-  // private final Counter m_distanceSensor;
 
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
 
-  // tunable numbers
-  
+  // private final TunableNumber mmVelocityUp;
+  // private final TunableNumber mmAccelerationUp;
+  // private final TunableNumber mmJerkUp;
+
+  // private final TunableNumber mmVelocityDown;
+  // private final TunableNumber mmAccelerationDown;
+  // private final TunableNumber mmJerkDown;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -102,6 +104,16 @@ public class Elevator extends SubsystemBase {
 
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
+
+    // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
+    // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
+    // mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
+
+    // mmVelocityDown = new TunableNumber("Elevator/MM Velocity Dowbn", MotionMagicProfileDown[0]);
+    // mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Dowbn",
+    // MotionMagicProfileDown[1]);
+    // mmJerkDown = new TunableNumber("Elevator/MM Jerk Dowbn", MotionMagicProfileDown[2]);
+
   }
 
   /**
@@ -119,7 +131,7 @@ public class Elevator extends SubsystemBase {
    *
    * @return the position in rotations of the elevator
    */
-  @Logged(name = "Elevator Position Radians")
+  // @Logged(name = "Elevator Position Radians")
   public Angle getPosition() {
     Measure<AngleUnit> motor1Position =
         BaseStatusSignal.getLatencyCompensatedValue(
@@ -136,7 +148,7 @@ public class Elevator extends SubsystemBase {
    *
    * @return the position in rotations of the elevator
    */
-  @Logged(name = "Elevator Position")
+  @Logged(name = "Elevator Position", importance = Importance.CRITICAL)
   public double logPosition() {
     return getPosition().in(Rotations);
   }
@@ -164,17 +176,6 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
-  public Command positionCommand(ElevatorPositions position, boolean algae) {
-    return Commands.runOnce(() -> setPosition(position, algae), this)
-        .until(() -> isAtPosition(position, algae));
-  }
-
-  public void stopMotors() {
-    m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(0));
-    m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(0));
-  }
-
-  // end temp methods
   public boolean getUpperLimit() {
     return !m_upperLimitSwitch.get();
   }
@@ -188,48 +189,52 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putBoolean("Upper Limit", getUpperLimit());
     SmartDashboard.putBoolean("Lower Limit", getLowerLimit());
 
-    // only apply if one of the numbers have changed because setting the config is a
-    // blocking operation
-    
+    // if (getLowerLimit()) {
+    //   m_ElevatorMotor1.setPosition(Rotations.of(0));
+    //   m_ElevatorMotor2.setPosition(Rotations.of(0));
+    // }
+    // if (getUpperLimit()) {
+    //   m_ElevatorMotor1.setPosition(Rotations.of(26));
+    //   m_ElevatorMotor2.setPosition(Rotations.of(26));
+    // }
+    double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
+    double algaeOffset =
+        (m_IsAlgae
+                && (m_SetpointPosition == ElevatorPositions.L2
+                    || m_SetpointPosition == ElevatorPositions.L3))
+            ? algaeRemovalOffset.in(Rotations)
+            : 0;
+    double targetRotations = currentPosition + algaeOffset;
 
-    if (getLowerLimit()) {
-      m_ElevatorMotor1.setPosition(Rotations.of(0));
-      m_ElevatorMotor2.setPosition(Rotations.of(0));
-    }
-    if (getUpperLimit()) {
-      m_ElevatorMotor1.setPosition(Rotations.of(26));
-      m_ElevatorMotor2.setPosition(Rotations.of(26));
-    }
-
-    if (getPosition().in(Rotations) < m_SetpointPosition.Rotations.in(Rotations)) {
+    if (getPosition().in(Rotations) < targetRotations) {
       m_PositionRequest.Velocity = MotionMagicProfileUp[0];
       m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
       m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+
+      // m_PositionRequest.Velocity = mmVelocityUp.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
+      // m_PositionRequest.Jerk = mmJerkUp.getNumber();
     } else {
       m_PositionRequest.Velocity = MotionMagicProfileDown[0];
       m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
       m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+      // m_PositionRequest.Velocity = mmVelocityDown.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
+      // m_PositionRequest.Jerk = mmJerkDown.getNumber();
     }
+
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
-      m_ElevatorMotor1.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
-      m_ElevatorMotor2.setControl(
-          m_CharacterizationRequest
-              .withOutput(0)
-              .withLimitForwardMotion(getUpperLimit())
-              .withLimitReverseMotion(getLowerLimit()));
+      m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(0));
+      m_ElevatorMotor2.setControl(m_CharacterizationRequest.withOutput(0));
     } else {
       m_ElevatorMotor1.setControl(
           m_PositionRequest
-              .withPosition(m_SetpointPosition.Rotations)
+              .withPosition(Rotations.of(targetRotations))
               .withLimitForwardMotion(getUpperLimit())
               .withLimitReverseMotion(getLowerLimit()));
       m_ElevatorMotor2.setControl(
           m_PositionRequest
-              .withPosition(m_SetpointPosition.Rotations)
+              .withPosition(Rotations.of(targetRotations))
               .withLimitForwardMotion(getUpperLimit())
               .withLimitReverseMotion(getLowerLimit()));
     }

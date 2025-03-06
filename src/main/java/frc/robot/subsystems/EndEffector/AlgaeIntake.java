@@ -4,29 +4,21 @@
 
 package frc.robot.subsystems.EndEffector;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.EndEffectorConstants.*;
-import static frc.robot.Constants.HardwareConstants.Elevator.*;
-import static frc.robot.Constants.HardwareConstants.Elevator.kS;
-import static frc.robot.Constants.HardwareConstants.EndEffector.*;
+import static frc.robot.Constants.EndEffectorConstants.MotorConfigs.*;
+import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
+import frc.robot.subsystems.Util.LidarDistanceSensor;
 
+@Logged(name = "Algae Intake", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaeIntake extends SubsystemBase {
   public static enum AlgaeStates {
     NONE,
@@ -35,51 +27,36 @@ public class AlgaeIntake extends SubsystemBase {
     OUTAKING
   }
 
-  public static enum PivotState {
-    RETRACTED,
-    GROUNDINTAKE,
-    DEAGLAEFY,
-    HOMING,
-    NONE
-  }
-
   // TODO: add tunable numbers for PIDS, velocity, Position, CURRENT LIMITS
+  @Logged(name = "Intake State", importance = Importance.CRITICAL)
   private AlgaeStates m_AlgaeIntakeState;
-  private PivotState m_PivotState;
+
+  // @Logged(name = "Algae Intake Motor", importance = Importance.INFO)
   private TalonFX m_AlgaeMotor;
-  private TalonFX m_AlgaePivot;
 
-  private Slot0Configs IntakePIDConfig = new Slot0Configs();
-  private final TunableNumber algaeIntakeKp;
-  private final TunableNumber algaeIntakeKd;
-  private final TunableNumber algaeIntakeKg;
-  private final TunableNumber algaeIntakeKs;
+  // private Slot0Configs IntakePIDConfig = new Slot0Configs();
+  // private final TunableNumber algaeIntakeKp;
+  // private final TunableNumber algaeIntakeKd;
+  // private final TunableNumber algaeIntakeKs;
 
-  private Slot0Configs PivotPIDConfig = new Slot0Configs();
-  private final TunableNumber algaePivotKp;
-  private final TunableNumber algaePivotKd;
-  private final TunableNumber algaePivotKs;
-  private final TunableNumber algaePivotKg;
+  // private final DigitalInput m_AlgaeIntakeLimit;
+  // @Logged
+  private final LidarDistanceSensor m_AlgaeDetector;
 
-  public final TunableNumber absoluteEncoderOffset;
-
+  // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
+  // hold request
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
-  private final PositionTorqueCurrentFOC pivotRequest =
-      new PositionTorqueCurrentFOC(Rotations.of(0));
-
-  private final DutyCycleEncoder m_absoluteEncoder;
 
   /** Creates a new AlgaeIntake. */
   public AlgaeIntake() {
-    m_AlgaeMotor = new TalonFX(algaeMotorCanID);
+    m_AlgaeMotor = new TalonFX(algaeMotorCanID, superstructureCANBusName);
     m_AlgaeMotor.getConfigurator().apply(getAlgaeMotorConfiguration());
     m_AlgaeIntakeState = AlgaeStates.NONE;
+    m_AlgaeDetector = new LidarDistanceSensor(Inches.of(4));
 
-    m_AlgaePivot = new TalonFX(pivotCanID);
-    m_AlgaePivot.getConfigurator().apply(getPivotConfiguration());
-    m_PivotState = PivotState.NONE;
+    // m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
 
     algaeRequest.UpdateFreqHz = 0;
     algaeRequest.UseTimesync = true;
@@ -87,38 +64,15 @@ public class AlgaeIntake extends SubsystemBase {
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;
 
-    pivotRequest.UpdateFreqHz = 0;
-    pivotRequest.UseTimesync = true;
+    // IntakePIDConfig.withKA(0)
+    //     .withKS(algaeKS)
+    //     .withKP(algaeKP)
+    //     .withKD(algaeKD)
+    //     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    IntakePIDConfig.withKA(kA)
-        .withKS(kS)
-        .withKV(kV)
-        .withKG(kG)
-        .withKP(kP)
-        .withKD(kD)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
-
-    algaeIntakeKp = new TunableNumber("Algae Intake/kP", kP);
-    algaeIntakeKd = new TunableNumber("Algae Intake/kD", kD);
-    algaeIntakeKg = new TunableNumber("Algae Intake/kG", kG);
-    algaeIntakeKs = new TunableNumber("Algae Intake/kS", kS);
-
-    absoluteEncoderOffset = new TunableNumber("Algae Encoder/Offset", algaeEncoderOffset.in(Rotations));
-
-    PivotPIDConfig.withKA(kA)
-        .withKS(kS)
-        .withKV(kV)
-        .withKG(kG)
-        .withKP(kP)
-        .withKD(kD)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
-
-    algaePivotKp = new TunableNumber("Algae Pivot/kP", kP);
-    algaePivotKd = new TunableNumber("Algae Pivot/kD", kD);
-    algaePivotKg = new TunableNumber("Algae Pivot/kG", kG);
-    algaePivotKs = new TunableNumber("Algae Pivot/kS", kS);
-
-    m_absoluteEncoder = new DutyCycleEncoder(algaePivotEncoderPort, 360.0, algaePivotZeroPoint.getRotations());
+    // algaeIntakeKp = new TunableNumber("Algae Intake/kP", algaeKP);
+    // algaeIntakeKd = new TunableNumber("Algae Intake/kD", algaeKD);
+    // algaeIntakeKs = new TunableNumber("Algae Intake/kS", algaeKS);
   }
 
   public void setAlgaeState(AlgaeStates state) {
@@ -129,81 +83,33 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
-  public void setPivotState(PivotState state) {
-    m_PivotState = state;
+  @Logged(name = "Algae In Inake", importance = Importance.CRITICAL)
+  public boolean algaeInIntake() {
+    return m_AlgaeDetector.belowThreshold();
+    // return !m_AlgaeIntakeLimit.get();
   }
 
   public AlgaeStates getAlgaeState() {
     return m_AlgaeIntakeState;
   }
 
-  public PivotState getPivotState() {
-    return m_PivotState;
-  }
-
-  public void homePivotToAbsoluteEncoder() {
-    double absoluteRotations = m_absoluteEncoder.get();
-    double offset = absoluteEncoderOffset.getNumber();
-    double relativeRotationsAxleCandidate1 = offset - absoluteRotations;
-    double relativeRotationsAxleCandidate2 = offset - (absoluteRotations + 1);
-    double relativeRotationsAxleCandidate3 = offset - (absoluteRotations - 1);
-
-    double relativeRotationsAxle = Math.min(
-        Math.abs(relativeRotationsAxleCandidate1),
-        Math.min(
-            Math.abs(relativeRotationsAxleCandidate2),
-            Math.abs(relativeRotationsAxleCandidate3)
-        )
-    );
-
-    double relativeRotationsMotor = relativeRotationsAxle * pivotMotorGearRatio;
-
-    // find rotations from current relative position to home
-    double totalRotations = m_AlgaePivot.getPosition().getValue().in(Rotations) - relativeRotationsMotor;
-
-    m_AlgaePivot.setControl(pivotRequest.withPosition(Rotations.of(totalRotations)));
-  }
-
-  public boolean isAtPositionAbsolute(double absolutePosition) {
-    return Math.abs(absolutePosition - m_absoluteEncoder.get()) < algaePivotDeadband;
-  }
-
-//  public boolean isAtPosition(PivotState state) {
-//
-//  }
-
-  public void resetPivotMotor(Angle rotations) {
-    m_AlgaePivot.setPosition(rotations);
+  public void resetAlgaeState() {
+    m_AlgaeIntakeState = AlgaeStates.NONE;
   }
 
   @Override
   public void periodic() {
-    if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
-        || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
-        || algaeIntakeKs.getNumber() != IntakePIDConfig.kS
-        || algaeIntakeKg.getNumber() != IntakePIDConfig.kG) {
-      IntakePIDConfig.kP = algaeIntakeKp.getNumber();
-      IntakePIDConfig.kD = algaeIntakeKd.getNumber();
-      IntakePIDConfig.kS = algaeIntakeKs.getNumber();
-      IntakePIDConfig.kG = algaeIntakeKg.getNumber();
+    // if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
+    //     || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
+    //     || algaeIntakeKs.getNumber() != IntakePIDConfig.kS) {
+    //   IntakePIDConfig.kP = algaeIntakeKp.getNumber();
+    //   IntakePIDConfig.kD = algaeIntakeKd.getNumber();
+    //   IntakePIDConfig.kS = algaeIntakeKs.getNumber();
 
-      m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
-    }
+    //   m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
+    // }
 
-    if (algaePivotKp.getNumber() != PivotPIDConfig.kP
-        || algaePivotKd.getNumber() != PivotPIDConfig.kD
-        || algaePivotKs.getNumber() != PivotPIDConfig.kS
-        || algaePivotKg.getNumber() != IntakePIDConfig.kG) {
-      PivotPIDConfig.kP = algaePivotKp.getNumber();
-      PivotPIDConfig.kD = algaePivotKd.getNumber();
-      PivotPIDConfig.kS = algaePivotKs.getNumber();
-      PivotPIDConfig.kG = algaePivotKg.getNumber();
-
-      m_AlgaePivot.getConfigurator().apply(PivotPIDConfig);
-    }
-
-    // This method will be called once per scheduler run
-    if (m_AlgaeMotor.getFault_StatorCurrLimit().getValue()) {
+    if (algaeInIntake() && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
     }
 
@@ -212,8 +118,7 @@ public class AlgaeIntake extends SubsystemBase {
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeIntakeSpeed));
       }
       case HASGAMEPIECE -> {
-        // set the velocity control to a very low value (like 1-2 rps) to hold the algae in. The
-        // motor will stall trying to get to the desired speed, and that will help hold the ball in;
+        // set the velocity control to a very low value (like 1-2 rps) to hold the algae in
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeHoldSpeed));
       }
       case OUTAKING -> {
@@ -223,24 +128,7 @@ public class AlgaeIntake extends SubsystemBase {
         // set a NONE state for when there is no algae and we are not intaking anything
         m_AlgaeMotor.setControl(currentOut.withOutput(Amps.of(0)));
       }
-      // no default case because all states are accounted for
-    }
-
-    switch (m_PivotState) {
-      case RETRACTED -> {
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
-      }
-      case GROUNDINTAKE -> {
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotGroundIntakePosition));
-      }
-      case DEAGLAEFY -> {
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotDeAlgifyPosition));
-      }
-      case NONE -> {
-        // just keep the pivot retracted if there is no state
-        m_AlgaePivot.setControl(pivotRequest.withPosition(pivotHomePosition));
-      }
-      // no default case because all states are accounted for
+        // no default case because all states are accounted for
     }
   }
 }

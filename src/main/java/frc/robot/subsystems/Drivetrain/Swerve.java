@@ -1,21 +1,18 @@
 package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static frc.robot.Constants.DrivetrainConstants.*;
-import static frc.robot.Constants.HardwareConstants.Swerve.*;
+import static frc.robot.Constants.DrivetrainConstants.MotorConfigs.*;
 import static frc.robot.Constants.VisionConstants.moduleMatrix;
 import static frc.robot.Constants.VisionConstants.visionMatrix;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,11 +22,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
 import frc.robot.Constants.DrivetrainConstants.BackRight;
 import frc.robot.Constants.DrivetrainConstants.FrontLeft;
@@ -43,62 +38,78 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * has methods to get and set individual module positions (for autos or X-Stance) and for teleop driving
  * also contains most of the logging for the chassis (voltage/current, speed, etc)
  */
-@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain")
+@Logged(strategy = Strategy.OPT_IN, name = "Drivetrain", importance = Importance.CRITICAL)
 public class Swerve extends SubsystemBase {
   private SwerveDrivePoseEstimator swerveOdometry;
 
   public TalonFXSwerveModule[] m_SwerveModules;
 
-  @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
+  // @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
   private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
   // TODO: tunable numebr for PIDs + current limits
-  @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Front Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontLeft;
 
-  @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Front Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_FrontRight;
 
-  @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Back Left", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackLeft;
 
-  @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
+  // @Logged(name = "mod/Back Right", importance = Importance.CRITICAL)
   private TalonFXSwerveModule m_BackRight;
 
- 
-  private final Slot0Configs drivePIDS;
-  private final Slot0Configs anglePIDS;
+  // private final TunableNumber driveKP;
+  // private final TunableNumber driveKI;
+  // private final TunableNumber driveKD;
+  // private final TunableNumber driveKS;
+
+  // private final Slot0Configs drivePIDS;
 
   // controllers for autos
   private final PIDController xController;
   private final PIDController yController;
   private final PIDController rController;
 
-  private final AprilTagCamera m_CenterCamera;
-  private final AprilTagCamera m_ModuleCamera;
-
-  private Matrix<N3, N1> tempMatrix;
+  private final AprilTagCamera m_RightFacingCamera;
+  private final AprilTagCamera m_LeftFacingCamera;
+  private final AprilTagCamera m_HPCamera;
 
   // do this later
-  // private final TunableNumber translationKP;
-  // private final TunableNumber translationKI;
-  // private final TunableNumber translationKD;
+  // private final TunableNumber xKP;
+  // private final TunableNumber xKI;
+  // private final TunableNumber xKD;
+
+  // private final TunableNumber yKP;
+  // private final TunableNumber yKI;
+  // private final TunableNumber yKD;
 
   // private final TunableNumber rotationKP;
   // private final TunableNumber rotationKI;
   // private final TunableNumber rotationKD;
 
+  // private final TunableNumber maxAutosSpeed;
 
-  // gryo
+  private double lastUpdatedTime = 0;
+  private boolean m_FieldRelative = true;
+
+  @Logged(name = "Sample Pose", importance = Importance.CRITICAL)
+  private Pose2d sample;
+
+  // gyro
   private Pigeon2 m_gyro;
 
   /** define swerve modules, Gyro, odometry */
-  public Swerve(AprilTagCamera moduleCamera, AprilTagCamera centerCamera) {
+  public Swerve(
+      AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
 
-    m_ModuleCamera = moduleCamera;
-    m_CenterCamera = centerCamera;
+    sample = null;
+    m_LeftFacingCamera = leftFacingCamera;
+    m_RightFacingCamera = rightFacingCamera;
+    m_HPCamera = HPCamera;
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized
@@ -121,6 +132,7 @@ public class Swerve extends SubsystemBase {
     xController = new PIDController(2.65, 0, 0);
     yController = new PIDController(3.9, 0, 0);
     rController = new PIDController(3.05, 0, 0);
+    rController.enableContinuousInput(-Math.PI, Math.PI);
     swerveOdometry =
         new SwerveDrivePoseEstimator(
             swerveKinematics,
@@ -130,16 +142,31 @@ public class Swerve extends SubsystemBase {
             moduleMatrix,
             visionMatrix);
     // init tunable numbers
-   
-    tempMatrix = visionMatrix;
+    // driveKP = new TunableNumber("Swerve/DriveMotor/kP", driveTorqueKP);
+    // driveKI = new TunableNumber("Swerve/DriveMotor/kI", driveTorqueKI);
+    // driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
+    // driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
 
-    drivePIDS =
-        new Slot0Configs()
-            .withKP(driveTorqueKP)
-            .withKI(0)
-            .withKD(driveTorqueKD)
-            .withKS(driveTorqueKS);
-    anglePIDS = new Slot0Configs().withKP(angleTorqueKP).withKI(0).withKD(angleTorqueKD);
+    // xKP = new TunableNumber("Autos/X-KP", 2.65);
+    // xKI = new TunableNumber("Autos/X-KI", 0);
+    // xKD = new TunableNumber("Autos/X-KD", 0);
+
+    // yKP = new TunableNumber("Autos/Y-KP", 3.9);
+    // yKI = new TunableNumber("Autos/Y-KI", 0);
+    // yKD = new TunableNumber("Autos/Y-KD", 0);
+    // rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
+    // rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
+    // rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
+
+    // maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
+
+    // drivePIDS =
+    //     new Slot0Configs()
+    //         .withKP(driveTorqueKP)
+    //         .withKI(0)
+    //         .withKD(driveTorqueKD)
+    //         .withKS(driveTorqueKS);
+    // setPoseByVision(m_LeftFacingCamera);
   }
 
   /**
@@ -148,20 +175,31 @@ public class Swerve extends SubsystemBase {
    * @param rotation - Yaw/angle of the robot (Counter Clockwise is positive)
    * @param openLoop - Use feedback and PID (if false)
    */
-  public void drive(
-      Translation2d translation, double rotation, boolean isOpenLoop, boolean fieldRelative) {
+  public void drive(Translation2d translation, double rotation) {
     SwerveModuleState[] swerveModuleStates =
         swerveKinematics.toSwerveModuleStates(
-            fieldRelative
+            m_FieldRelative
                 ? ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(), translation.getY(), rotation, getRotation2D())
                 : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxSpeed.in(MetersPerSecond));
 
     for (TalonFXSwerveModule mod : m_SwerveModules) {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, false);
+      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false, false);
     }
+  }
+
+  public void toggleRobotRelative() {
+    m_FieldRelative = false;
+  }
+
+  public void toggleFieldRelative() {
+    m_FieldRelative = true;
+  }
+
+  public boolean getFieldRelative() {
+    return m_FieldRelative;
   }
 
   /**
@@ -171,8 +209,24 @@ public class Swerve extends SubsystemBase {
    */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
     setpointSpeeds = speeds;
-    var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
-    // setModuleStates(swerveModuleStates, false);
+    var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds);
+    setModuleStates(swerveModuleStates, false);
+  }
+
+  public void setFieldRelative(ChassisSpeeds speeds) {
+    setpointSpeeds = speeds;
+    var states =
+        swerveKinematics.toSwerveModuleStates(
+            ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation2D()));
+    setModuleStates(states, false);
+  }
+
+  public void setRobotRelative(ChassisSpeeds speeds) {
+    setpointSpeeds = speeds;
+    var states =
+        swerveKinematics.toSwerveModuleStates(
+            ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getRotation2D()));
+    setModuleStates(states, false);
   }
 
   /**
@@ -186,16 +240,14 @@ public class Swerve extends SubsystemBase {
 
   /** follows an autonomous path provided by choreo */
   public void followSwerveSample(SwerveSample sample) {
-    // TODO: some fancy optimization stuff
+    this.sample = sample.getPose();
+    Pose2d pose = getPose();
     ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(
-                xController.calculate(getPose().getX(), sample.x) + sample.vx,
-                yController.calculate(getPose().getY(), sample.y) + sample.vy,
-                rController.calculate(getPose().getRotation().getRadians(), sample.heading)
-                    + sample.omega),
-            getPose().getRotation());
-    this.setChassisSpeeds(speeds);
+        new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega + rController.calculate(pose.getRotation().getRadians(), sample.heading));
+    this.setFieldRelative(speeds);
   }
 
   /**
@@ -204,7 +256,9 @@ public class Swerve extends SubsystemBase {
    * @param desiredStates The desired module state to set the wheels
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean steerWhenStationary) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        desiredStates,
+        maxSpeed.in(MetersPerSecond)); // 4.7 // TODO: change this back to controller constants
     for (TalonFXSwerveModule mod : m_SwerveModules) {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false, steerWhenStationary);
     }
@@ -260,6 +314,20 @@ public class Swerve extends SubsystemBase {
     }
   }
 
+  public void updatePoseByVision(AprilTagCamera camera) {
+    double timestamp = Timer.getFPGATimestamp();
+    // if (timestamp - lastUpdatedTime < 0.005) {
+    //   return;
+    // }
+
+    lastUpdatedTime = timestamp;
+    if (camera.getEstimatedPose() != null) {
+      swerveOdometry.addVisionMeasurement(
+          camera.getEstimatedPose().estimatedPose.toPose2d(),
+          camera.getEstimatedPose().timestampSeconds);
+    }
+  }
+
   /**
    * returns the velocity and angle of all swerve modules
    *
@@ -294,7 +362,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return position of all swerve modules
    */
-  @Logged(name = "Module Positions", importance = Importance.INFO)
+  // @Logged(name = "Module Positions", importance = Importance.INFO)
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (TalonFXSwerveModule mod : m_SwerveModules) {
@@ -308,54 +376,103 @@ public class Swerve extends SubsystemBase {
     m_gyro.setYaw(0);
   }
 
-  /**
-   * gives a breaking heading (360->0 degrees for example) Takes into account a gyro invert
-   *
-   * @return rotation2d returned by the gyro
-   */
-  @Logged(name = "Gyro Angle", importance = Importance.INFO)
+  public void zeroGyro(Rotation2d startVal) {
+    m_gyro.setYaw(startVal.getDegrees());
+  }
+
+  /** gives a breaking heading (360->0 degrees for example) Takes into account a gyro invert */
   public Rotation2d getRotation2D() {
-    return Rotation2d.fromDegrees(m_gyro.getYaw().getValue().in(Degrees));
+    return Rotation2d.fromDegrees(m_gyro.getYaw(true).getValue().in(Degrees));
+  }
+
+  @Logged(name = "Gyro Angle Degrees", importance = Importance.CRITICAL)
+  public double getRotationDegrees() {
+    return m_gyro.getYaw(true).getValue().in(Degrees);
   }
 
   @Override
   public void periodic() {
-    if (m_CenterCamera.getEstimatedPose() != null) {
-      swerveOdometry.addVisionMeasurement(
-          m_CenterCamera.getEstimatedPose().estimatedPose.toPose2d(),
-          m_CenterCamera.getEstimatedPose().timestampSeconds);
-    }
-    if (m_ModuleCamera.getEstimatedPose() != null) {
-      swerveOdometry.addVisionMeasurement(
-          m_ModuleCamera.getEstimatedPose().estimatedPose.toPose2d(),
-          m_ModuleCamera.getEstimatedPose().timestampSeconds);
-    }
+    m_LeftFacingCamera.updateHeading(getRotation2D());
+    updatePoseByVision(m_LeftFacingCamera);
+    m_RightFacingCamera.updateHeading(getRotation2D());
+    updatePoseByVision(m_RightFacingCamera);
+    // m_HPCamera.updateHeading(getRotation2D());
+    // updatePoseByVision(m_HPCamera);
 
     swerveOdometry.update(getRotation2D(), getModulePositions());
 
-    if (m_CenterCamera.getEstimatedPose() != null) {
+    // set odometry to vision pose if it deviates by more than half a meter
+
+    if (m_LeftFacingCamera.getEstimatedPose() != null) {
       if (Math.abs(
-                  m_CenterCamera.getEstimatedPose().estimatedPose.getX()
+                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
                       - swerveOdometry.getEstimatedPosition().getX())
               > .5
           || Math.abs(
-                  m_CenterCamera.getEstimatedPose().estimatedPose.getY()
+                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
                       - swerveOdometry.getEstimatedPosition().getY())
               > .5) {
-        setPoseByVision(m_CenterCamera);
+        setPoseByVision(m_LeftFacingCamera);
       }
     }
-    if (m_ModuleCamera.getEstimatedPose() != null) {
+    if (m_RightFacingCamera.getEstimatedPose() != null) {
       if (Math.abs(
-                  m_ModuleCamera.getEstimatedPose().estimatedPose.getX()
+                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
                       - swerveOdometry.getEstimatedPosition().getX())
               > .5
           || Math.abs(
-                  m_ModuleCamera.getEstimatedPose().estimatedPose.getY()
+                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
                       - swerveOdometry.getEstimatedPosition().getY())
               > .5) {
-        setPoseByVision(m_ModuleCamera);
+        setPoseByVision(m_RightFacingCamera);
       }
     }
+    // if (m_HPCamera.getEstimatedPose() != null) {
+    //   if (Math.abs(
+    //               m_HPCamera.getEstimatedPose().estimatedPose.getX()
+    //                   - swerveOdometry.getEstimatedPosition().getX())
+    //           > .5
+    //       || Math.abs(
+    //               m_HPCamera.getEstimatedPose().estimatedPose.getY()
+    //                   - swerveOdometry.getEstimatedPosition().getY())
+    //           > .5) {
+    //     setPoseByVision(m_HPCamera);
+    //   }
+    // }
+    // if (driveKP.getNumber() != drivePIDS.kP
+    //     || driveKI.getNumber() != drivePIDS.kI
+    //     || driveKD.getNumber() != drivePIDS.kD
+    //     || driveKS.getNumber() != drivePIDS.kS) {
+
+    //   drivePIDS.kP = driveKP.getNumber();
+    //   drivePIDS.kI = driveKI.getNumber();
+    //   drivePIDS.kD = driveKI.getNumber();
+    //   drivePIDS.kS = driveKD.getNumber();
+
+    //   for (TalonFXSwerveModule mod : m_SwerveModules) {
+    //     mod.setDrivePIDS(drivePIDS);
+    //   }
+    // }
+    // if (xKP.getNumber() != xController.getP()
+    //     || xKI.getNumber() != xController.getI()
+    //     || xKD.getNumber() != xController.getD()) {
+    //   xController.setP(xKP.getNumber());
+    //   xController.setI(xKI.getNumber());
+    //   xController.setD(xKD.getNumber());
+    // }
+    // if (yKP.getNumber() != yController.getP()
+    //     || yKI.getNumber() != yController.getI()
+    //     || yKD.getNumber() != yController.getD()) {
+    //   yController.setP(yKP.getNumber());
+    //   yController.setI(yKI.getNumber());
+    //   yController.setD(yKD.getNumber());
+    // }
+    // if (rotationKP.getNumber() != rController.getP()
+    //     || rotationKI.getNumber() != rController.getI()
+    //     || rotationKD.getNumber() != rController.getD()) {
+    //   rController.setP(rotationKP.getNumber());
+    //   rController.setI(rotationKI.getNumber());
+    //   rController.setD(rotationKD.getNumber());
+    // }
   }
 }

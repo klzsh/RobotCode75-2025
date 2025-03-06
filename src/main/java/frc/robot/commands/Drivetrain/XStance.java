@@ -4,18 +4,18 @@
 
 package frc.robot.commands.Drivetrain;
 
+import static frc.robot.Constants.DrivetrainConstants.*;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
 public class XStance extends Command {
   private Swerve m_Swerve;
 
-  SwerveModuleState[] states =
-      DrivetrainConstants.swerveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
+  SwerveModuleState[] states = swerveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
 
   /** Creates a new XStance. */
   // turns all wheels at a 45/-45 degree angle and locks the swerve drive in place

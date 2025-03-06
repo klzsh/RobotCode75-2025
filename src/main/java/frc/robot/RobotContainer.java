@@ -4,37 +4,46 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.OIConstants.*;
+import static frc.robot.Constants.VisionConstants.*;
+
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.Drivetrain.DriveToPose;
+import frc.lib.dashboard.ActionFactory;
+import frc.lib.dashboard.AutoSelector;
+import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.ResetHeading;
-import frc.robot.commands.Drivetrain.SnapHoldRotation;
+import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
+import frc.robot.commands.Drivetrain.YoloBranchAlign;
+import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
+import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
-import frc.robot.commands.EndEffector.IntakeCoral;
-import frc.robot.commands.EndEffector.ScoreCoral;
+import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
+import frc.robot.subsystems.EndEffector.AlgaeIntake;
+import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
+import frc.robot.subsystems.EndEffector.AlgaePivot;
+import frc.robot.subsystems.EndEffector.AlgaePivot.PivotState;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
+import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+import java.util.ArrayList;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,73 +51,98 @@ import frc.robot.subsystems.Vision.AprilTagCamera;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-@Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "CoralCam")
-  private final AprilTagCamera CoralCam =
-      new AprilTagCamera("Center_Cam", VisionConstants.CenterCamPose);
+  @Logged(name = "Left Facing Mod Cam")
+  private final AprilTagCamera m_LeftFacingCamera =
+      new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "CenterCam")
-  private final AprilTagCamera CenterCam =
-      new AprilTagCamera("Coral_Cam", VisionConstants.CoralCamPose);
+  @Logged(name = "Right Facing Mod Cam")
+  private final AprilTagCamera m_RightFacingCamera =
+      new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  @Logged(name = "Swerve")
-  private final Swerve m_Swerve = new Swerve(CoralCam, CenterCam);
+  // @Logged(name = "HP Cam")
+  private final AprilTagCamera m_HPCamera = new AprilTagCamera("ChuteSideCam", HPCameraPose);
 
-  @Logged(name = "Elevator")
+  private final ObjectDetetectorCamera m_CageDetetectorCamera =
+      new ObjectDetetectorCamera("Cage_camera");
+
+  // @Logged(name = "Branch Cam")
+  private final ObjectDetetectorCamera m_BranchCamera = new ObjectDetetectorCamera("Branch_Cam");
+
+  @Logged(name = "Swerve", importance = Importance.CRITICAL)
+  private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
+
+  @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
-  @Logged(name = "Coral Intake")
+  @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
-  // private final CANdleWrapper m_Wrapper = new CANdleWrapper();
+  @Logged(name = "Climber", importance = Importance.CRITICAL)
+  private final Climber m_Climber = new Climber();
 
-  // define auto factory for autos
-  // private final AutoFactory factory =
-  //     new AutoFactory(
-  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+  @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
+  private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
+
+  @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
+  private final AlgaePivot m_AlgaePivot = new AlgaePivot();
+
+  // define drivetrain controllers
+  @Logged
+  private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
 
   // define OI controls
-  private final Joystick m_LeftStick = new Joystick(OIConstants.leftStickPort);
-  private final Joystick m_RightStick = new Joystick(OIConstants.rightStickPort);
-  private final CommandXboxController m_Controller =
-      new CommandXboxController(OIConstants.controllerPort);
+  private final Joystick m_LeftStick = new Joystick(leftStickPort);
+  private final Joystick m_RightStick = new Joystick(rightStickPort);
+  private final CommandXboxController m_Controller = new CommandXboxController(controllerPort);
 
   // define driver buttons
   private final JoystickButton robotRelative =
-      new JoystickButton(m_RightStick, OIConstants.robotRelativeButton);
+      new JoystickButton(m_RightStick, robotRelativeButton); // center button
   private final JoystickButton resetHeading =
-      new JoystickButton(m_LeftStick, OIConstants.resetHeadingButton);
-  private final JoystickButton Xstance = new JoystickButton(m_RightStick, OIConstants.xstance);
+      new JoystickButton(m_LeftStick, resetHeadingButton); // left button
+  private final JoystickButton Xstance = new JoystickButton(m_RightStick, xstanceButton);
 
-  private final JoystickButton alignButton = new JoystickButton(m_LeftStick, 2);
-  private final JoystickButton testDrivePose = new JoystickButton(m_RightStick, 5);
+  private final JoystickButton AlignLeft =
+      new JoystickButton(m_LeftStick, autoAlignButton); // trigger
+  private final JoystickButton AlignRight =
+      new JoystickButton(m_RightStick, autoAlignButton); // trigger
+  private final JoystickButton SimilarFaceRotate =
+      new JoystickButton(m_RightStick, rotateToSimilarFaceButton); // left button
 
-  private final JoystickButton holdButton =
-      new JoystickButton(m_RightStick, OIConstants.holdHeadingButton);
+  private final JoystickButton CageAlign =
+      new JoystickButton(m_LeftStick, cageAlignButton); // center button
 
-  private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  //   private final JoystickButton holdButton =
+  //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
+  // private final AutoFactory m_factory =
+  //     new AutoFactory(
+  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
-  //   private final Map<Integer, Command> m_AutoMap = Map.of(
-  //     1, new ScoreL1(m_Elevator, m_CoralIntake),
-  //     3, new ScoreL4(m_Elevator, m_CoralIntake), // TODO add left/right distinction
-  //     4, new ScoreL4(m_Elevator, m_CoralIntake),
-  //     6, new IntakeCoral(m_CoralIntake) //TODO add left/middle/right distinction
-  //   );
-  //   private final AutoSelector m_Selector =
-  //       new AutoSelector(
-  //           m_AutoMap,
-  //           m_Swerve,
-  //           new ArrayList<Command>(),
-  //           new ArrayList<Command>());
+  private final ActionFactory m_ActionFactory =
+      new ActionFactory(
+          m_Swerve,
+          m_Elevator,
+          m_CoralIntake,
+          m_AlgaePivot,
+          m_AlgaeIntake,
+          m_PoseAlignController,
+          m_LeftFacingCamera,
+          m_RightFacingCamera);
+
+  private final AutoSelector m_AutoSelector =
+      new AutoSelector(
+          m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDefaultCommands();
-    configureBindings();
-    // configureChooser();
+    configureJoystickBinds();
+    configureControllerBinds();
+    configureChooser();
   }
 
   private void configureDefaultCommands() {
@@ -120,16 +154,21 @@ public class RobotContainer {
             // this decision, we have to negate the stick values.
             () -> -m_LeftStick.getY(),
             () -> -m_LeftStick.getX(),
-            () -> -m_RightStick.getX(),
-            false,
-            !robotRelative.getAsBoolean()));
-    // m_Wrapper.setDefaultCommand(new LEDsDefaultCommand(m_Wrapper));
+            () -> -m_RightStick.getX()));
+
     m_Elevator.setDefaultCommand(
         new InstantCommand(() -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
             .repeatedly());
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
             .repeatedly());
+    m_AlgaeIntake.setDefaultCommand(
+        new InstantCommand(() -> m_AlgaeIntake.resetAlgaeState(), m_AlgaeIntake).repeatedly());
+    m_AlgaePivot.setDefaultCommand(
+        new InstantCommand(() -> m_AlgaePivot.resetPivotState(), m_AlgaePivot).repeatedly());
+    m_Climber.setDefaultCommand(
+        new InstantCommand(
+            () -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
   }
 
   /**
@@ -141,49 +180,132 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
-  private void configureBindings() {
+  private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    holdButton.whileTrue(
-        new SnapHoldRotation(m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
+    CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
-    m_Controller.a().whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    m_Controller.x().whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    m_Controller.y().whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    m_Controller.b().whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
+    robotRelative
+        .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
+        .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
+    // AlignLeft.whileTrue(
+    //     new AlignToBranch(
+    //         m_Swerve,
+    //         m_RightFacingCamera,
+    //         true,
+    //         m_PoseAlignController,
+    //         new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
 
-    m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
-    m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake));
+    // AlignLeft.whileTrue(
+    //   new AlignToBranch(
+    //       m_Swerve,
+    //       m_RightFacingCamera,
+    //       true,
+    //       m_PoseAlignController,
+    //       new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
 
-    testDrivePose.whileTrue(
-        new DriveToPose(m_Swerve, new Pose2d(2.9, 4.0, new Rotation2d(0)), false));
-    // m_Controller
-    //     .a()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .b()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .x()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
-    //             .repeatedly());
-    // m_Controller
-    //     .y()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //                 () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
-    //             .repeatedly());
+    // Auto Align commands
+
   }
 
-  private void configureChooser() {}
+  public void configureControllerBinds() {
+    // score L* commands
+    m_Controller
+        .a()
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
+        .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    m_Controller
+        .x()
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
+        .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    m_Controller
+        .y()
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
+        .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    m_Controller
+        .b()
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
+        .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    // algae commands
+    m_Controller
+        .povRight()
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake)
+                .repeatedly());
+    m_Controller
+        .leftBumper()
+        .whileTrue(
+            new InstantCommand(
+                    () -> {
+                      m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
+                      m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
+                    },
+                    m_AlgaeIntake,
+                    m_AlgaePivot)
+                .repeatedly()
+                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
+    // coral commands
+    m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
+    m_Controller
+        .povDown()
+        .whileTrue(
+            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
+                .repeatedly());
+    // manual elevator overrides
+
+    m_Controller
+        .a()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .x()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .y()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
+                .repeatedly());
+    m_Controller
+        .b()
+        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        .whileTrue(
+            new InstantCommand(
+                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
+                .repeatedly());
+    // dealgaefy commands
+    m_Controller
+        .x()
+        .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
+    m_Controller
+        .y()
+        .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
+  }
+
+  private void configureChooser() {
+    m_AutoSelector.setupAutoTab();
+    m_AutoSelector.clearAll();
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -192,6 +314,31 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return m_AutoChooser.getSelected();
-    return null;
+    // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
+
+    // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
+    m_AutoSelector.generatePaths(); // TODO: move to robot or smth due to the delay
+    return m_AutoSelector.getAutoCommand();
+
+    // return new SequentialCommandGroup(
+    //   m_factory.resetOdometry("st-bl-1"),
+    //     m_factory.trajectoryCmd("st-bl-1", 0),
+    //     new YoloBranchAlign(m_Swerve, m_BranchCamera, false),
+    //     new ScoreL4(m_Elevator, m_CoralIntake),
+    //     m_factory.trajectoryCmd("st-bl-1", 1),
+    //     new ParallelRaceGroup(new WaitCommand(0.5), new IntakeCoral(m_CoralIntake)),
+    //     new ParallelCommandGroup(
+    //         m_factory.trajectoryCmd("st-bl-1", 2), new IntakeCoral(m_CoralIntake)),
+    //     new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake));
+    // return new TestAuto(
+    //     m_Factory,
+    //     m_CoralIntake,
+    //     m_Swerve,
+    //     m_Elevator,
+    //     m_LeftFacingCamera,
+    //     m_RightFacingCamera,
+    //     m_VisionController,
+    //     m_PoseAlignController);
+    // return null;
   }
 }

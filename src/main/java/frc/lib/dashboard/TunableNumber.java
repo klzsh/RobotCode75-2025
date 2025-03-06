@@ -1,6 +1,6 @@
 package frc.lib.dashboard;
 
-import static frc.robot.Constants.HardwareConstants.TUNING_MODE;
+import static frc.robot.Constants.RobotConstants.TUNING_MODE;
 
 import edu.wpi.first.networktables.DoubleEntry;
 import edu.wpi.first.networktables.NetworkTable;

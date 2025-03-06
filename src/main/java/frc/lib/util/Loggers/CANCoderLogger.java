@@ -23,7 +23,7 @@ public class CANCoderLogger extends ClassSpecificLogger<CANcoder> {
 
   @Override
   public void update(EpilogueBackend logger, CANcoder CANcoder) {
-    if (Epilogue.shouldLog(Importance.INFO)) {
+    if (Epilogue.shouldLog(Importance.INFO) || Epilogue.shouldLog(Importance.DEBUG)) {
       logger.log("Absolute Position", CANcoder.getAbsolutePosition().getValue().in(Degrees));
       logger.log("Magnet Fault", CANcoder.getFault_BadMagnet().getValue());
     }

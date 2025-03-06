@@ -2,15 +2,18 @@ package frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 public class ObjectDetetectorCamera extends SubsystemBase {
   // TODO: fix this mess
   private PhotonCamera m_Camera;
-  private PhotonPipelineResult m_Result;
+  private Optional<PhotonPipelineResult> m_Result;
   private List<PhotonTrackedTarget> m_Targets;
 
   public ObjectDetetectorCamera(String name) {
@@ -20,39 +23,70 @@ public class ObjectDetetectorCamera extends SubsystemBase {
   public void updateByUnreadResults() {
     List<PhotonPipelineResult> unreadResults = m_Camera.getAllUnreadResults();
     if (unreadResults.size() > 0) {
-      m_Result = unreadResults.get(unreadResults.size() - 1);
+      m_Result = Optional.of(unreadResults.get(unreadResults.size() - 1));
     }
   }
 
+  // Unused now
   // Using deprecated method for testing
-  public void updateByLatestResult() {
-    m_Result = m_Camera.getLatestResult();
-  }
+  // public void updateByLatestResult() {
+  //   m_Result = m_Camera.getLatestResult();
+  // }
 
   public OptionalDouble getTargetPitch(int targetID) {
-    if (m_Result.hasTargets()) {
-      return OptionalDouble.of(m_Result.getTargets().get(targetID).getPitch());
+    if (m_Result.isPresent() && m_Result.get().hasTargets()) {
+      return OptionalDouble.of(m_Result.get().getTargets().get(targetID).getPitch());
     }
     return OptionalDouble.empty();
   }
 
   public OptionalDouble getTargetYaw(int targetID) {
-    if (m_Result.hasTargets()) {
-      return OptionalDouble.of(m_Result.getTargets().get(targetID).getYaw());
+    if (m_Result.get().hasTargets()) {
+      return OptionalDouble.of(m_Result.get().getTargets().get(targetID).getYaw());
     }
     return OptionalDouble.empty();
   }
 
   public OptionalDouble getTargetSkew(int targetID) {
-    if (m_Result.hasTargets()) {
-      return OptionalDouble.of(m_Result.getTargets().get(targetID).getSkew());
+    if (m_Result.get().hasTargets()) {
+      return OptionalDouble.of(m_Result.get().getTargets().get(targetID).getSkew());
     }
     return OptionalDouble.empty();
   }
 
   public OptionalDouble getTargetArea(int targetID) {
-    if (m_Result.hasTargets()) {
-      return OptionalDouble.of(m_Result.getTargets().get(targetID).getArea());
+    if (m_Result.get().hasTargets()) {
+      return OptionalDouble.of(m_Result.get().getTargets().get(targetID).getArea());
+    }
+    return OptionalDouble.empty();
+  }
+
+  public OptionalInt getNumTargets() {
+    if (m_Result.isEmpty()) {
+      return OptionalInt.of(0);
+    }
+    if (m_Result.get().hasTargets()) {
+      return OptionalInt.of(m_Result.get().getTargets().size());
+    }
+    return OptionalInt.empty();
+  }
+
+  public boolean hasTargets() {
+    if (m_Result.isEmpty()) {
+      return false;
+    }
+    return m_Result.get().hasTargets();
+  }
+
+  public OptionalDouble getTargetXFromCenter(int targetID) {
+    if (m_Result.get().hasTargets()) {
+      List<TargetCorner> corners =
+          m_Result.get().getTargets().get(targetID).getMinAreaRectCorners();
+      double sum = 0;
+      for (TargetCorner corner : corners) {
+        sum += corner.x;
+      }
+      return OptionalDouble.of(320 - sum / 4);
     }
     return OptionalDouble.empty();
   }
