@@ -167,8 +167,6 @@ public class AutoSelector {
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 
-    Timer.delay(3);
-
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
 
