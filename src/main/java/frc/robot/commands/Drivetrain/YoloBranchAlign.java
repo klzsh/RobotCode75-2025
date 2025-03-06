@@ -3,6 +3,7 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.dashboard.TunableNumber;
@@ -16,12 +17,12 @@ public class YoloBranchAlign extends Command {
     new TunableNumber("YOLO Align/P", 0.07),
     new TunableNumber("YOLO Align/I", 0),
     new TunableNumber("YOLO Align/D", 0),
-    new TunableNumber("YOLO Align/Tolderance", 0.00001)
+    new TunableNumber("YOLO Align/Tolerance", 0.2)
   };
 
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
-  private final boolean isCenterAlign;
+  private final boolean isAlignInPlace;
 
   // private final PIDController rotationController; // add if needed, poss just pass through a
   // heading or do this as a seperate command
@@ -35,20 +36,21 @@ public class YoloBranchAlign extends Command {
 
   private ChassisSpeeds desiredSpeeds;
 
-  private final double finalYawSetpoint = 0;
+  private final double finalYawSetpoint = -2.2;
   private final double driveIntoReefSpeed = .5;
-  private final double stallSpeedThreshold = .05;
+  private final double stallSpeedThreshold = .1;
+  double startTime = 0;
 
   public YoloBranchAlign(
-      Swerve swerve, ObjectDetetectorCamera brachDetectorCamera, boolean alignCenter) {
+      Swerve swerve, ObjectDetetectorCamera brachDetectorCamera, boolean alignInPlace) {
     m_Swerve = swerve;
     m_BranchDetectorCamera = brachDetectorCamera;
-    isCenterAlign = alignCenter;
+    isAlignInPlace = alignInPlace;
 
     xController = new PIDController(.1, 0, 0);
     yController = new PIDController(0.07, 0, 0);
-    yController.setTolerance(.00001);
-    yController.setSetpoint(Units.degreesToRadians(finalYawSetpoint));
+    yController.setTolerance(.2);
+    yController.setSetpoint(finalYawSetpoint);
 
     desiredSpeeds = new ChassisSpeeds();
 
@@ -56,7 +58,9 @@ public class YoloBranchAlign extends Command {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    startTime = Timer.getFPGATimestamp();
+  }
 
   @Override
   public void execute() {
@@ -69,16 +73,35 @@ public class YoloBranchAlign extends Command {
 
     m_BranchDetectorCamera.updateByUnreadResults();
 
-    if (!m_BranchDetectorCamera.hasTargets()) {
-      m_Swerve.setChassisSpeeds(new ChassisSpeeds(0, 0, 0)); // poss creep
-      return;
+    if (!isAlignInPlace) {
+      if (!m_BranchDetectorCamera.hasTargets()) {
+        desiredSpeeds = new ChassisSpeeds(.1,0,0);
+        m_Swerve.setChassisSpeeds(desiredSpeeds); // poss creep
+      } else {
+      double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
+
+      yCommand = yController.calculate(targetYaw);
+
+      m_Swerve.setChassisSpeeds(new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0));
+      desiredSpeeds.vxMetersPerSecond = driveIntoReefSpeed;
+      desiredSpeeds.vyMetersPerSecond = yCommand;
+      }
+    } 
+
+    else {
+      if (!m_BranchDetectorCamera.hasTargets()) {
+        desiredSpeeds = new ChassisSpeeds(0,0.05,0); // scoot left n shi poss see a branch or sum
+        m_Swerve.setChassisSpeeds(desiredSpeeds);
+      }
+      else {
+        double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
+
+        yCommand = yController.calculate(targetYaw);
+        desiredSpeeds.vxMetersPerSecond = 0; // can't push into reef while trying to align
+        desiredSpeeds.vyMetersPerSecond = yCommand;
+        m_Swerve.setChassisSpeeds(desiredSpeeds);
+      }
     }
-
-    double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
-
-    yCommand = yController.calculate(targetYaw);
-
-    m_Swerve.setChassisSpeeds(new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0));
     // if (!yController.atSetpoint()) {
     //   // if (isLeft) { // use leftmost for target indexing in photonvision
     //   //   currentYaw = m_BranchDetectorCamera.getTargetYaw(0);
@@ -98,9 +121,8 @@ public class YoloBranchAlign extends Command {
   @Override
   public boolean isFinished() {
     // should be stalling when driving into reef
-    return (m_Swerve.getChassisSpeeds().vxMetersPerSecond < stallSpeedThreshold
-        && desiredSpeeds.vxMetersPerSecond == driveIntoReefSpeed
-        && yController.atSetpoint());
+    // return Timer.getFPGATimestamp() - startTime >= 3;
+    return false;
   }
 
   @Override

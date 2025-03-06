@@ -68,7 +68,7 @@ public class RobotContainer {
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
   // @Logged(name = "HP Cam")
-  private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
+  private final AprilTagCamera m_HPCamera = new AprilTagCamera("ChuteSideCam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
       new ObjectDetetectorCamera("Cage_camera");
@@ -188,7 +188,7 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
+    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
     AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 

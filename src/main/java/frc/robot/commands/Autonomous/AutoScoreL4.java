@@ -26,7 +26,7 @@ public class AutoScoreL4 extends SequentialCommandGroup {
         new IntakeCoral(coralIntake),
         new ParallelCommandGroup(
             // align to branch color
-            new RotateToSimilarFace(swerve),
+            // new RotateToSimilarFace(swerve),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, true)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake, false),
