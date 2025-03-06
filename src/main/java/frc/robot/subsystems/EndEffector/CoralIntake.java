@@ -20,6 +20,7 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @Logged(name = "Coral Intake", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
@@ -137,7 +138,7 @@ public class CoralIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("Has Coral", getBeamBreak());
 
     //     if (coralVelocitykP.getNumber() != velocityConfig.kP
     //     || coralVelocitykI.getNumber() != velocityConfig.kI

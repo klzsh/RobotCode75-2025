@@ -15,6 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Util.LidarDistanceSensor;
 
@@ -93,6 +94,8 @@ public class AlgaeIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putBoolean("Has Algae", algaeInIntake());
+
     // if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
     //     || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
     //     || algaeIntakeKs.getNumber() != IntakePIDConfig.kS) {
