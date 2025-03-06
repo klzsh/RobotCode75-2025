@@ -22,7 +22,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
 import frc.robot.Constants.DrivetrainConstants.BackRight;
@@ -302,11 +304,11 @@ public class Swerve extends SubsystemBase {
    * @param camera the camera to set the odoemtry with
    */
   public void setPoseByVision(AprilTagCamera camera) {
-    if (camera.getEstimatedPose() != null) {
+    if (camera.getEstimatedPose(getPose()) != null) {
       swerveOdometry.resetPosition(
           getRotation2D(),
           getModulePositions(),
-          camera.getEstimatedPose().estimatedPose.toPose2d());
+          camera.getEstimatedPose(getPose()).estimatedPose.toPose2d());
     }
   }
 
@@ -317,10 +319,10 @@ public class Swerve extends SubsystemBase {
     // }
 
     lastUpdatedTime = timestamp;
-    if (camera.getEstimatedPose() != null) {
+    if (camera.getEstimatedPose(getPose()) != null) {
       swerveOdometry.addVisionMeasurement(
-          camera.getEstimatedPose().estimatedPose.toPose2d(),
-          camera.getEstimatedPose().timestampSeconds);
+          camera.getEstimatedPose(getPose()).estimatedPose.toPose2d(),
+          camera.getEstimatedPose(getPose()).timestampSeconds);
     }
   }
 
@@ -386,8 +388,20 @@ public class Swerve extends SubsystemBase {
     return m_gyro.getYaw(true).getValue().in(Degrees);
   }
 
+  @Logged(name = "Left Facing Camera Estimated Pose", importance = Importance.DEBUG)
+  public Pose2d leftCameraEstimatedPose() {
+    return m_LeftFacingCamera.getEstimatedPose2d(getPose());
+  }
+
+  @Logged(name = "Right Facing Camera Estimated Pose", importance = Importance.DEBUG)
+  public Pose2d rightCameraEstimatedPose() {
+    return m_LeftFacingCamera.getEstimatedPose2d(getPose());
+  }
+
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+
     m_LeftFacingCamera.updateHeading(getRotation2D());
     updatePoseByVision(m_LeftFacingCamera);
     m_RightFacingCamera.updateHeading(getRotation2D());
@@ -399,25 +413,25 @@ public class Swerve extends SubsystemBase {
 
     // set odometry to vision pose if it deviates by more than half a meter
 
-    if (m_LeftFacingCamera.getEstimatedPose() != null) {
+    if (m_LeftFacingCamera.getEstimatedPose(getPose()) != null) {
       if (Math.abs(
-                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getX()
+                  m_LeftFacingCamera.getEstimatedPose(getPose()).estimatedPose.getX()
                       - swerveOdometry.getEstimatedPosition().getX())
               > .5
           || Math.abs(
-                  m_LeftFacingCamera.getEstimatedPose().estimatedPose.getY()
+                  m_LeftFacingCamera.getEstimatedPose(getPose()).estimatedPose.getY()
                       - swerveOdometry.getEstimatedPosition().getY())
               > .5) {
         setPoseByVision(m_LeftFacingCamera);
       }
     }
-    if (m_RightFacingCamera.getEstimatedPose() != null) {
+    if (m_RightFacingCamera.getEstimatedPose(getPose()) != null) {
       if (Math.abs(
-                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getX()
+                  m_RightFacingCamera.getEstimatedPose(getPose()).estimatedPose.getX()
                       - swerveOdometry.getEstimatedPosition().getX())
               > .5
           || Math.abs(
-                  m_RightFacingCamera.getEstimatedPose().estimatedPose.getY()
+                  m_RightFacingCamera.getEstimatedPose(getPose()).estimatedPose.getY()
                       - swerveOdometry.getEstimatedPosition().getY())
               > .5) {
         setPoseByVision(m_RightFacingCamera);

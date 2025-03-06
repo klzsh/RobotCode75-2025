@@ -13,7 +13,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-// import frc.robot.subsystems.Drivetrain.VisionController;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
@@ -141,4 +140,7 @@ public class VisionConstants {
   public static final double finalPitchSetpointLeft = -3.37;
   public static final double finalYawSetpointRight = -7.97;
   public static final double finalPitchSetpointRight = -7.88;
+
+  public static final double minTagAreaThreshold = 0.1;
+  public static final double maxTagDistanceThreshold = 5;
 }

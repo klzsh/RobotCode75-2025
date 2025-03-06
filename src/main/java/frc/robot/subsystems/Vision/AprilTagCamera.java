@@ -17,6 +17,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static frc.robot.Constants.VisionConstants.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -224,6 +227,27 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
+  public OptionalDouble maxTagDist(Pose2d currentPose) {
+    double maxDist = Double.MIN_VALUE;
+    for (PhotonTrackedTarget target : m_result.getTargets()) {
+      double dist =
+          PhotonUtils.calculateDistanceToTargetMeters(
+              cameraToRobotPose.getZ(),
+              getAprilTagHeight(target.getFiducialId()),
+              0,
+              Units.degreesToRadians(target.getPitch()));
+      if (dist > maxDist) {
+        maxDist = dist;
+      }
+    }
+
+    if (maxDist == Double.MIN_VALUE) {
+      return OptionalDouble.empty();
+    } else {
+      return OptionalDouble.of(maxDist);
+    }
+  }
+
   // @Logged
   public double getPrimaryTagX() {
     if (m_result.getTargets().size() >= 1) {
@@ -251,15 +275,23 @@ public class AprilTagCamera extends SubsystemBase {
     }
   }
 
-  public EstimatedRobotPose getEstimatedPose() {
-    if (minTagArea().isPresent() && minTagArea().getAsDouble() < 0) {
+  public EstimatedRobotPose getEstimatedPose(Pose2d currentPose) {
+    if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
+      return null;
+    }
+    if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
       return null;
     }
     return m_pose;
   }
 
-  @Logged(name = "Estimated Pose", importance = Importance.DEBUG)
-  public Pose2d getEstimatedPose2d() {
+  public Pose2d getEstimatedPose2d(Pose2d currentPose) {
+    if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
+      return null;
+    }
+    if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+      return null;
+    }
     if (m_pose != null) {
       return m_pose.estimatedPose.toPose2d();
     } else {

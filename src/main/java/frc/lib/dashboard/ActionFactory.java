@@ -5,13 +5,14 @@ import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
+import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 
 public class ActionFactory {
   private Swerve m_Swerve;
@@ -20,8 +21,7 @@ public class ActionFactory {
   private AlgaePivot m_AlgaePivot;
   private AlgaeIntake m_AlgaeIntake;
   private PoseAlignController m_PoseAlignController;
-  private AprilTagCamera m_LeftFacingCamera;
-  private AprilTagCamera m_RightFacingCamera;
+  private ObjectDetetectorCamera m_BranchCamera;
 
   public ActionFactory(
       Swerve swerve,
@@ -30,16 +30,14 @@ public class ActionFactory {
       AlgaePivot pivot,
       AlgaeIntake algaeIntake,
       PoseAlignController poseAlignController,
-      AprilTagCamera leftCamera,
-      AprilTagCamera rightCamera) {
+      ObjectDetetectorCamera branchCam) {
     m_Swerve = swerve;
     m_Elevator = elevator;
     m_CoralIntake = coralIntake;
     m_AlgaePivot = pivot;
     m_AlgaeIntake = algaeIntake;
     m_PoseAlignController = poseAlignController;
-    m_LeftFacingCamera = leftCamera;
-    m_RightFacingCamera = rightCamera;
+    m_BranchCamera = branchCam;
   }
 
   public Command getCommand(int action) {
@@ -55,6 +53,8 @@ public class ActionFactory {
         return new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot);
       case 5:
         return new AutoIntakeCoral(m_Swerve, m_CoralIntake);
+      case 6:
+        return new YoloBranchAlign(m_Swerve, m_BranchCamera, true);
     }
     return null;
   }
@@ -71,6 +71,8 @@ public class ActionFactory {
         return "Processor";
       case 5:
         return "Intake";
+      case 6:
+        return "YOLO";
     }
     return null;
   }
