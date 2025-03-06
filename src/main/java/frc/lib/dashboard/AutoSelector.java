@@ -86,7 +86,6 @@ public class AutoSelector {
 
   private GenericEntry autoStringEntry;
   private GenericEntry feedbackEntry;
-  // private GenericEntry safetyEntry;
 
   private final SendableChooser<String> presetChooser;
 
