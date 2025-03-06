@@ -21,7 +21,6 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /*
@@ -176,19 +175,18 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
+  @Logged(name = "Upper Limit", importance = Importance.CRITICAL)
   public boolean getUpperLimit() {
     return !m_upperLimitSwitch.get();
   }
 
+  @Logged(name = "Lower Limit", importance = Importance.CRITICAL)
   public boolean getLowerLimit() {
     return !m_lowerLimitSwitch.get() || !m_backupLimitSwitch.get();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Upper Limit", getUpperLimit());
-    SmartDashboard.putBoolean("Lower Limit", getLowerLimit());
-
     // if (getLowerLimit()) {
     //   m_ElevatorMotor1.setPosition(Rotations.of(0));
     //   m_ElevatorMotor2.setPosition(Rotations.of(0));

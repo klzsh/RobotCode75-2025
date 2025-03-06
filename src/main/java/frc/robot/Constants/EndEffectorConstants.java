@@ -28,7 +28,6 @@ import edu.wpi.first.units.measure.Time;
 public class EndEffectorConstants {
 
   /* CANIDS */
-  // TODO: find these
   public static final int coralMotorCanID = 43; // TalonFXS into minion
   public static final int pivotCanID = 44; // Kraken X60
   public static final int algaeMotorCanID = 45; // Kraken X44
@@ -36,7 +35,6 @@ public class EndEffectorConstants {
   public static final int coralBeamBreakPort = 2; // Banner BeamBreak
   public static final int algaePivotEncoderPort = 4; // REV Through Bore
   public static final int algaeLidarSensorPort = 5; // Pololu LIDAR sensor
-  // public static final int algaeLimitSwitchPort = 6;
 
   public static final Angle algaePivotZeroPoint = Rotations.of(0);
   public static final Angle algaeEncoderOffset = Rotations.of(0);
@@ -59,8 +57,7 @@ public class EndEffectorConstants {
 
   public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(150);
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(-20);
-  // TODO: change to current
-  public static final AngularVelocity algaeHoldSpeed = RotationsPerSecond.of(100);
+  public static final Current algaeHoldCurrent = Amps.of(25);
 
   public static final double coralPositionDeadband = 0.5;
   public static final double algaePivotDeadband = 0.1;
