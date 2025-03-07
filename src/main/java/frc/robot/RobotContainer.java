@@ -54,19 +54,19 @@ import java.util.ArrayList;
 // @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "Left Facing Mod Cam")
+  @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "Right Facing Mod Cam")
+  @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  // @Logged(name = "HP Cam")
-  private final AprilTagCamera m_HPCamera = new AprilTagCamera("ChuteSideCam", HPCameraPose);
+  @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+  private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
-      new ObjectDetetectorCamera("Cage_camera");
+      new ObjectDetetectorCamera("Cage_Cam");
 
   // @Logged(name = "Branch Cam")
   private final ObjectDetetectorCamera m_BranchCamera = new ObjectDetetectorCamera("Branch_Cam");
@@ -114,6 +114,9 @@ public class RobotContainer {
 
   private final JoystickButton CageAlign =
       new JoystickButton(m_LeftStick, cageAlignButton); // center button
+
+  private final JoystickButton resetBranchCam =
+      new JoystickButton(m_LeftStick, resetBranchCamButton);
 
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
@@ -195,6 +198,9 @@ public class RobotContainer {
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
         .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
+    resetBranchCam
+        .whileTrue(new InstantCommand(() -> m_BranchCamera.setDriverMode(true)))
+        .whileFalse(new InstantCommand(() -> m_BranchCamera.setDriverMode(false)));
   }
 
   public void configureControllerBinds() {
