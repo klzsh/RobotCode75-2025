@@ -3,8 +3,6 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
@@ -38,9 +36,9 @@ public class AlignToCage extends Command {
     m_CageDetector = cageDetector;
 
     xController = new PIDController(0.05, 0.0, 0.0);
-    xController.setTolerance(.3);
+    xController.setTolerance(.7);
     yController = new PIDController(0.05, 0.0, 0.0);
-    yController.setTolerance(.3);
+    yController.setTolerance(.7);
     rotationController = new PIDController(0.05, 0.0, 0.0);
     rotationController.setTolerance(1.5);
 
@@ -66,7 +64,7 @@ public class AlignToCage extends Command {
             // this line is needed because the heading of the cage differs based on which alliance
             // you are on. Since the Gyro is field relative with 0 being facing away from the blue
             // driver station wall
-            DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0);
+            0);
 
     if (currentYaw.isPresent() && currentPitch.isPresent()) {
       if (!yController.atSetpoint()) {

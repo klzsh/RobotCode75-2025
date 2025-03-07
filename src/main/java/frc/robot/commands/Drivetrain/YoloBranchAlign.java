@@ -49,6 +49,9 @@ public class YoloBranchAlign extends Command {
     yController = new PIDController(0.07, 0, 0);
     yController.setTolerance(.2);
     yController.setSetpoint(finalYawSetpoint);
+    if (alignInPlace) {
+      yController.setP(.03);
+    }
 
     desiredSpeeds = new ChassisSpeeds();
 
