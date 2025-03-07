@@ -26,7 +26,7 @@ public class ElevatorConstants {
   public static final int backupLimitPort = 3;
 
   // Distance from GROUND.
-  public static final Angle algaeRemovalOffset = Rotations.of(4.871);
+  public static final Angle algaeRemovalOffset = Rotations.of(3);
   public static final Angle l1Position = Rotations.of(6.0);
   public static final Angle l2Position = Rotations.of(7.5);
   public static final Angle l3Position = Rotations.of(15.7);

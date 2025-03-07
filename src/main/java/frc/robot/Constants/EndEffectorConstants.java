@@ -51,7 +51,7 @@ public class EndEffectorConstants {
   public static final double coralScoreDelay = 0.3;
 
   public static final Angle pivotHomePosition = Rotations.of(12.8);
-  public static final Angle pivotGroundIntakePosition = Rotations.of(4);
+  public static final Angle pivotGroundIntakePosition = Rotations.of(2.6);
   public static final Angle pivotDeAlgifyPosition = Rotations.of(6);
   public static final Angle pivotEncoderOffset = Rotations.of(0.135);
 

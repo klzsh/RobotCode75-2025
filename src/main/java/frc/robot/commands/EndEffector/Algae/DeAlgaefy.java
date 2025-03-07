@@ -7,6 +7,7 @@ package frc.robot.commands.EndEffector.Algae;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -57,6 +58,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                   new SetElevatorPosition(elevator, ElevatorPositions.L2, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+          new WaitCommand(0.2),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
               .repeatedly()
               .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));
@@ -76,6 +78,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                   new SetElevatorPosition(elevator, ElevatorPositions.L3, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+          new WaitCommand(0.2),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
               .repeatedly()
               .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));
