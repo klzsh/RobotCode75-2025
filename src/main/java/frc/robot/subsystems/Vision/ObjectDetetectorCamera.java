@@ -77,6 +77,10 @@ public class ObjectDetetectorCamera extends SubsystemBase {
     return m_Result.get().hasTargets();
   }
 
+  public void setDriverMode(boolean on) {
+    m_Camera.setDriverMode(on);
+  }
+
   public OptionalDouble getTargetXFromCenter(int targetID) {
     if (m_Result.get().hasTargets()) {
       List<TargetCorner> corners =

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Vision;
 
+import static frc.robot.Constants.VisionConstants.*;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.epilogue.Logged;
@@ -17,9 +19,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static frc.robot.Constants.VisionConstants.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -279,7 +278,15 @@ public class AprilTagCamera extends SubsystemBase {
     // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
     //   return null;
     // }
-    if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+    if (maxTagDist(currentPose).isPresent()
+        && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+      return null;
+    }
+    if (m_result.getMultiTagResult().isPresent()
+        && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.2) {
+      return null;
+    }
+    if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.2) {
       return null;
     }
     return m_pose;
@@ -289,7 +296,15 @@ public class AprilTagCamera extends SubsystemBase {
     // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
     //   return null;
     // }
-    if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+    if (maxTagDist(currentPose).isPresent()
+        && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+      return null;
+    }
+    if (m_result.getMultiTagResult().isPresent()
+        && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.2) {
+      return null;
+    }
+    if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.2) {
       return null;
     }
     if (m_pose != null) {
@@ -365,6 +380,15 @@ public class AprilTagCamera extends SubsystemBase {
 
   public void updateHeading(Rotation2d heading) {
     m_poseEstimator.addHeadingData(Timer.getFPGATimestamp(), heading);
+  }
+
+  @Logged(name = "Estimated Pose", importance = Importance.CRITICAL)
+  public Pose2d getEstimatedPose2d() {
+    if (m_pose != null) {
+      return m_pose.estimatedPose.toPose2d();
+    } else {
+      return null;
+    }
   }
 
   // public double getLatency() {  // This dont exist in 2025 either ig
