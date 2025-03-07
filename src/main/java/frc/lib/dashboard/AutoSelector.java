@@ -264,27 +264,32 @@ public class AutoSelector {
         try {
           // m_trajectories.add(
           //     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+
           if (lastPose.charAt(0) >= 'a' && lastPose.charAt(0) <= 'f') {
             lastPose = lastPose.substring(0, 1);
           }
-
           if (!isOdometryReset) {
             sequential.addCommands(
-                Commands.runOnce(() -> m_swerve.zeroGyro(Rotation2d.fromDegrees(180))),
-                factory.resetOdometry(lastPose + "-" + point));
+                Commands.runOnce(
+                    () ->
+                        m_swerve.zeroGyro(
+                            Rotation2d.fromDegrees(
+                                DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0))),
+                factory.resetOdometry("" + lastPose + "-" + point));
             isOdometryReset = true;
           }
 
           parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
-          if (DriverStation.getAlliance().get() == Alliance.Red) {
-            m_trajectories.set(
-                m_trajectories.size() - 1,
-                new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() - 1).traj.flipped()));
-          }
+          // if (DriverStation.getAlliance().get() == Alliance.Red) {
+          //   m_trajectories.set(
+          //       m_trajectories.size() - 1,
+          //       new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() -
+          // 1).traj.flipped()));
+          // }
           s.append("" + lastPose + "-" + point + " ");
           lastPose = point;
         } catch (Exception e) {
-          setFeedback("Path File Not Found: " + lastPose + "-" + point);
+          setFeedback(e.getMessage());
           m_autoCommand = Commands.runOnce(() -> {});
           return;
         }
