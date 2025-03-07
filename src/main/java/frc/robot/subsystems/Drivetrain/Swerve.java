@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -115,7 +116,7 @@ public class Swerve extends SubsystemBase {
     // subsystem is not initialized
     m_gyro = new Pigeon2(kPigeonID, driveBusName);
     m_gyro.getConfigurator().apply(new Pigeon2Configuration());
-    m_gyro.setYaw(0);
+    m_gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0);
 
     zeroGyro();
 
