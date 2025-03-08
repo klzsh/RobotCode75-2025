@@ -12,12 +12,12 @@ import java.util.OptionalDouble;
 
 public class YoloBranchAlign extends Command {
 
-  private final TunableNumber[] strafePID = {
-    new TunableNumber("YOLO Align/P", 0.07),
-    new TunableNumber("YOLO Align/I", 0),
-    new TunableNumber("YOLO Align/D", 0),
-    new TunableNumber("YOLO Align/Tolerance", 0.2)
-  };
+  // private final TunableNumber[] strafePID = {
+  //   new TunableNumber("YOLO Align/P", 0.07),
+  //   new TunableNumber("YOLO Align/I", 0),
+  //   new TunableNumber("YOLO Align/D", 0),
+  //   new TunableNumber("YOLO Align/Tolerance", 0.2)
+  // };
 
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
@@ -25,7 +25,7 @@ public class YoloBranchAlign extends Command {
 
   // private final PIDController rotationController; // add if needed, poss just pass through a
   // heading or do this as a seperate command
-  private final PIDController xController;
+  // private final PIDController xController;
   private final PIDController yController;
   private double xCommand;
   private double yCommand;
@@ -46,12 +46,13 @@ public class YoloBranchAlign extends Command {
     m_BranchDetectorCamera = brachDetectorCamera;
     isAlignInPlace = alignInPlace;
 
-    xController = new PIDController(.1, 0, 0);
+    // xController = new PIDController(.1, 0, 0);
     yController = new PIDController(0.07, 0, 0);
     yController.setTolerance(.2);
     yController.setSetpoint(finalYawSetpoint);
     if (alignInPlace) {
       yController.setP(.03);
+      yController.setD(0.02);
     }
 
     desiredSpeeds = new ChassisSpeeds();
@@ -66,10 +67,10 @@ public class YoloBranchAlign extends Command {
 
   @Override
   public void execute() {
-    yController.setP(strafePID[0].getNumber());
-    yController.setI(strafePID[1].getNumber());
-    yController.setD(strafePID[2].getNumber());
-    yController.setTolerance(strafePID[3].getNumber());
+    // yController.setP(strafePID[0].getNumber());
+    // yController.setI(strafePID[1].getNumber());
+    // yController.setD(strafePID[2].getNumber());
+    // yController.setTolerance(strafePID[3].getNumber());
     // yController.setP(0.07);
     // yController.setTolerance(0.2);
 

@@ -58,7 +58,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                   new SetElevatorPosition(elevator, ElevatorPositions.L2, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-          new WaitCommand(0.2),
+          new WaitCommand(0.35),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
               .repeatedly()
               .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));
@@ -78,7 +78,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                   new SetElevatorPosition(elevator, ElevatorPositions.L3, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-          new WaitCommand(0.2),
+          new WaitCommand(0.35),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
               .repeatedly()
               .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));

@@ -10,10 +10,9 @@ import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
+import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -40,7 +39,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     DataLogManager.start(); // start only in comp
-    DriverStation.startDataLog(DataLogManager.getLog());
+    DriverStation.startDataLog(DataLogManager.getLog(), true);
     m_robotContainer = new RobotContainer();
 
     Epilogue.configure(
@@ -66,15 +65,15 @@ public class Robot extends TimedRobot {
           //   // log INFO and CRITICAL data to NT, NOT DISK
           //   config.minimumImportance = Logged.Importance.INFO;
 
-          config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+          // config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
           // config.backend = new FileBackend(DataLogManager.getLog());
           //   DataLogManager.stop();
           // ! FMS ATTACHED
           //   // only disk log during comp
           //   // do not log joysticks
           //   config.minimumImportance = Logged.Importance.CRITICAL;
-          //   DriverStation.startDataLog(DataLogManager.getLog(), false);
-          //   config.backend = new FileBackend(DataLogManager.getLog());
+          // DriverStation.startDataLog(DataLogManager.getLog(), false);
+          config.backend = new FileBackend(DataLogManager.getLog());
           // at home
           config.minimumImportance = Importance.CRITICAL;
         });

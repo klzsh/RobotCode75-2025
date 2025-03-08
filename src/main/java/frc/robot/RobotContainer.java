@@ -9,6 +9,7 @@ import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,18 +52,18 @@ import java.util.ArrayList;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-// @Logged(strategy = Strategy.OPT_IN)
+@Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-//   @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-//   @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-//   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
@@ -90,7 +91,7 @@ public class RobotContainer {
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
-  @Logged
+  //   @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
 
   // define OI controls
@@ -236,7 +237,7 @@ public class RobotContainer {
             new InstantCommand(
                     () -> {
                       m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
-                      m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
+                      m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE);
                     },
                     m_AlgaeIntake,
                     m_AlgaePivot)
