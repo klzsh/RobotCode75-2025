@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
+import frc.robot.commands.EndEffector.setElevatorPositionModified;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -58,10 +59,12 @@ public class DeAlgaefy extends SequentialCommandGroup {
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                   new SetElevatorPosition(elevator, ElevatorPositions.L2, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-          new WaitCommand(0.35),
-          new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
-              .repeatedly()
-              .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));
+          new WaitCommand(0.15),
+          new ParallelCommandGroup(
+              new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
+                  .repeatedly()
+                  .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)),
+              new setElevatorPositionModified(elevator, ElevatorPositions.L2)));
     } else {
       /* L3 Algae Intake */
       addCommands(
@@ -78,10 +81,12 @@ public class DeAlgaefy extends SequentialCommandGroup {
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
                   new SetElevatorPosition(elevator, ElevatorPositions.L3, true))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-          new WaitCommand(0.35),
-          new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
-              .repeatedly()
-              .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)));
+          new WaitCommand(0.15),
+          new ParallelCommandGroup(
+              new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
+                  .repeatedly()
+                  .until(() -> algaePivot.isAtPosition(PivotState.RETRACTED)),
+              new setElevatorPositionModified(elevator, ElevatorPositions.L3)));
     }
   }
 }

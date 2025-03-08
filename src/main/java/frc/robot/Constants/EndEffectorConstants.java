@@ -55,7 +55,7 @@ public class EndEffectorConstants {
   public static final Angle pivotDeAlgifyPosition = Rotations.of(6);
   public static final Angle pivotEncoderOffset = Rotations.of(0.135);
 
-  public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(150);
+  public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(200);
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(-20);
   public static final Current algaeHoldCurrent = Amps.of(25);
 

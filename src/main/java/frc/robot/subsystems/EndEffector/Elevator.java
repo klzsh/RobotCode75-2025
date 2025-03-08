@@ -54,6 +54,7 @@ public class Elevator extends SubsystemBase {
 
   // @Logged
   private boolean m_IsAlgae = false;
+  private boolean m_OffsetAfterAlgaeIntook = false;
 
   // define motors
   // @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
@@ -125,6 +126,15 @@ public class Elevator extends SubsystemBase {
     m_IsAlgae = isAlgae;
   }
 
+  public void setPositionAlgaeOffset(ElevatorPositions position, boolean setOffsetOn) {
+    m_SetpointPosition = position;
+    m_OffsetAfterAlgaeIntook = setOffsetOn;
+  }
+
+  public void toggleOffset(boolean offset) {
+    m_OffsetAfterAlgaeIntook = offset;
+  }
+
   /**
    * average position between the two motors
    *
@@ -175,6 +185,22 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
+  public boolean isAtAlgaeOffset(ElevatorPositions position) {
+    double currentPosition = getPosition().in(Rotations);
+    double algaeOffset =
+        ((m_OffsetAfterAlgaeIntook
+                    && m_IsAlgae
+                    && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
+                ? algaeRemovalOffset.in(Rotations)
+                : 0)
+            + 1.5;
+
+    return MathUtil.applyDeadband(
+            currentPosition - position.Rotations.in(Rotations) - algaeOffset,
+            deadband.in(Rotations))
+        == 0.0;
+  }
+
   @Logged(name = "Upper Limit", importance = Importance.CRITICAL)
   public boolean getUpperLimit() {
     return !m_upperLimitSwitch.get();
@@ -203,6 +229,9 @@ public class Elevator extends SubsystemBase {
             ? algaeRemovalOffset.in(Rotations)
             : 0;
     double targetRotations = currentPosition + algaeOffset;
+    if (m_OffsetAfterAlgaeIntook) {
+      targetRotations += 1.5;
+    }
 
     if (getPosition().in(Rotations) < targetRotations) {
       m_PositionRequest.Velocity = MotionMagicProfileUp[0];

@@ -49,9 +49,9 @@ public final class ClimberConstants {
     public static final double kV = 0.1; // current per unit of requested velocity
     public static final double kP = 0.000001;
     public static final double kI = 0;
-    public static final double kD = 5;
+    public static final double kD = 7.6;
 
-    public static final double motionMagicCruiseVelocity = 50;
+    public static final double motionMagicCruiseVelocity = 40;
     public static final double motionMagicCruiseAcceleration = 10;
     public static final double motionMagickV = 0.12;
     public static final double motionMagickA = 0.1;

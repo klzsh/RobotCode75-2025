@@ -107,7 +107,7 @@ public class Swerve extends SubsystemBase {
   public Swerve(
       AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
 
-    sample = new Pose2d(new Translation2d(0,0), Rotation2d.fromDegrees(0));
+    sample = new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0));
     m_LeftFacingCamera = leftFacingCamera;
     m_RightFacingCamera = rightFacingCamera;
     m_HPCamera = HPCamera;
