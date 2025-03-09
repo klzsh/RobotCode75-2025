@@ -45,18 +45,17 @@ public class RotateToSimilarFace extends Command {
     targetHeading = Math.round(m_Swerve.getRotation2D().getDegrees() / 60.0) * 60.0;
 
     if (hp && DriverStation.getAlliance().get() == Alliance.Blue) {
-      if (Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - 36)) <  Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - 144))) {
+      if (Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - 36))
+          < Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - 144))) {
         targetHeading = 36;
-      }
-      else {
+      } else {
         targetHeading = 144;
       }
-    }
-    else if (hp) {
-      if (Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - (36 - 180))) <  Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - (144 - 180)))) {
+    } else if (hp) {
+      if (Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - (36 - 180)))
+          < Math.abs(wrap(m_Swerve.getRotation2D().getDegrees() - (144 - 180)))) {
         targetHeading = 36 - 180;
-      }
-      else {
+      } else {
         targetHeading = 144 - 180;
       }
     }

@@ -22,7 +22,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -69,7 +68,6 @@ public class Elevator extends SubsystemBase {
   private final DigitalInput m_upperLimitSwitch;
   private final DigitalInput m_backupLimitSwitch;
 
-  
   // private final TunableNumber AlgaeOffsetPrePickupRotations;
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
@@ -116,8 +114,9 @@ public class Elevator extends SubsystemBase {
     // mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Down",
     // MotionMagicProfileDown[1]);
     // mmJerkDown = new TunableNumber("Elevator/MM Jerk Down", MotionMagicProfileDown[2]);
-    
-    // AlgaeOffsetPrePickupRotations = new TunableNumber("Elevator/Pre Pickup Offset", algaeRemovalOffset.in(Rotations));
+
+    // AlgaeOffsetPrePickupRotations = new TunableNumber("Elevator/Pre Pickup Offset",
+    // algaeRemovalOffset.in(Rotations));
   }
 
   /**

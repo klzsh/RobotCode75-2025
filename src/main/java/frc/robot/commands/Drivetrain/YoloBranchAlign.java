@@ -5,6 +5,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import java.util.OptionalDouble;
@@ -34,6 +35,9 @@ public class YoloBranchAlign extends Command {
 
   private ChassisSpeeds desiredSpeeds;
 
+  // private final TunableNumber inPlaceYP;
+  // private final TunableNumber inPlaceYD;
+
   private final double finalYawSetpoint = -2.2;
   private final double driveIntoReefSpeed = .5;
   private final double stallSpeedThreshold = .05;
@@ -45,13 +49,19 @@ public class YoloBranchAlign extends Command {
     m_BranchDetectorCamera = brachDetectorCamera;
     isAlignInPlace = alignInPlace;
 
+    // inPlaceYP = new TunableNumber("Yolo Align/YP", 0.04);
+    // inPlaceYD = new TunableNumber("Yolo Align/YD", 0.005);
+
     // xController = new PIDController(.1, 0, 0);
     yController = new PIDController(0.07, 0, 0);
     yController.setTolerance(.2);
     yController.setSetpoint(finalYawSetpoint);
     if (alignInPlace) {
-      yController.setP(.03);
-      yController.setD(0.02);
+      yController.setP(0.1);
+      yController.setD(0);
+      // yController.setP(.04);
+      // yController.setD(0.005);
+      yController.setTolerance(2);
     }
 
     desiredSpeeds = new ChassisSpeeds();
@@ -92,7 +102,8 @@ public class YoloBranchAlign extends Command {
       }
     } else {
       if (!m_BranchDetectorCamera.hasTargets()) {
-        desiredSpeeds = new ChassisSpeeds(0, 0.05, 0); // scoot left n shi poss see a branch or sum
+        desiredSpeeds =
+            new ChassisSpeeds(0, -.05, 0); // scoot toward direction of last seen target and shi
         m_Swerve.setChassisSpeeds(desiredSpeeds);
       } else {
         double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();

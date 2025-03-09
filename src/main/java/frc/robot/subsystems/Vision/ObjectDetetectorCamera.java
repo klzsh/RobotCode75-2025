@@ -83,9 +83,8 @@ public class ObjectDetetectorCamera extends SubsystemBase {
 
   public void reloadPipeline() {
     if (m_Camera.getPipelineIndex() == 0) {
-    m_Camera.setPipelineIndex(1);
-    }
-    else {
+      m_Camera.setPipelineIndex(1);
+    } else {
       m_Camera.setPipelineIndex(0);
     }
   }

@@ -252,6 +252,11 @@ public class RobotContainer {
         .whileTrue(
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
                 .repeatedly());
+    m_Controller
+        .povLeft()
+        .whileTrue(
+            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.REVERSING), m_CoralIntake)
+                .repeatedly());
     // manual elevator overrides
 
     m_Controller

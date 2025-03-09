@@ -17,7 +17,6 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Util.LidarDistanceSensor;
 
 @Logged(name = "Algae Intake", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
@@ -47,6 +46,7 @@ public class AlgaeIntake extends SubsystemBase {
       new VelocityTorqueCurrentFOC(RotationsPerSecond.of(0));
   // hold request
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
+
   // private final TunableNumber intakeSpeedRPS;
 
   /** Creates a new AlgaeIntake. */
@@ -61,7 +61,8 @@ public class AlgaeIntake extends SubsystemBase {
 
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;
-    // intakeSpeedRPS = new TunableNumber("Algae Intake/Intake Speed RPS", algaeIntakeSpeed.in(RotationsPerSecond));
+    // intakeSpeedRPS = new TunableNumber("Algae Intake/Intake Speed RPS",
+    // algaeIntakeSpeed.in(RotationsPerSecond));
 
     // IntakePIDConfig.withKA(0)
     //     .withKS(algaeKS)

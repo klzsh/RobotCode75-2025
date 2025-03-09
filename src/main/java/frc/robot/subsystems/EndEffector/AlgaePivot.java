@@ -18,7 +18,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaePivot extends SubsystemBase {
@@ -55,7 +54,8 @@ public class AlgaePivot extends SubsystemBase {
 
     pivotRequest.UpdateFreqHz = 0;
     pivotRequest.UseTimesync = true;
-    // deAlgaefyRotations = new TunableNumber("Algae Pivot/DeAlgaefy Position", pivotDeAlgifyPosition.in(Rotations));
+    // deAlgaefyRotations = new TunableNumber("Algae Pivot/DeAlgaefy Position",
+    // pivotDeAlgifyPosition.in(Rotations));
     // PivotRetractDelay = new TunableNumber("Algae Pivot/Retract Delay Seconds", 0.15);
 
     m_absoluteEncoder =
@@ -110,7 +110,7 @@ public class AlgaePivot extends SubsystemBase {
   @Override
   public void periodic() {
     // if(m_PivotState == PivotState.DEALGAEFY){
-      // m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgaefyRotations.getNumber()))
+    // m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgaefyRotations.getNumber()))
     // } else {
     m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
     // }

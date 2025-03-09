@@ -10,9 +10,13 @@ import static frc.robot.Constants.ClimberConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -24,6 +28,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
 
 @Logged(name = "Climber", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
@@ -60,6 +65,8 @@ public class Climber extends SubsystemBase {
   // private final TunableNumber climberMMKa;
 
   // private final TunableNumber zeroPoint;
+  // private final TunableNumber retractSetpoint;
+  // private final TunableNumber extendSetpoint;
 
   private final MotionMagicExpoTorqueCurrentFOC m_PositionRequest;
 
@@ -80,6 +87,9 @@ public class Climber extends SubsystemBase {
 
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
     m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
+
+    // retractSetpoint = new TunableNumber("Climber/Retract Setpoint", climbPosition.in(Rotations));
+    // extendSetpoint = new TunableNumber("Climber/Extend Setpoint", climbExtendPosition.in(Rotations));
 
     // PIDConfig.withKA(kA)
     //     .withKS(kS)
@@ -126,9 +136,11 @@ public class Climber extends SubsystemBase {
     } else if (rightY > 0.2) {
       resetPosition();
       setPositionRequest(climbExtendPosition);
+      // setPositionRequest(Rotations.of(extendSetpoint.getNumber()));
     } else if (rightY < -0.2) {
       resetPosition();
       setPositionRequest(climbPosition);
+      // setPositionRequest(Rotations.of(retractSetpoint.getNumber()));
     } else {
       runCurrent(0);
     }

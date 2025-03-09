@@ -160,6 +160,7 @@ public class CoralIntake extends SubsystemBase {
 
     // m_CoralMotor.getConfigurator().apply(positionConfig);
     // }
+    
 
     if (getBeamBreak() && m_CoralIntakeState == CoralStates.INTAKING) {
       m_CoralIntakeState = CoralStates.POSITIONING;
