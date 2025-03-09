@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Time;
 public final class ClimberConstants {
   public static final double climberGearRatio = 39.6 / 1.0;
   public static final Angle climbPosition = Rotations.of(0);
-  public static final Angle climbExtendPosition = Rotations.of(100);
+  public static final Angle climbExtendPosition = Rotations.of(105);
   public static final double climbDeadband = 0.5;
   public static final int limitPort = 7;
   public static final int climberMotor2CANID = 47;
@@ -38,8 +38,8 @@ public final class ClimberConstants {
     public static final Current statorForwardCurrentLimit = Amps.of(100);
     public static final Current statorReverseCurrentLimit = Amps.of(100);
 
-    public static final Angle forwardSoftLimit = Rotations.of(102);
-    public static final Angle reverseSoftLimit = Rotations.of(-4);
+    public static final Angle forwardSoftLimit = Rotations.of(104);
+    public static final Angle reverseSoftLimit = Rotations.of(-8);
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
@@ -89,7 +89,7 @@ public final class ClimberConstants {
       m_ClimberMotorConfig.TorqueCurrent.PeakReverseTorqueCurrent =
           statorReverseCurrentLimit.in(Amps);
 
-      m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+      m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardSoftLimit.in(Rotations);
       m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
