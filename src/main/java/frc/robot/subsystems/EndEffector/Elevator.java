@@ -22,6 +22,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -68,6 +69,8 @@ public class Elevator extends SubsystemBase {
   private final DigitalInput m_upperLimitSwitch;
   private final DigitalInput m_backupLimitSwitch;
 
+  
+  // private final TunableNumber AlgaeOffsetPrePickupRotations;
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
@@ -109,11 +112,12 @@ public class Elevator extends SubsystemBase {
     // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
     // mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
 
-    // mmVelocityDown = new TunableNumber("Elevator/MM Velocity Dowbn", MotionMagicProfileDown[0]);
-    // mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Dowbn",
+    // mmVelocityDown = new TunableNumber("Elevator/MM Velocity Down", MotionMagicProfileDown[0]);
+    // mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Down",
     // MotionMagicProfileDown[1]);
-    // mmJerkDown = new TunableNumber("Elevator/MM Jerk Dowbn", MotionMagicProfileDown[2]);
-
+    // mmJerkDown = new TunableNumber("Elevator/MM Jerk Down", MotionMagicProfileDown[2]);
+    
+    // AlgaeOffsetPrePickupRotations = new TunableNumber("Elevator/Pre Pickup Offset", algaeRemovalOffset.in(Rotations));
   }
 
   /**
@@ -126,14 +130,14 @@ public class Elevator extends SubsystemBase {
     m_IsAlgae = isAlgae;
   }
 
-  public void setPositionAlgaeOffset(ElevatorPositions position, boolean setOffsetOn) {
-    m_SetpointPosition = position;
-    m_OffsetAfterAlgaeIntook = setOffsetOn;
-  }
+  // public void setPositionAlgaeOffset(ElevatorPositions position, boolean setOffsetOn) {
+  //   m_SetpointPosition = position;
+  //   m_OffsetAfterAlgaeIntook = setOffsetOn;
+  // }
 
-  public void toggleOffset(boolean offset) {
-    m_OffsetAfterAlgaeIntook = offset;
-  }
+  // public void toggleOffset(boolean offset) {
+  //   m_OffsetAfterAlgaeIntook = offset;
+  // }
 
   /**
    * average position between the two motors
@@ -178,6 +182,7 @@ public class Elevator extends SubsystemBase {
     double algaeOffset =
         (isAlgae && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
             ? algaeRemovalOffset.in(Rotations)
+            // ? AlgaeOffsetPrePickupRotations.getNumber()
             : 0;
     return MathUtil.applyDeadband(
             currentPosition - position.Rotations.in(Rotations) - algaeOffset,
@@ -185,21 +190,22 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
-  public boolean isAtAlgaeOffset(ElevatorPositions position) {
-    double currentPosition = getPosition().in(Rotations);
-    double algaeOffset =
-        ((m_OffsetAfterAlgaeIntook
-                    && m_IsAlgae
-                    && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
-                ? algaeRemovalOffset.in(Rotations)
-                : 0)
-            + 1.5;
+  // public boolean isAtAlgaeOffset(ElevatorPositions position) {
+  //   double currentPosition = getPosition().in(Rotations);
+  //   double algaeOffset =
+  //       ((m_OffsetAfterAlgaeIntook
+  //                   && m_IsAlgae
+  //                   && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
+  //               // ? algaeRemovalOffset.in(Rotations)
+  //               ? AlgaeOffsetPrePickupRotations.getNumber()
+  //               : 0)
+  //           + AlgaeOffsetRotations.getNumber();
 
-    return MathUtil.applyDeadband(
-            currentPosition - position.Rotations.in(Rotations) - algaeOffset,
-            deadband.in(Rotations))
-        == 0.0;
-  }
+  //   return MathUtil.applyDeadband(
+  //           currentPosition - position.Rotations.in(Rotations) - algaeOffset,
+  //           deadband.in(Rotations))
+  //       == 0.0;
+  // }
 
   @Logged(name = "Upper Limit", importance = Importance.CRITICAL)
   public boolean getUpperLimit() {
@@ -227,11 +233,12 @@ public class Elevator extends SubsystemBase {
                 && (m_SetpointPosition == ElevatorPositions.L2
                     || m_SetpointPosition == ElevatorPositions.L3))
             ? algaeRemovalOffset.in(Rotations)
+            // ? AlgaeOffsetPrePickupRotations.getNumber()
             : 0;
     double targetRotations = currentPosition + algaeOffset;
-    if (m_OffsetAfterAlgaeIntook) {
-      targetRotations += 1.5;
-    }
+    // if (m_OffsetAfterAlgaeIntook) {
+    //   targetRotations += AlgaeOffsetRotations.getNumber();
+    // }
 
     if (getPosition().in(Rotations) < targetRotations) {
       m_PositionRequest.Velocity = MotionMagicProfileUp[0];

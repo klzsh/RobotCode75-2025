@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaePivot extends SubsystemBase {
@@ -36,6 +37,8 @@ public class AlgaePivot extends SubsystemBase {
   }
 
   private PivotState m_PivotState;
+  // private final TunableNumber deAlgaefyRotations;
+  // private final TunableNumber PivotRetractDelay;
 
   // @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
   private TalonFX m_AlgaePivot;
@@ -52,6 +55,8 @@ public class AlgaePivot extends SubsystemBase {
 
     pivotRequest.UpdateFreqHz = 0;
     pivotRequest.UseTimesync = true;
+    // deAlgaefyRotations = new TunableNumber("Algae Pivot/DeAlgaefy Position", pivotDeAlgifyPosition.in(Rotations));
+    // PivotRetractDelay = new TunableNumber("Algae Pivot/Retract Delay Seconds", 0.15);
 
     m_absoluteEncoder =
         new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.in(Rotations));
@@ -71,6 +76,11 @@ public class AlgaePivot extends SubsystemBase {
 
   public void resetPivotState() {
     m_PivotState = PivotState.NONE;
+  }
+
+  public double getPivotDelay() {
+    // return PivotRetractDelay.getNumber();
+    return 0.15;
   }
 
   public boolean isAtPositionAbsolute(double absolutePosition) {
@@ -99,6 +109,10 @@ public class AlgaePivot extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // if(m_PivotState == PivotState.DEALGAEFY){
+      // m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgaefyRotations.getNumber()))
+    // } else {
     m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
+    // }
   }
 }

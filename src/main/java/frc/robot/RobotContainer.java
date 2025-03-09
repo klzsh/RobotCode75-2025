@@ -199,9 +199,11 @@ public class RobotContainer {
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
         .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
-    resetBranchCam
-        .whileTrue(new InstantCommand(() -> m_BranchCamera.setDriverMode(true)))
-        .whileFalse(new InstantCommand(() -> m_BranchCamera.setDriverMode(false)));
+    // resetBranchCam
+    //     .whileTrue(new InstantCommand(() -> m_BranchCamera.setDriverMode(true)))
+    //     .whileFalse(new InstantCommand(() -> m_BranchCamera.setDriverMode(false)));
+
+    resetBranchCam.onTrue(new InstantCommand(() -> m_BranchCamera.reloadPipeline()));
   }
 
   public void configureControllerBinds() {
