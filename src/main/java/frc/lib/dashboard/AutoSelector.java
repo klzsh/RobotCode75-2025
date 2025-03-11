@@ -64,9 +64,6 @@ import java.util.Map;
  */
 
 public class AutoSelector {
-
-
-
   private List<Trajectory> m_trajectories = new ArrayList<>();
   private Command m_autoCommand = Commands.runOnce(() -> {});
   private Pose2d m_startPose;
@@ -104,9 +101,9 @@ public class AutoSelector {
     presetChooser = new SendableChooser<>();
 
     presetChooser.setDefaultOption("Custom", "");
-    presetChooser.addOption("Left Side Two Piece", "st cr 3 ht 5 bl 6 3");
-    presetChooser.addOption("Right Side Two Piece", "sb el 3 hb 5 fl 3");
-    presetChooser.addOption("Middle One Piece", "sm dl 3");
+    presetChooser.addOption("Left Side Two Piece", Presets.LeftSideTwoPiece);
+    presetChooser.addOption("Right Side Two Piece", Presets.RightSideTwoPiece);
+    presetChooser.addOption("Middle One Piece", Presets.MiddleOnePiece);
 
     // define auto factory for autos
     factory =

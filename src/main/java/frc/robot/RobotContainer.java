@@ -227,7 +227,7 @@ public class RobotContainer {
         .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
         .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
     // algae commands
-   m_Controller
+    m_Controller
         .povRight()
         .whileTrue(
             new InstantCommand(
