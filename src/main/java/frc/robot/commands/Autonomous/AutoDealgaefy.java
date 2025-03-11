@@ -15,7 +15,7 @@ import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -34,7 +34,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       Elevator elevator,
       AlgaeIntake intake,
       AlgaePivot pivot,
-      PoseAlignController poseController) {
+      ChezyController chezyController) {
     addRequirements(swerve, elevator, intake, pivot);
     FieldElement elem = CheckBounds.nearestElement(swerve.getPose());
     if (!FieldPose.fieldElementIsReef(elem)) {
@@ -43,7 +43,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
     ElevatorPositions elevatorHeight = algaeHeights.get(elem.toString());
     addCommands(
         new ParallelCommandGroup(
-            // new DriveToPose(swerve, poseController, new
+            // new ChezyPose(swerve, chezyController, new
             // FieldPose(DriverStation.getAlliance().get(), elem, Offset.MID), false),
             new SetElevatorPosition(elevator, elevatorHeight, true)),
         new ParallelCommandGroup(
