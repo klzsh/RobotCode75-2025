@@ -15,6 +15,10 @@ import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 
+/*
+ * Return command based on a text code
+ */
+
 public class ActionFactory {
   private Swerve m_Swerve;
   private Elevator m_Elevator;
@@ -48,6 +52,7 @@ public class ActionFactory {
   }
 
   public Command getCommand(int action) {
+    // 1 - L1, 2 - Dealgaefy, 3 - L4, 4 - Processor, 5 - Intake
     switch (action) {
       case 1:
         return new AutoScoreL1(

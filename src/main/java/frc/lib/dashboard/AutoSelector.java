@@ -1,9 +1,9 @@
 package frc.lib.dashboard;
 
 import choreo.auto.AutoFactory;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.networktables.GenericEntry;
@@ -66,15 +66,9 @@ import java.util.Map;
 
 public class AutoSelector {
 
-  private class ChoreoTrajectory {
-    public choreo.trajectory.Trajectory traj;
 
-    public ChoreoTrajectory(choreo.trajectory.Trajectory t) {
-      traj = t;
-    }
-  }
 
-  private List<ChoreoTrajectory> m_trajectories = new ArrayList<>();
+  private List<Trajectory> m_trajectories = new ArrayList<>();
   private Command m_autoCommand = Commands.runOnce(() -> {});
   private Pose2d m_startPose;
   private Field2d m_field;
@@ -123,6 +117,7 @@ public class AutoSelector {
   }
 
   public void clearField() {
+    // for displaying; clears shuffleboard field
     for (int i = 0; i < 100; i++) {
       FieldObject2d obj = m_field.getObject("traj" + i);
       obj.setTrajectory(new edu.wpi.first.math.trajectory.Trajectory());
@@ -130,11 +125,12 @@ public class AutoSelector {
   }
 
   private void drawPaths() {
+    // draws trajectory on shuffleboard field
     clearField();
     for (int i = 0; i < m_trajectories.size(); i++) {
-      ChoreoTrajectory pathTraj = m_trajectories.get(i);
-      List<Pose2d> poses = Arrays.asList(pathTraj.traj.getPoses());
-      Trajectory displayTraj =
+      Trajectory pathTraj = m_trajectories.get(i);
+      List<Pose2d> poses = Arrays.asList(pathTraj.getPoses());
+      edu.wpi.first.math.trajectory.Trajectory displayTraj =
           TrajectoryGenerator.generateTrajectory(
               poses, new TrajectoryConfig(AutoConstants.kMaxSpeed, AutoConstants.kMaxAcceleration));
       m_field.getObject("traj" + i).setTrajectory(displayTraj);
@@ -142,11 +138,13 @@ public class AutoSelector {
   }
 
   public void clearAll() {
+    // clears CHOREO trajectories
     m_trajectories.clear();
     clearField();
   }
 
   public void reset() {
+    // complete reset of everything
     clearAll();
     autoStringEntry.setString("");
     feedbackEntry.setString("Enter a command!");
@@ -171,6 +169,7 @@ public class AutoSelector {
 
     Timer.delay(3);
 
+    // Command Buttons
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
 
@@ -189,7 +188,7 @@ public class AutoSelector {
         .withSize(1, 1)
         .withPosition(1, 3);
 
-
+    // buttons
     ntTable.addListener(
         "Generate",
         EnumSet.of(Kind.kValueAll),
@@ -213,10 +212,12 @@ public class AutoSelector {
   public void generatePaths() {
     setFeedback("Generating paths...");
 
+    // if there is no preset, just use the string
     if (presetChooser.getSelected() != "") {
       autoStringEntry.setString(presetChooser.getSelected());
     }
 
+    // note that this gets set by preset if a preset is chosen
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
 
@@ -286,7 +287,7 @@ public class AutoSelector {
           if (DriverStation.getAlliance().get() == Alliance.Red) {
             m_trajectories.set(
                 m_trajectories.size() - 1,
-                new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() - 1).traj.flipped()));
+                m_trajectories.get(m_trajectories.size() - 1).flipped());
           }
           s.append("" + lastPose + "-" + point + " ");
           lastPose = point;
