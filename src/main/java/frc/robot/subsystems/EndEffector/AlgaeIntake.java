@@ -9,16 +9,17 @@ import static frc.robot.Constants.EndEffectorConstants.*;
 import static frc.robot.Constants.EndEffectorConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.subsystems.Util.LidarDistanceSensor;
 
-// @Logged(name = "Algae Intake", strategy = Strategy.OPT_IN)
+@Logged(name = "Algae Intake", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaeIntake extends SubsystemBase {
   public static enum AlgaeStates {
     NONE,
@@ -27,20 +28,17 @@ public class AlgaeIntake extends SubsystemBase {
     OUTAKING
   }
 
-  // TODO: add tunable numbers for PIDS, velocity, Position, CURRENT LIMITS
-  // @Logged(name = "Intake State")
+  @Logged(name = "Intake State", importance = Importance.CRITICAL)
   private AlgaeStates m_AlgaeIntakeState;
 
   // @Logged(name = "Algae Intake Motor", importance = Importance.INFO)
   private TalonFX m_AlgaeMotor;
 
-  private Slot0Configs IntakePIDConfig = new Slot0Configs();
-  private final TunableNumber algaeIntakeKp;
-  private final TunableNumber algaeIntakeKd;
-  private final TunableNumber algaeIntakeKs;
+  // private Slot0Configs IntakePIDConfig = new Slot0Configs();
+  // private final TunableNumber algaeIntakeKp;
+  // private final TunableNumber algaeIntakeKd;
+  // private final TunableNumber algaeIntakeKs;
 
-  // private final DigitalInput m_AlgaeIntakeLimit;
-  // @Logged
   private final LidarDistanceSensor m_AlgaeDetector;
 
   // intake speed
@@ -49,6 +47,8 @@ public class AlgaeIntake extends SubsystemBase {
   // hold request
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(Amps.of(0));
 
+  // private final TunableNumber intakeSpeedRPS;
+
   /** Creates a new AlgaeIntake. */
   public AlgaeIntake() {
     m_AlgaeMotor = new TalonFX(algaeMotorCanID, superstructureCANBusName);
@@ -56,23 +56,23 @@ public class AlgaeIntake extends SubsystemBase {
     m_AlgaeIntakeState = AlgaeStates.NONE;
     m_AlgaeDetector = new LidarDistanceSensor(Inches.of(4));
 
-    // m_AlgaeIntakeLimit = new DigitalInput(algaeLimitSwitchPort);
-
     algaeRequest.UpdateFreqHz = 0;
     algaeRequest.UseTimesync = true;
 
     currentOut.UpdateFreqHz = 0;
     currentOut.UseTimesync = true;
+    // intakeSpeedRPS = new TunableNumber("Algae Intake/Intake Speed RPS",
+    // algaeIntakeSpeed.in(RotationsPerSecond));
 
-    IntakePIDConfig.withKA(0)
-        .withKS(algaeKS)
-        .withKP(algaeKP)
-        .withKD(algaeKD)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+    // IntakePIDConfig.withKA(0)
+    //     .withKS(algaeKS)
+    //     .withKP(algaeKP)
+    //     .withKD(algaeKD)
+    //     .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
 
-    algaeIntakeKp = new TunableNumber("Algae Intake/kP", algaeKP);
-    algaeIntakeKd = new TunableNumber("Algae Intake/kD", algaeKD);
-    algaeIntakeKs = new TunableNumber("Algae Intake/kS", algaeKS);
+    // algaeIntakeKp = new TunableNumber("Algae Intake/kP", algaeKP);
+    // algaeIntakeKd = new TunableNumber("Algae Intake/kD", algaeKD);
+    // algaeIntakeKs = new TunableNumber("Algae Intake/kS", algaeKS);
   }
 
   public void setAlgaeState(AlgaeStates state) {
@@ -83,10 +83,9 @@ public class AlgaeIntake extends SubsystemBase {
     }
   }
 
-  // @Logged
+  @Logged(name = "Algae In Inake", importance = Importance.CRITICAL)
   public boolean algaeInIntake() {
     return m_AlgaeDetector.belowThreshold();
-    // return !m_AlgaeIntakeLimit.get();
   }
 
   public AlgaeStates getAlgaeState() {
@@ -99,15 +98,17 @@ public class AlgaeIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
-        || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
-        || algaeIntakeKs.getNumber() != IntakePIDConfig.kS) {
-      IntakePIDConfig.kP = algaeIntakeKp.getNumber();
-      IntakePIDConfig.kD = algaeIntakeKd.getNumber();
-      IntakePIDConfig.kS = algaeIntakeKs.getNumber();
+    SmartDashboard.putBoolean("Has Algae", algaeInIntake());
 
-      m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
-    }
+    // if (algaeIntakeKp.getNumber() != IntakePIDConfig.kP
+    //     || algaeIntakeKd.getNumber() != IntakePIDConfig.kD
+    //     || algaeIntakeKs.getNumber() != IntakePIDConfig.kS) {
+    //   IntakePIDConfig.kP = algaeIntakeKp.getNumber();
+    //   IntakePIDConfig.kD = algaeIntakeKd.getNumber();
+    //   IntakePIDConfig.kS = algaeIntakeKs.getNumber();
+
+    //   m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
+    // }
 
     if (algaeInIntake() && m_AlgaeIntakeState != AlgaeStates.OUTAKING) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
@@ -116,10 +117,12 @@ public class AlgaeIntake extends SubsystemBase {
     switch (m_AlgaeIntakeState) {
       case INTAKING -> {
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeIntakeSpeed));
+        // m_AlgaeMotor.setControl(algaeRequest.withVelocity(intakeSpeedRPS.getNumber()));
+
       }
       case HASGAMEPIECE -> {
         // set the velocity control to a very low value (like 1-2 rps) to hold the algae in
-        m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeHoldSpeed));
+        m_AlgaeMotor.setControl(currentOut.withOutput(algaeHoldCurrent));
       }
       case OUTAKING -> {
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeOutakeSpeed));

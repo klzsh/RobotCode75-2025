@@ -6,6 +6,8 @@ package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
@@ -27,9 +29,17 @@ public class ResetHeading extends Command {
   @Override
   public void execute() {
     // resets the gyro and pose based on the gyro
-    m_Swerve.zeroGyro();
-    m_Swerve.setPose(
-        new Pose2d(m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), new Rotation2d(0)));
+    if (DriverStation.getAlliance().get() == Alliance.Blue) {
+      m_Swerve.zeroGyro(Rotation2d.fromDegrees(0));
+      m_Swerve.setPose(
+          new Pose2d(
+              m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), Rotation2d.fromDegrees(0)));
+    } else {
+      m_Swerve.zeroGyro(Rotation2d.fromDegrees(180));
+      m_Swerve.setPose(
+          new Pose2d(
+              m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), Rotation2d.fromDegrees(180)));
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -41,7 +51,8 @@ public class ResetHeading extends Command {
   public boolean isFinished() {
     boolean resetted = false;
     // see if the pose has actually reset
-    if (m_Swerve.getPose().getRotation().getDegrees() == 0) {
+    if (m_Swerve.getPose().getRotation().getDegrees()
+        == (DriverStation.getAlliance().get() == Alliance.Blue ? 0 : 180)) {
       resetted = true;
     } else {
       resetted = false;

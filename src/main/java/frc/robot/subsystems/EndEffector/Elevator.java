@@ -13,22 +13,24 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
  * 2 stage WCP GreyT elevator
- * Uses motion magic to honor a target cruise velocity and acceleration
+ * Uses motion magic to honor a target \ and acceleration
  *  Motion magic is used to prevent the elevator from destroying itself by moving too fast
  *
  */
-// @Logged(strategy = Strategy.OPT_IN, name = "Elevator")
+@Logged(strategy = Strategy.OPT_IN, name = "Elevator", importance = Importance.CRITICAL)
 public class Elevator extends SubsystemBase {
 
   // we only have a certain number of states the elevator will be in at any given time
@@ -47,11 +49,12 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  // @Logged(name = "Current Position", importance = Importance.INFO)
+  @Logged(name = "Current Position", importance = Importance.CRITICAL)
   private ElevatorPositions m_SetpointPosition = ElevatorPositions.HOME;
 
   // @Logged
   private boolean m_IsAlgae = false;
+  private boolean m_OffsetAfterAlgaeIntook = false;
 
   // define motors
   // @Logged(name = "Left Elevator Motor", importance = Importance.DEBUG)
@@ -65,9 +68,18 @@ public class Elevator extends SubsystemBase {
   private final DigitalInput m_upperLimitSwitch;
   private final DigitalInput m_backupLimitSwitch;
 
+  // private final TunableNumber AlgaeOffsetPrePickupRotations;
   // define control requests
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
+
+  // private final TunableNumber mmVelocityUp;
+  // private final TunableNumber mmAccelerationUp;
+  // private final TunableNumber mmJerkUp;
+
+  // private final TunableNumber mmVelocityDown;
+  // private final TunableNumber mmAccelerationDown;
+  // private final TunableNumber mmJerkDown;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -93,6 +105,18 @@ public class Elevator extends SubsystemBase {
 
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
+
+    // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
+    // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
+    // mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
+
+    // mmVelocityDown = new TunableNumber("Elevator/MM Velocity Down", MotionMagicProfileDown[0]);
+    // mmAccelerationDown = new TunableNumber("Elevator/MM Acceleration Down",
+    // MotionMagicProfileDown[1]);
+    // mmJerkDown = new TunableNumber("Elevator/MM Jerk Down", MotionMagicProfileDown[2]);
+
+    // AlgaeOffsetPrePickupRotations = new TunableNumber("Elevator/Pre Pickup Offset",
+    // algaeRemovalOffset.in(Rotations));
   }
 
   /**
@@ -104,6 +128,15 @@ public class Elevator extends SubsystemBase {
     m_SetpointPosition = position;
     m_IsAlgae = isAlgae;
   }
+
+  // public void setPositionAlgaeOffset(ElevatorPositions position, boolean setOffsetOn) {
+  //   m_SetpointPosition = position;
+  //   m_OffsetAfterAlgaeIntook = setOffsetOn;
+  // }
+
+  // public void toggleOffset(boolean offset) {
+  //   m_OffsetAfterAlgaeIntook = offset;
+  // }
 
   /**
    * average position between the two motors
@@ -127,7 +160,7 @@ public class Elevator extends SubsystemBase {
    *
    * @return the position in rotations of the elevator
    */
-  // @Logged(name = "Elevator Position")
+  @Logged(name = "Elevator Position", importance = Importance.CRITICAL)
   public double logPosition() {
     return getPosition().in(Rotations);
   }
@@ -148,6 +181,7 @@ public class Elevator extends SubsystemBase {
     double algaeOffset =
         (isAlgae && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
             ? algaeRemovalOffset.in(Rotations)
+            // ? AlgaeOffsetPrePickupRotations.getNumber()
             : 0;
     return MathUtil.applyDeadband(
             currentPosition - position.Rotations.in(Rotations) - algaeOffset,
@@ -155,19 +189,35 @@ public class Elevator extends SubsystemBase {
         == 0.0;
   }
 
+  // public boolean isAtAlgaeOffset(ElevatorPositions position) {
+  //   double currentPosition = getPosition().in(Rotations);
+  //   double algaeOffset =
+  //       ((m_OffsetAfterAlgaeIntook
+  //                   && m_IsAlgae
+  //                   && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
+  //               // ? algaeRemovalOffset.in(Rotations)
+  //               ? AlgaeOffsetPrePickupRotations.getNumber()
+  //               : 0)
+  //           + AlgaeOffsetRotations.getNumber();
+
+  //   return MathUtil.applyDeadband(
+  //           currentPosition - position.Rotations.in(Rotations) - algaeOffset,
+  //           deadband.in(Rotations))
+  //       == 0.0;
+  // }
+
+  @Logged(name = "Upper Limit", importance = Importance.CRITICAL)
   public boolean getUpperLimit() {
     return !m_upperLimitSwitch.get();
   }
 
+  @Logged(name = "Lower Limit", importance = Importance.CRITICAL)
   public boolean getLowerLimit() {
     return !m_lowerLimitSwitch.get() || !m_backupLimitSwitch.get();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Upper Limit", getUpperLimit());
-    SmartDashboard.putBoolean("Lower Limit", getLowerLimit());
-
     // if (getLowerLimit()) {
     //   m_ElevatorMotor1.setPosition(Rotations.of(0));
     //   m_ElevatorMotor2.setPosition(Rotations.of(0));
@@ -182,17 +232,28 @@ public class Elevator extends SubsystemBase {
                 && (m_SetpointPosition == ElevatorPositions.L2
                     || m_SetpointPosition == ElevatorPositions.L3))
             ? algaeRemovalOffset.in(Rotations)
+            // ? AlgaeOffsetPrePickupRotations.getNumber()
             : 0;
     double targetRotations = currentPosition + algaeOffset;
+    // if (m_OffsetAfterAlgaeIntook) {
+    //   targetRotations += AlgaeOffsetRotations.getNumber();
+    // }
 
     if (getPosition().in(Rotations) < targetRotations) {
       m_PositionRequest.Velocity = MotionMagicProfileUp[0];
       m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
       m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+
+      // m_PositionRequest.Velocity = mmVelocityUp.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
+      // m_PositionRequest.Jerk = mmJerkUp.getNumber();
     } else {
       m_PositionRequest.Velocity = MotionMagicProfileDown[0];
       m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
       m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+      // m_PositionRequest.Velocity = mmVelocityDown.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
+      // m_PositionRequest.Jerk = mmJerkDown.getNumber();
     }
 
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {

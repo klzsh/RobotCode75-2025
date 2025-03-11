@@ -2,6 +2,8 @@ package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
@@ -13,9 +15,10 @@ public class RotateToSimilarFace extends Command {
   public RotateToSimilarFace(Swerve swerve) {
     m_Swerve = swerve;
     m_RotationController = new PIDController(0.05, 0, 0);
-    m_RotationController.setTolerance(1.5);
+    m_RotationController.setTolerance(1.5);    
     addRequirements(m_Swerve);
   }
+
 
   @Override
   public void initialize() {

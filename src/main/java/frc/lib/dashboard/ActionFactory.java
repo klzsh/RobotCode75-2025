@@ -1,19 +1,18 @@
 package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.Autonomous.AutoDealgaefy;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
+import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.Vision.AprilTagCamera;
+import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 
 /*
  * Return command based on a text code
@@ -26,9 +25,7 @@ public class ActionFactory {
   private AlgaePivot m_AlgaePivot;
   private AlgaeIntake m_AlgaeIntake;
   private PoseAlignController m_PoseAlignController;
-  private VisionTranslationController m_VisionController;
-  private AprilTagCamera m_LeftFacingCamera;
-  private AprilTagCamera m_RightFacingCamera;
+  private ObjectDetetectorCamera m_BranchCamera;
 
   public ActionFactory(
       Swerve swerve,
@@ -37,40 +34,32 @@ public class ActionFactory {
       AlgaePivot pivot,
       AlgaeIntake algaeIntake,
       PoseAlignController poseAlignController,
-      VisionTranslationController visionController,
-      AprilTagCamera leftCamera,
-      AprilTagCamera rightCamera) {
+      ObjectDetetectorCamera branchCam) {
     m_Swerve = swerve;
     m_Elevator = elevator;
     m_CoralIntake = coralIntake;
     m_AlgaePivot = pivot;
     m_AlgaeIntake = algaeIntake;
     m_PoseAlignController = poseAlignController;
-    m_VisionController = visionController;
-    m_LeftFacingCamera = leftCamera;
-    m_RightFacingCamera = rightCamera;
+    m_BranchCamera = branchCam;
   }
 
   public Command getCommand(int action) {
     // 1 - L1, 2 - Dealgaefy, 3 - L4, 4 - Processor, 5 - Intake
     switch (action) {
       case 1:
-        return new AutoScoreL1(
-            m_Swerve, m_Elevator, m_CoralIntake, m_VisionController, m_PoseAlignController);
-      case 2:
-        return new AutoDealgaefy(
-            m_Swerve,
-            m_Elevator,
-            m_AlgaeIntake,
-            m_AlgaePivot,
-            m_VisionController,
-            m_PoseAlignController);
+        return new AutoScoreL1(m_Swerve, m_Elevator, m_CoralIntake, m_PoseAlignController);
+        // case 2:
+        //   return new AutoDealgaefy(
+        //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_PoseAlignController);
       case 3:
         return new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake);
       case 4:
         return new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot);
       case 5:
         return new AutoIntakeCoral(m_Swerve, m_CoralIntake);
+      case 6:
+        return new YoloBranchAlign(m_Swerve, m_BranchCamera, true);
     }
     return null;
   }
@@ -79,14 +68,16 @@ public class ActionFactory {
     switch (action) {
       case 1:
         return "L1";
-      case 2:
-        return "Dealgaefy";
+        // case 2:
+        //   return "Dealgaefy";
       case 3:
         return "L4";
       case 4:
         return "Processor";
       case 5:
         return "Intake";
+      case 6:
+        return "YOLO";
     }
     return null;
   }

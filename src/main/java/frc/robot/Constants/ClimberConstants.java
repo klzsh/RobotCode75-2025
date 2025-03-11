@@ -14,18 +14,16 @@ import edu.wpi.first.units.measure.Time;
 
 public final class ClimberConstants {
   public static final double climberGearRatio = 39.6 / 1.0;
-  // TODO: tune
   public static final Angle climbPosition = Rotations.of(0);
-  public static final Angle climbExtendPosition = Rotations.of(100);
+  public static final Angle climbExtendPosition = Rotations.of(105);
   public static final double climbDeadband = 0.5;
   public static final int limitPort = 7;
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
 
   public static final int climberEncoderPort = 6;
-  // public static final Angle climberStartPosition = Rotations.of(0.015); // TODO tune
   public static final Angle climbPositionAbsoluteStart = Rotations.of(0.288);
-  public static final Angle climbPositionAbsoluteFinish = Rotations.of(0.2); // TODO tune
+  public static final Angle climbPositionAbsoluteFinish = Rotations.of(0.2);
   public static final double climbDeadbandAbsolute = 0.25;
 
   public static final class MotorConfigs {
@@ -40,8 +38,8 @@ public final class ClimberConstants {
     public static final Current statorForwardCurrentLimit = Amps.of(100);
     public static final Current statorReverseCurrentLimit = Amps.of(100);
 
-    public static final Angle forwardSoftLimit = Rotations.of(26);
-    public static final Angle reverseSoftLimit = Rotations.of(0);
+    public static final Angle forwardSoftLimit = Rotations.of(104);
+    public static final Angle reverseSoftLimit = Rotations.of(-8);
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
@@ -51,9 +49,9 @@ public final class ClimberConstants {
     public static final double kV = 0.1; // current per unit of requested velocity
     public static final double kP = 0.000001;
     public static final double kI = 0;
-    public static final double kD = 5;
+    public static final double kD = 7.6;
 
-    public static final double motionMagicCruiseVelocity = 25;
+    public static final double motionMagicCruiseVelocity = 40;
     public static final double motionMagicCruiseAcceleration = 10;
     public static final double motionMagickV = 0.12;
     public static final double motionMagickA = 0.1;
@@ -94,7 +92,7 @@ public final class ClimberConstants {
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardSoftLimit.in(Rotations);
-      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
           reverseSoftLimit.in(Rotations);
 

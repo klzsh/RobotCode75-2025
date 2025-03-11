@@ -28,7 +28,6 @@ import edu.wpi.first.units.measure.Time;
 public class EndEffectorConstants {
 
   /* CANIDS */
-  // TODO: find these
   public static final int coralMotorCanID = 43; // TalonFXS into minion
   public static final int pivotCanID = 44; // Kraken X60
   public static final int algaeMotorCanID = 45; // Kraken X44
@@ -36,29 +35,29 @@ public class EndEffectorConstants {
   public static final int coralBeamBreakPort = 2; // Banner BeamBreak
   public static final int algaePivotEncoderPort = 4; // REV Through Bore
   public static final int algaeLidarSensorPort = 5; // Pololu LIDAR sensor
-  // public static final int algaeLimitSwitchPort = 6;
 
   public static final Angle algaePivotZeroPoint = Rotations.of(0);
   public static final Angle algaeEncoderOffset = Rotations.of(0);
 
-  public static final double coralMotorGearRatio = 16.0;
+  public static final double coralMotorGearRatio = 5.0;
   public static final double algaeMotorGearRatio = 25.0;
   public static final double pivotMotorGearRatio = (25.0 * 50.0) / 26.0; // ~48.076
 
-  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(1000);
-  public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(100);
-  public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-100);
+  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(30);
+  public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(50);
+  public static final AngularVelocity coralScoreSpeedL1 = RotationsPerSecond.of(7);
+  public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-30);
   public static final Angle coralRotationsAfterIntake = Rotations.of(0.5);
   public static final double coralScoreDelay = 0.3;
 
   public static final Angle pivotHomePosition = Rotations.of(12.8);
-  public static final Angle pivotGroundIntakePosition = Rotations.of(4);
-  public static final Angle pivotDeAlgifyPosition = Rotations.of(6);
+  public static final Angle pivotGroundIntakePosition = Rotations.of(2.6);
+  public static final Angle pivotDeAlgifyPosition = Rotations.of(4.5);
+  public static final Angle pivotEncoderOffset = Rotations.of(0.135);
 
-  public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(150);
+  public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(200);
   public static final AngularVelocity algaeOutakeSpeed = RotationsPerSecond.of(-20);
-  // TODO: change to current
-  public static final AngularVelocity algaeHoldSpeed = RotationsPerSecond.of(100);
+  public static final Current algaeHoldCurrent = Amps.of(25);
 
   public static final double coralPositionDeadband = 0.5;
   public static final double algaePivotDeadband = 0.1;
@@ -112,12 +111,12 @@ public class EndEffectorConstants {
 
     /* Torque PID */
     public static final double openLoopRamp = 0.1;
-    public static final double closedLoopRamp = 0.0;
+    public static final double closedLoopRamp = 0.1;
 
-    public static final double coralVelocityKP = 3;
+    public static final double coralVelocityKP = 0.3;
     public static final double coralVelocityKI = 0.0;
     public static final double coralVelocityKD = 0.0;
-    public static final double coralVelocityKS = 25;
+    public static final double coralVelocityKS = 4.9;
 
     public static final double coralPositionKP = 0.75;
     public static final double coralPositionKI = 0.0;

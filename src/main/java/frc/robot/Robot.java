@@ -10,10 +10,11 @@ import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
-import edu.wpi.first.epilogue.logging.NTEpilogueBackend;
+import edu.wpi.first.epilogue.logging.FileBackend;
 import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
 import edu.wpi.first.net.PortForwarder;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -23,11 +24,11 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-@Logged(strategy = Strategy.OPT_IN)
+@Logged(strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  @Logged(strategy = Strategy.OPT_IN)
+  @Logged(strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
   private final RobotContainer m_robotContainer;
 
   /**
@@ -37,7 +38,8 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    // DataLogManager.start(); // do not start this when not in comp
+    DataLogManager.start(); // start only in comp
+    DriverStation.startDataLog(DataLogManager.getLog(), true);
     m_robotContainer = new RobotContainer();
 
     Epilogue.configure(
@@ -63,20 +65,21 @@ public class Robot extends TimedRobot {
           //   // log INFO and CRITICAL data to NT, NOT DISK
           //   config.minimumImportance = Logged.Importance.INFO;
 
-          config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+          // config.backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+          // config.backend = new FileBackend(DataLogManager.getLog());
           //   DataLogManager.stop();
           // ! FMS ATTACHED
           //   // only disk log during comp
           //   // do not log joysticks
           //   config.minimumImportance = Logged.Importance.CRITICAL;
-          //   DriverStation.startDataLog(DataLogManager.getLog(), false);
-          //   config.backend = new FileBackend(DataLogManager.getLog());
+          // DriverStation.startDataLog(DataLogManager.getLog(), false);
+          config.backend = new FileBackend(DataLogManager.getLog());
           // at home
-          config.minimumImportance = Importance.DEBUG;
+          config.minimumImportance = Importance.CRITICAL;
         });
     Epilogue.bind(this);
-    PortForwarder.add(5800, "photon-frontcams.local", 5800);
-    PortForwarder.add(5800, "photon-rearcams.local", 5800);
+    PortForwarder.add(5800, "photon-frontcams.local", 5801);
+    PortForwarder.add(5800, "photon-rearcams.local", 5802);
   }
 
   /**

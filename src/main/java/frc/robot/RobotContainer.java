@@ -7,22 +7,18 @@ package frc.robot;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
-import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
@@ -37,7 +33,6 @@ import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -57,51 +52,47 @@ import java.util.ArrayList;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-// @Logged(strategy = Strategy.OPT_IN)
+@Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "Left Facing Mod Cam")
+  //   @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "Right Facing Mod Cam")
+  //   @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  // @Logged(name = "HP Cam")
+  //   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
-      new ObjectDetetectorCamera("Cage_camera");
+      new ObjectDetetectorCamera("Cage_Cam");
 
   // @Logged(name = "Branch Cam")
   private final ObjectDetetectorCamera m_BranchCamera = new ObjectDetetectorCamera("Branch_Cam");
 
-  @Logged(name = "Swerve")
+  @Logged(name = "Swerve", importance = Importance.CRITICAL)
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-  // @Logged(name = "Elevator")
+  @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
-  @Logged(name = "Coral Intake")
+  @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
-  @Logged(name = "Climber")
+  @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-  // @Logged(name = "Algae Intake")
+  @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  @Logged(name = "Algae Pivot")
+  @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
-  @Logged
+  //   @Logged
   private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
-
-  //   //@Logged
-  private final VisionTranslationController m_VisionController =
-      new VisionTranslationController(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -125,6 +116,9 @@ public class RobotContainer {
   private final JoystickButton CageAlign =
       new JoystickButton(m_LeftStick, cageAlignButton); // center button
 
+  private final JoystickButton resetBranchCam =
+      new JoystickButton(m_LeftStick, resetBranchCamButton);
+
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
   // private final AutoFactory m_factory =
@@ -139,9 +133,7 @@ public class RobotContainer {
           m_AlgaePivot,
           m_AlgaeIntake,
           m_PoseAlignController,
-          m_VisionController,
-          m_LeftFacingCamera,
-          m_RightFacingCamera);
+          m_BranchCamera);
 
   private final AutoSelector m_AutoSelector =
       new AutoSelector(
@@ -194,32 +186,24 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
-    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    AlignLeft.whileTrue(
+        new RotateToSimilarFace(m_Swerve)
+            .andThen(
+                new YoloBranchAlign(
+                    m_Swerve, m_BranchCamera, false))); // rotate then translate on left trigger
+    // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
         .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
-    // AlignLeft.whileTrue(
-    //     new AlignToBranch(
-    //         m_Swerve,
-    //         m_RightFacingCamera,
-    //         true,
-    //         m_PoseAlignController,
-    //         new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
+    // resetBranchCam
+    //     .whileTrue(new InstantCommand(() -> m_BranchCamera.setDriverMode(true)))
+    //     .whileFalse(new InstantCommand(() -> m_BranchCamera.setDriverMode(false)));
 
-    // AlignLeft.whileTrue(
-    //   new AlignToBranch(
-    //       m_Swerve,
-    //       m_RightFacingCamera,
-    //       true,
-    //       m_PoseAlignController,
-    //       new FieldPose(Alliance.Blue, FieldElement.B, Offset.LEFT)));
-
-    // Auto Align commands
-
+    resetBranchCam.onTrue(new InstantCommand(() -> m_BranchCamera.reloadPipeline()));
   }
 
   public void configureControllerBinds() {
@@ -255,7 +239,7 @@ public class RobotContainer {
             new InstantCommand(
                     () -> {
                       m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
-                      m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
+                      m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE);
                     },
                     m_AlgaeIntake,
                     m_AlgaePivot)
@@ -267,6 +251,11 @@ public class RobotContainer {
         .povDown()
         .whileTrue(
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
+                .repeatedly());
+    m_Controller
+        .povLeft()
+        .whileTrue(
+            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.REVERSING), m_CoralIntake)
                 .repeatedly());
     // manual elevator overrides
 
@@ -324,11 +313,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // return m_AutoChooser.getSelected();
-    // m_Swerve.setPose(Choreo.loadTrajectory("TUNING_PATH_LINE").get().getInitialPose(false).get());
-
-    // return m_Factory.trajectoryCmd("TUNING_PATH_LINE");
-    m_AutoSelector.generatePaths(); // TODO: move to robot or smth due to the delay
+    m_AutoSelector.generatePaths();
     return m_AutoSelector.getAutoCommand();
 
     // return new SequentialCommandGroup(
@@ -341,15 +326,5 @@ public class RobotContainer {
     //     new ParallelCommandGroup(
     //         m_factory.trajectoryCmd("st-bl-1", 2), new IntakeCoral(m_CoralIntake)),
     //     new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake));
-    // return new TestAuto(
-    //     m_Factory,
-    //     m_CoralIntake,
-    //     m_Swerve,
-    //     m_Elevator,
-    //     m_LeftFacingCamera,
-    //     m_RightFacingCamera,
-    //     m_VisionController,
-    //     m_PoseAlignController);
-    // return null;
   }
 }

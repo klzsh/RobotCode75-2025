@@ -11,7 +11,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 
 public class ObjectDetetectorCamera extends SubsystemBase {
-  // TODO: fix this mess
   private PhotonCamera m_Camera;
   private Optional<PhotonPipelineResult> m_Result;
   private List<PhotonTrackedTarget> m_Targets;
@@ -76,6 +75,18 @@ public class ObjectDetetectorCamera extends SubsystemBase {
       return false;
     }
     return m_Result.get().hasTargets();
+  }
+
+  public void setDriverMode(boolean on) {
+    m_Camera.setDriverMode(on);
+  }
+
+  public void reloadPipeline() {
+    if (m_Camera.getPipelineIndex() == 0) {
+      m_Camera.setPipelineIndex(1);
+    } else {
+      m_Camera.setPipelineIndex(0);
+    }
   }
 
   public OptionalDouble getTargetXFromCenter(int targetID) {

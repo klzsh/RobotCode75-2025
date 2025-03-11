@@ -40,7 +40,6 @@ public final class DrivetrainConstants {
 
     public static final class RotationAlign {
 
-      // TODO: tune
       public static final double kp = 0.08;
       public static final double kd = 0.03;
       public static final double maxVelocityMultiplier = 0.8;
@@ -118,7 +117,7 @@ public final class DrivetrainConstants {
   public static final double angleGearRatio = 150.0 / 7.0; // ~21:1 ratio
 
   /** Meters per Second */
-  public static final LinearVelocity maxSpeed = MetersPerSecond.of(4.49);
+  public static final LinearVelocity maxSpeed = MetersPerSecond.of(3.5);
 
   public static final LinearAcceleration maxAcceleration = MetersPerSecondPerSecond.of(3);
 

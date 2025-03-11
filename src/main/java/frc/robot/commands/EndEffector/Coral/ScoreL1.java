@@ -24,7 +24,7 @@ public class ScoreL1 extends SequentialCommandGroup {
     addCommands(
         new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
         new ParallelCommandGroup(
-            new ScoreCoral(coralIntake),
+            new ScoreCoral(coralIntake, true),
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
         new ParallelCommandGroup(
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false),

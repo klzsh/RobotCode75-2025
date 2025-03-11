@@ -26,8 +26,8 @@ public class ElevatorConstants {
   public static final int backupLimitPort = 3;
 
   // Distance from GROUND.
-  public static final Angle algaeRemovalOffset = Rotations.of(4.871);
-  public static final Angle l1Position = Rotations.of(5.5);
+  public static final Angle algaeRemovalOffset = Rotations.of(3);
+  public static final Angle l1Position = Rotations.of(6.0);
   public static final Angle l2Position = Rotations.of(7.5);
   public static final Angle l3Position = Rotations.of(15.7);
   public static final Angle l4Position = Rotations.of(25.8);
@@ -35,8 +35,8 @@ public class ElevatorConstants {
   public static final Angle processorPosition = Rotations.of(2);
 
   // velocity, acceleration, jerk
-  public static double[] MotionMagicProfileUp = {70, 70, 1000};
-  public static double[] MotionMagicProfileDown = {40, 40, 400};
+  public static double[] MotionMagicProfileUp = {130, 130, 1000};
+  public static double[] MotionMagicProfileDown = {40, 50, 400};
 
   public static final Angle deadband = Rotations.of(0.7);
 

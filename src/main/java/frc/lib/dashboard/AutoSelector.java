@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -38,6 +37,7 @@ import java.util.Map;
  * Feedback - displays errors, shows completed path
  * Generate - checks paths for errors, displays trajectories on field, sets auto command
  * Reset - reset trajectories, string, and auto command
+ * Presets - sendable chooser of preset autos (must click generate after selecting)
  *
  * FORMAT FOR AUTO STRING
  * Separated into words by spaces - commands in the same word are executed simultaneously
@@ -49,16 +49,15 @@ import java.util.Map;
  */
 
 /* ACTIONS
- * 1 for align + score L1
+ * 1 for align + elevator movement & score L1
  * 2 for align + elevator movement & dealgify (decide level by last point or apriltag)
  * 3 for align + elevator movement & score L4
- * 4 for align + elevator movement & processor
- * 5 for align to left/middle/right coral station + wait set time
+ * 4 for align + score processor
+ * 5 for intake coral + wait set time
  */
 
 /* POINTS
  * ST, SM, SB - top/middle/bottom starting positions
- * L - arbitrary leave point
  * P - processor
  * A, B, C, D, E, F - reef points, followed by L/M/R for offset (M for algae)
  * HT, HB - human player stations
@@ -80,7 +79,6 @@ public class AutoSelector {
 
   private GenericEntry autoStringEntry;
   private GenericEntry feedbackEntry;
-  // private GenericEntry safetyEntry;
 
   private final SendableChooser<String> presetChooser;
 
@@ -103,12 +101,12 @@ public class AutoSelector {
     m_startCommands = startCommands;
     m_endCommands = endCommands;
 
-    presetChooser =  new SendableChooser<>();
+    presetChooser = new SendableChooser<>();
 
     presetChooser.setDefaultOption("Custom", "");
-    presetChooser.addOption("Left Side Two Piece", "st cr 3 ht 5 bl 3");
-    presetChooser.addOption("Right Side Two Piece", "sb er 3 hb 5 fl 3");
-    presetChooser.addOption("Middle Coral Algae", "sm dl 3 2 p 4 hb");
+    presetChooser.addOption("Left Side Two Piece", "st cr 3 ht 5 bl 6 3");
+    presetChooser.addOption("Right Side Two Piece", "sb el 3 hb 5 fl 3");
+    presetChooser.addOption("Middle One Piece", "sm dl 3");
 
     // define auto factory for autos
     factory =
@@ -161,34 +159,29 @@ public class AutoSelector {
   }
 
   public void setupAutoTab() {
-    System.out.println("setting up auto tab");
     NetworkTableInstance nt = NetworkTableInstance.getDefault();
     NetworkTable ntTable = nt.getTable("Shuffleboard").getSubTable("Auto");
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
 
-    Timer.delay(3);
-
-    // Command Buttons
     autoTab.add("Enter Command", "").withSize(4, 1).withPosition(0, 0);
     autoTab.add(m_field).withSize(6, 4).withPosition(4, 0);
 
-    autoTab.add(presetChooser).withSize(4, 1).withPosition(0, 1);
+    autoTab.add(presetChooser).withSize(2, 1).withPosition(2, 2);
 
-    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 2);
+    autoTab.addString("Feedback", () -> getFeedback()).withSize(4, 1).withPosition(0, 1);
 
     autoTab
         .add("Generate", true)
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
-        .withPosition(0, 3);
+        .withPosition(0, 2);
     autoTab
         .add("Reset", true)
         .withWidget(BuiltInWidgets.kToggleButton)
         .withSize(1, 1)
-        .withPosition(1, 3);
+        .withPosition(1, 2);
 
-    // buttons
     ntTable.addListener(
         "Generate",
         EnumSet.of(Kind.kValueAll),
@@ -221,7 +214,6 @@ public class AutoSelector {
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
 
-    System.out.println(autoString.length());
     if (!m_startPositions.containsKey(words[0].toLowerCase())) {
       setFeedback("Invalid start position");
       return;
@@ -272,27 +264,32 @@ public class AutoSelector {
         try {
           // m_trajectories.add(
           //     new ChoreoTrajectory(Choreo.loadTrajectory("" + lastPose + "-" + point).get()));
+
           if (lastPose.charAt(0) >= 'a' && lastPose.charAt(0) <= 'f') {
             lastPose = lastPose.substring(0, 1);
           }
-
           if (!isOdometryReset) {
             sequential.addCommands(
-                Commands.runOnce(() -> m_swerve.zeroGyro(Rotation2d.fromDegrees(180))),
-                factory.resetOdometry(lastPose + "-" + point));
+                Commands.runOnce(
+                    () ->
+                        m_swerve.zeroGyro(
+                            Rotation2d.fromDegrees(
+                                DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0))),
+                factory.resetOdometry("" + lastPose + "-" + point));
             isOdometryReset = true;
           }
 
           parallelGroup.addCommands(factory.trajectoryCmd("" + lastPose + "-" + point));
-          if (DriverStation.getAlliance().get() == Alliance.Red) {
-            m_trajectories.set(
-                m_trajectories.size() - 1,
-                m_trajectories.get(m_trajectories.size() - 1).flipped());
-          }
+          // if (DriverStation.getAlliance().get() == Alliance.Red) {
+          //   m_trajectories.set(
+          //       m_trajectories.size() - 1,
+          //       new ChoreoTrajectory(m_trajectories.get(m_trajectories.size() -
+          // 1).traj.flipped()));
+          // }
           s.append("" + lastPose + "-" + point + " ");
           lastPose = point;
         } catch (Exception e) {
-          setFeedback("Path File Not Found: " + lastPose + "-" + point);
+          setFeedback(e.getMessage());
           m_autoCommand = Commands.runOnce(() -> {});
           return;
         }

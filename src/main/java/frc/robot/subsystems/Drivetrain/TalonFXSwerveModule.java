@@ -35,7 +35,7 @@ import frc.lib.util.SwerveModuleConstants;
  * and swerve module position (distance drive motor has gone (meters) / angle (rotation2d) )
  * mainly used as an abstraction layer
  */
-// @Logged(strategy = Strategy.OPT_IN)
+// @Logged(strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class TalonFXSwerveModule {
   public int moduleNumber;
   private Rotation2d angleOffset;

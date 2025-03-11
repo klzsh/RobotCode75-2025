@@ -13,7 +13,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-// import frc.robot.subsystems.Drivetrain.VisionController;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
@@ -136,19 +135,12 @@ public class VisionConstants {
               Units.inchesToMeters(0.0), Units.inchesToMeters(0.0), Units.inchesToMeters(0.0)),
           new Rotation3d(
               Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(0)));
+  // todo: check values at comp
   public static final double finalYawSetpointLeft = 13.8;
   public static final double finalPitchSetpointLeft = -3.37;
   public static final double finalYawSetpointRight = -7.97;
   public static final double finalPitchSetpointRight = -7.88;
 
-  // color branch align
-  // TODO tune all
-  public static final double heightThreshold = 0.0;
-  public static final double widthThreshold = 0.0;
-  public static final double widthSetpoint = 0.0;
-  public static final double xSetpoint = 0.0;
-  public static final double widthTolerance = 0.0;
-  public static final double xTolerance = 0.0;
-
-  public static final double heightWidthRatioThreshold = 0.0;
+  public static final double minTagAreaThreshold = 0.15;
+  public static final double maxTagDistanceThreshold = 3;
 }

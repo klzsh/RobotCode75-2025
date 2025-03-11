@@ -18,9 +18,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
-@Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN)
+@Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaePivot extends SubsystemBase {
 
   public static enum PivotState {
@@ -37,11 +36,11 @@ public class AlgaePivot extends SubsystemBase {
   }
 
   private PivotState m_PivotState;
+  // private final TunableNumber deAlgaefyRotations;
+  // private final TunableNumber PivotRetractDelay;
 
-  @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
+  // @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
   private TalonFX m_AlgaePivot;
-
-  public final TunableNumber absoluteEncoderOffset;
 
   private final MotionMagicExpoTorqueCurrentFOC pivotRequest =
       new MotionMagicExpoTorqueCurrentFOC(Rotations.of(0));
@@ -55,49 +54,33 @@ public class AlgaePivot extends SubsystemBase {
 
     pivotRequest.UpdateFreqHz = 0;
     pivotRequest.UseTimesync = true;
-
-    absoluteEncoderOffset =
-        new TunableNumber("Algae Encoder/Offset", algaeEncoderOffset.in(Rotations));
+    // deAlgaefyRotations = new TunableNumber("Algae Pivot/DeAlgaefy Position",
+    // pivotDeAlgifyPosition.in(Rotations));
+    // PivotRetractDelay = new TunableNumber("Algae Pivot/Retract Delay Seconds", 0.15);
 
     m_absoluteEncoder =
         new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.in(Rotations));
     Timer.delay(5);
-    m_AlgaePivot.setPosition((getAbsolutePosition() - 0.135) * pivotMotorGearRatio);
+    m_AlgaePivot.setPosition(
+        (getAbsolutePosition() - pivotEncoderOffset.in(Rotations)) * pivotMotorGearRatio);
   }
 
   public void setPivotState(PivotState state) {
     m_PivotState = state;
   }
 
+  @Logged(name = "Pivot State", importance = Importance.CRITICAL)
   public PivotState getPivotState() {
     return m_PivotState;
   }
 
-  public void homePivotToAbsoluteEncoder() {
-    double absoluteRotations = m_absoluteEncoder.get();
-    double offset = absoluteEncoderOffset.getNumber();
-    double relativeRotationsAxleCandidate1 = offset - absoluteRotations;
-    double relativeRotationsAxleCandidate2 = offset - (absoluteRotations + 1);
-    double relativeRotationsAxleCandidate3 = offset - (absoluteRotations - 1);
-
-    double relativeRotationsAxle =
-        Math.min(
-            Math.abs(relativeRotationsAxleCandidate1),
-            Math.min(
-                Math.abs(relativeRotationsAxleCandidate2),
-                Math.abs(relativeRotationsAxleCandidate3)));
-
-    double relativeRotationsMotor = relativeRotationsAxle * pivotMotorGearRatio;
-
-    // find rotations from current relative position to home
-    double totalRotations =
-        m_AlgaePivot.getPosition().getValue().in(Rotations) - relativeRotationsMotor;
-
-    m_AlgaePivot.setControl(pivotRequest.withPosition(Rotations.of(totalRotations)));
-  }
-
   public void resetPivotState() {
     m_PivotState = PivotState.NONE;
+  }
+
+  public double getPivotDelay() {
+    // return PivotRetractDelay.getNumber();
+    return 0.15;
   }
 
   public boolean isAtPositionAbsolute(double absolutePosition) {
@@ -119,13 +102,17 @@ public class AlgaePivot extends SubsystemBase {
     return m_absoluteEncoder.get();
   }
 
-  @Logged(name = "Pivot Position")
+  @Logged(name = "Pivot Position", importance = Importance.CRITICAL)
   public double getPivotPosition() {
     return m_AlgaePivot.getPosition().refresh().getValue().in(Rotations);
   }
 
   @Override
   public void periodic() {
+    // if(m_PivotState == PivotState.DEALGAEFY){
+    // m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgaefyRotations.getNumber()))
+    // } else {
     m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
+    // }
   }
 }

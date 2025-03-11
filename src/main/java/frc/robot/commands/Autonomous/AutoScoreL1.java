@@ -14,7 +14,6 @@ import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.PoseAlignController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Drivetrain.VisionTranslationController;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
@@ -25,7 +24,6 @@ public class AutoScoreL1 extends SequentialCommandGroup {
       Swerve swerve,
       Elevator elevator,
       CoralIntake coralIntake,
-      VisionTranslationController visionController,
       PoseAlignController poseController) {
     addRequirements(swerve, elevator, coralIntake);
     addCommands(
@@ -34,7 +32,7 @@ public class AutoScoreL1 extends SequentialCommandGroup {
             // align to branch color
             new SetElevatorPosition(elevator, ElevatorPositions.L1, true)),
         new ParallelCommandGroup(
-            new ScoreCoral(coralIntake),
+            new ScoreCoral(coralIntake, true),
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
         new ParallelCommandGroup(
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
