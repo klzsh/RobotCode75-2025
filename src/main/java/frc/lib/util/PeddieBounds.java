@@ -8,9 +8,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +33,7 @@ class IDVectorPair {
   }
 }
 
+// we are literally peddie but better
 public class PeddieBounds {
 
   private static Swerve m_Swerve;
@@ -42,34 +46,18 @@ public class PeddieBounds {
   public static void init(Swerve swerve) {
     m_Swerve = swerve;
     Translation2d reefCenter;
-    // BLUE
+    AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     if (DriverStation.getAlliance().isEmpty()
         || DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-      Pose2d tag18 =
-          AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-              .getTagPose(18)
-              .get()
-              .toPose2d();
-      Pose2d tag21 =
-          AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-              .getTagPose(21)
-              .get()
-              .toPose2d();
+      // BLUE
+      Pose2d tag18 = field.getTagPose(18).get().toPose2d();
+      Pose2d tag21 = field.getTagPose(21).get().toPose2d();
       reefCenter =
           new Translation2d((tag18.getX() + tag21.getX()) / 2, (tag18.getY() + tag21.getY()) / 2);
-    }
-    // RED
-    else {
-      Pose2d tag7 =
-          AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-              .getTagPose(7)
-              .get()
-              .toPose2d();
-      Pose2d tag10 =
-          AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-              .getTagPose(10)
-              .get()
-              .toPose2d();
+    } else {
+      // RED
+      Pose2d tag7 = field.getTagPose(7).get().toPose2d();
+      Pose2d tag10 = field.getTagPose(10).get().toPose2d();
       reefCenter =
           new Translation2d((tag7.getX() + tag10.getX()) / 2, (tag7.getY() + tag10.getY()) / 2);
     }
@@ -92,7 +80,6 @@ public class PeddieBounds {
      */
 
     double reefCornerToCenter = Units.inchesToMeters(2 * 32.75 / Math.sqrt(3));
-    // TODO: tune
     reefCornerToCenter += 1.2;
 
     badHexagonPoints = new ArrayList<>();
@@ -140,40 +127,30 @@ public class PeddieBounds {
       angle += angle2d(p1.getX(), p1.getY(), p2.getX(), p2.getY());
     }
 
-    return !(Math.abs(angle) < Math.PI);
+    return Math.abs(angle) >= Math.PI;
   }
 
   public static boolean insideBadHexagon(Pose2d p) {
     return insideBadHexagon(new Translation2d(p.getX(), p.getY()));
   }
 
-  public static int getReefID() {
+  public static FieldElement getReefElement() {
     // calculate current odometry pose
     Translation2d odometryPose = m_Swerve.getPose().getTranslation();
     List<IDVectorPair> robotToTag = new ArrayList<>();
+    AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-    // BLUE:
     if (DriverStation.getAlliance().isEmpty()
         || DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+      // BLUE:
       for (int i = 17; i <= 22; i++) {
-        Translation2d tagPose =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-                .getTagPose(i)
-                .get()
-                .toPose2d()
-                .getTranslation();
+        Translation2d tagPose = field.getTagPose(i).get().toPose2d().getTranslation();
         robotToTag.add(new IDVectorPair(i, tagPose.minus(odometryPose)));
       }
-    }
-    // RED:
-    else {
+    } else {
+      // RED:
       for (int i = 6; i <= 11; i++) {
-        Translation2d tagPose =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
-                .getTagPose(i)
-                .get()
-                .toPose2d()
-                .getTranslation();
+        Translation2d tagPose = field.getTagPose(i).get().toPose2d().getTranslation();
         robotToTag.add(new IDVectorPair(i, tagPose.minus(odometryPose)));
       }
     }
@@ -191,10 +168,11 @@ public class PeddieBounds {
     double tag0neededAngle = FieldConstants.tagToHeadingMap.get(tag0id);
     double tag0gyroError = Math.abs(m_Swerve.getRotationDegrees() - tag0neededAngle);
 
-    if (isInBadHexagon) return tag0gyroError < 30.0 ? tag0id : 0;
+    if (isInBadHexagon)
+      return tag0gyroError < 30.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
 
     if (robotToTag.get(1).vector.getNorm() - robotToTag.get(0).vector.getNorm() >= 0.25)
-      return tag0gyroError < 45.0 ? tag0id : 0;
+      return tag0gyroError < 45.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
 
     ChassisSpeeds speeds = m_Swerve.getChassisSpeeds();
     Translation2d robotMovement =
@@ -211,6 +189,53 @@ public class PeddieBounds {
     }
 
     double bestTagNeededAngle = FieldConstants.tagToHeadingMap.get(bestTag);
-    return Math.abs(m_Swerve.getRotationDegrees() - bestTagNeededAngle) < 45.0 ? bestTag : 0;
+    return Math.abs(m_Swerve.getRotationDegrees() - bestTagNeededAngle) < 45.0
+        ? VisionConstants.tagIDToFieldElement.get(bestTag)
+        : null;
+  }
+
+  private static final double hpThreshold =
+      0.5; // section in the middle where bound is determined by vel
+
+  public static FieldElement getHPElement() {
+    Translation2d odometryPose = m_Swerve.getPose().getTranslation();
+    AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+
+    if (DriverStation.getAlliance().isEmpty()
+        || DriverStation.getAlliance().get() == Alliance.Blue) {
+      // BLUE:
+      double distToT =
+          field.getTagPose(13).get().toPose2d().getTranslation().getDistance(odometryPose);
+      double distToB =
+          field.getTagPose(12).get().toPose2d().getTranslation().getDistance(odometryPose);
+
+      if (distToT > distToB + hpThreshold) {
+        return FieldElement.HB;
+      } else if (distToB > distToT + hpThreshold) {
+        return FieldElement.HT;
+      } else {
+        ChassisSpeeds fieldRelative =
+            ChassisSpeeds.fromRobotRelativeSpeeds(
+                m_Swerve.getChassisSpeeds(), m_Swerve.getRotation2D());
+        return fieldRelative.vyMetersPerSecond > 0 ? FieldElement.HT : FieldElement.HB;
+      }
+    } else {
+      // RED:
+      double distToT =
+          field.getTagPose(1).get().toPose2d().getTranslation().getDistance(odometryPose);
+      double distToB =
+          field.getTagPose(2).get().toPose2d().getTranslation().getDistance(odometryPose);
+
+      if (distToT > distToB + hpThreshold) {
+        return FieldElement.HB;
+      } else if (distToB > distToT + hpThreshold) {
+        return FieldElement.HT;
+      } else {
+        ChassisSpeeds fieldRelative =
+            ChassisSpeeds.fromRobotRelativeSpeeds(
+                m_Swerve.getChassisSpeeds(), m_Swerve.getRotation2D());
+        return fieldRelative.vyMetersPerSecond < 0 ? FieldElement.HT : FieldElement.HB;
+      }
+    }
   }
 }

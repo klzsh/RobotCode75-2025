@@ -31,7 +31,7 @@ import frc.robot.commands.EndEffector.Coral.ScoreL1;
 import frc.robot.commands.EndEffector.Coral.ScoreL2;
 import frc.robot.commands.EndEffector.Coral.ScoreL3;
 import frc.robot.commands.EndEffector.Coral.ScoreL4;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -92,7 +92,7 @@ public class RobotContainer {
 
   // define drivetrain controllers
   //   @Logged
-  private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
+  private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -132,7 +132,7 @@ public class RobotContainer {
           m_CoralIntake,
           m_AlgaePivot,
           m_AlgaeIntake,
-          m_PoseAlignController,
+          m_ChezyController,
           m_BranchCamera);
 
   private final AutoSelector m_AutoSelector =

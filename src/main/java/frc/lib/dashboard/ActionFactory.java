@@ -6,7 +6,7 @@ import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -24,7 +24,7 @@ public class ActionFactory {
   private CoralIntake m_CoralIntake;
   private AlgaePivot m_AlgaePivot;
   private AlgaeIntake m_AlgaeIntake;
-  private PoseAlignController m_PoseAlignController;
+  private ChezyController m_ChezyController;
   private ObjectDetetectorCamera m_BranchCamera;
 
   public ActionFactory(
@@ -33,14 +33,14 @@ public class ActionFactory {
       CoralIntake coralIntake,
       AlgaePivot pivot,
       AlgaeIntake algaeIntake,
-      PoseAlignController poseAlignController,
+      ChezyController chezyController,
       ObjectDetetectorCamera branchCam) {
     m_Swerve = swerve;
     m_Elevator = elevator;
     m_CoralIntake = coralIntake;
     m_AlgaePivot = pivot;
     m_AlgaeIntake = algaeIntake;
-    m_PoseAlignController = poseAlignController;
+    m_ChezyController = chezyController;
     m_BranchCamera = branchCam;
   }
 
@@ -48,14 +48,14 @@ public class ActionFactory {
     // 1 - L1, 2 - Dealgaefy, 3 - L4, 4 - Processor, 5 - Intake
     switch (action) {
       case 1:
-        return new AutoScoreL1(m_Swerve, m_Elevator, m_CoralIntake, m_PoseAlignController);
+        return new AutoScoreL1(m_Swerve, m_Elevator, m_CoralIntake);
         // case 2:
         //   return new AutoDealgaefy(
-        //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_PoseAlignController);
+        //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_ChezyController);
       case 3:
         return new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake);
       case 4:
-        return new AutoScoreProcessor(m_Swerve, m_PoseAlignController, m_AlgaeIntake, m_AlgaePivot);
+        return new AutoScoreProcessor(m_Swerve, m_ChezyController, m_AlgaeIntake, m_AlgaePivot);
       case 5:
         return new AutoIntakeCoral(m_Swerve, m_CoralIntake);
       case 6:
