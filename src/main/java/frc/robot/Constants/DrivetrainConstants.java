@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -34,7 +35,7 @@ public final class DrivetrainConstants {
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
-    public static final double toleranceRadians = 1.5;
+    public static final double toleranceRadians = Units.degreesToRadians(1.5);
     public static final double toleranceTranslation = .01;
 
     public static final class RotationAlign {
@@ -47,7 +48,7 @@ public final class DrivetrainConstants {
     }
 
     public static final class OdometryAlign {
-      public static final double xP =  4;
+      public static final double xP = 4;
       public static final double xI = 0.0;
       public static final double xD = 0.0;
 
