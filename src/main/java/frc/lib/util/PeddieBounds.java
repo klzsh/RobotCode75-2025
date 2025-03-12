@@ -1,17 +1,22 @@
 package frc.lib.util;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.FieldConstants.*;
+import static frc.robot.Constants.VisionConstants.tagIDToFieldElement;
+
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -33,8 +38,90 @@ class IDVectorPair {
   }
 }
 
-// we are literally peddie but better
+// screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie 
 public class PeddieBounds {
+
+  public static FieldElement nearestElement(Pose2d pose) {
+    List<AprilTag> tags =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags();
+    FieldElement nearestElement = null;
+    double nearestDistance = Double.MAX_VALUE;
+
+    for (AprilTag tag : tags) {
+      if (tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation())
+          < nearestDistance) {
+        nearestDistance = tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation());
+        nearestElement = tagIDToFieldElement.get(tag.ID);
+      }
+    }
+    return nearestElement;
+  }
+
+  public static int nearestTag(Pose2d pose) {
+    List<AprilTag> tags =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded).getTags();
+    int nearestTag = 0;
+    double nearestDistance = Double.MAX_VALUE;
+
+    for (AprilTag tag : tags) {
+      if (tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation())
+          < nearestDistance) {
+        nearestDistance = tag.pose.toPose2d().getTranslation().getDistance(pose.getTranslation());
+        nearestTag = tag.ID;
+      }
+    }
+    System.out.println("Nearest tag: " + nearestTag);
+    return nearestTag;
+  }
+
+  public static Pose2d getNearestFieldPose2d(Swerve swerve, FieldPose targetPose) {
+    targetPose.fieldElement = nearestElement(swerve.getPose());
+    return fieldElementToPose2d(swerve, targetPose);
+  }
+
+  public static Pose2d fieldElementToPose2d(Swerve swerve, FieldPose targetPose) {
+    int targetTag =
+        targetPose.alliance == Alliance.Blue
+            ? blueTags.get(targetPose.fieldElement)
+            : redTags.get(targetPose.fieldElement);
+    Pose2d tagPose =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded)
+            .getTagPose(targetTag)
+            .get()
+            .toPose2d();
+    // return tagPose;
+    Rotation2d tagHeading = tagPose.getRotation();
+    double bumperSize = 18.5;
+    Pose2d poseToDrive =
+        tagPose.transformBy(
+            new Transform2d(Inches.of(bumperSize).in(Meters), 0, new Rotation2d(0)));
+    // flip the pose
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.LEFT) {
+      tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+      poseToDrive =
+          poseToDrive.transformBy(
+              new Transform2d(0, reefLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+    }
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement)
+        && targetPose.offset == Offset.RIGHT) {
+      tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+      poseToDrive =
+          poseToDrive.transformBy(
+              new Transform2d(0, reefRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+    }
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
+      return new Pose2d(
+          poseToDrive.getX(),
+          poseToDrive.getY(),
+          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
+    } else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+      return new Pose2d(
+          poseToDrive.getX(),
+          poseToDrive.getY(),
+          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 90));
+    }
+    return poseToDrive;
+  }
 
   private static Swerve m_Swerve;
   private static List<Translation2d> badHexagonPoints;
@@ -88,14 +175,6 @@ public class PeddieBounds {
           new Translation2d(
               reefCenter.getX() + reefCornerToCenter * Math.cos(Math.toRadians(i)),
               reefCenter.getY() + reefCornerToCenter * Math.sin(Math.toRadians(i))));
-    }
-
-    Field2d[] fields = new Field2d[6];
-    for (int i = 0; i < 6; i++) {
-      Translation2d p = badHexagonPoints.get(i);
-      fields[i] = new Field2d();
-      fields[i].setRobotPose(new Pose2d(p.getX(), p.getY(), new Rotation2d(0)));
-      SmartDashboard.putData("hexagon " + i, fields[i]);
     }
   }
 
@@ -183,8 +262,6 @@ public class PeddieBounds {
     else {
       double similar0 = cosineSimilarity(robotToTag.get(0).vector, robotMovement);
       double similar1 = cosineSimilarity(robotToTag.get(1).vector, robotMovement);
-      SmartDashboard.putNumber("tag 0 similarity", similar0);
-      SmartDashboard.putNumber("tag 1 similarity", similar1);
       bestTag = similar0 >= similar1 ? tag0id : tag1id;
     }
 

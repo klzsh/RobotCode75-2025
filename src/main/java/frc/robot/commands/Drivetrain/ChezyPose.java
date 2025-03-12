@@ -7,7 +7,7 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.util.CheckBounds;
+import frc.lib.util.PeddieBounds;
 import frc.lib.util.FieldPose;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -43,7 +43,7 @@ public class ChezyPose extends Command {
   @Override
   public void initialize() {
     if (targetPose2d == null) {
-      targetPose2d = CheckBounds.getNearestFieldPose2d(m_swerve, targetPose);
+      targetPose2d = PeddieBounds.getNearestFieldPose2d(m_swerve, targetPose);
     }
     m_chezyController.reset(targetPose2d);
   }

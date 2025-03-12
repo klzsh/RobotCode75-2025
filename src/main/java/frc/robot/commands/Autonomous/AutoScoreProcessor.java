@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.lib.util.CheckBounds;
+import frc.lib.util.PeddieBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
@@ -26,7 +26,7 @@ public class AutoScoreProcessor extends SequentialCommandGroup {
       Swerve swerve, ChezyController chezyController, AlgaeIntake intake, AlgaePivot pivot) {
     addRequirements(swerve, intake, pivot);
     Pose2d poseToDrive =
-        CheckBounds.getNearestFieldPose2d(
+        PeddieBounds.getNearestFieldPose2d(
             swerve, new FieldPose(DriverStation.getAlliance().get(), FieldElement.P, Offset.MID));
     addCommands(
         new ChezyPose(swerve, chezyController, poseToDrive, false),

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.CheckBounds;
+import frc.lib.util.PeddieBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
@@ -36,7 +36,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       AlgaePivot pivot,
       ChezyController chezyController) {
     addRequirements(swerve, elevator, intake, pivot);
-    FieldElement elem = CheckBounds.nearestElement(swerve.getPose());
+    FieldElement elem = PeddieBounds.nearestElement(swerve.getPose());
     if (!FieldPose.fieldElementIsReef(elem)) {
       return;
     }
