@@ -39,7 +39,7 @@ public final class ClimberConstants {
     public static final Current statorReverseCurrentLimit = Amps.of(100);
 
     public static final Angle forwardSoftLimit = Rotations.of(104);
-    public static final Angle reverseSoftLimit = Rotations.of(-8);
+    public static final Angle reverseSoftLimit = Rotations.of(-9.5);
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
