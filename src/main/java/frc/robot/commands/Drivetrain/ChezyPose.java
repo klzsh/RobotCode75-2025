@@ -51,7 +51,7 @@ public class ChezyPose extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    ChassisSpeeds speeds = m_chezyController.update(m_swerve.getPose());
+    ChassisSpeeds speeds = m_chezyController.update(targetPose2d);
     m_swerve.setChassisSpeeds(speeds);
   }
 
