@@ -52,7 +52,7 @@ public class ChezyPose extends Command {
   @Override
   public void execute() {
     ChassisSpeeds speeds = m_chezyController.update(targetPose2d);
-    m_swerve.setChassisSpeeds(speeds);
+    m_swerve.setFieldRelative(speeds);
   }
 
   // Called once the command ends or is interrupted.
