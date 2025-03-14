@@ -25,12 +25,9 @@ import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
+import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
-import frc.robot.commands.EndEffector.Coral.ScoreL1;
-import frc.robot.commands.EndEffector.Coral.ScoreL2;
-import frc.robot.commands.EndEffector.Coral.ScoreL3;
-import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
@@ -159,7 +156,7 @@ public class RobotContainer {
             () -> -m_LeftStick.getX(),
             () -> -m_RightStick.getX()));
 
-    m_Elevator.setDefaultCommand(
+    m_Elevator.setDefaultCommand( //TODO change this to L1 or L2 as home depending on elev stability
         new InstantCommand(() -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
             .repeatedly());
     m_CoralIntake.setDefaultCommand(
@@ -210,22 +207,18 @@ public class RobotContainer {
     // score L* commands
     m_Controller
         .a()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
-        .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L1, false));
     m_Controller
         .x()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
-        .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no de-algaefy
+        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L2, false));
     m_Controller
         .y()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
-        .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no de-algaefy
+        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L3, false));
     m_Controller
         .b()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
-        .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L4, false));
     // algae commands
     m_Controller
         .povRight()
@@ -248,7 +241,7 @@ public class RobotContainer {
     // coral commands
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
-        .povDown()
+        .rightTrigger(0.15)
         .whileTrue(
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
                 .repeatedly());
@@ -257,48 +250,14 @@ public class RobotContainer {
         .whileTrue(
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.REVERSING), m_CoralIntake)
                 .repeatedly());
-    // manual elevator overrides
-
-    m_Controller
-        .a()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
-                .repeatedly());
-    m_Controller
-        .x()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
-                .repeatedly());
-    m_Controller
-        .y()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
-                .repeatedly());
-    m_Controller
-        .b()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .whileTrue(
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
-                .repeatedly());
     // dealgaefy commands
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
   }
 
@@ -315,16 +274,5 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     m_AutoSelector.generatePaths();
     return m_AutoSelector.getAutoCommand();
-
-    // return new SequentialCommandGroup(
-    //   m_factory.resetOdometry("st-bl-1"),
-    //     m_factory.trajectoryCmd("st-bl-1", 0),
-    //     new YoloBranchAlign(m_Swerve, m_BranchCamera, false),
-    //     new ScoreL4(m_Elevator, m_CoralIntake),
-    //     m_factory.trajectoryCmd("st-bl-1", 1),
-    //     new ParallelRaceGroup(new WaitCommand(0.5), new IntakeCoral(m_CoralIntake)),
-    //     new ParallelCommandGroup(
-    //         m_factory.trajectoryCmd("st-bl-1", 2), new IntakeCoral(m_CoralIntake)),
-    //     new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake));
   }
 }
