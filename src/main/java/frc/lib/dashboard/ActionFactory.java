@@ -13,6 +13,7 @@ import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+import frc.robot.subsystems.Vision.YoloController;
 
 /*
  * Return command based on a text code
@@ -25,6 +26,7 @@ public class ActionFactory {
   private AlgaePivot m_AlgaePivot;
   private AlgaeIntake m_AlgaeIntake;
   private ChezyController m_ChezyController;
+  private YoloController m_YoloController;
   private ObjectDetetectorCamera m_BranchCamera;
 
   public ActionFactory(
@@ -34,6 +36,7 @@ public class ActionFactory {
       AlgaePivot pivot,
       AlgaeIntake algaeIntake,
       ChezyController chezyController,
+      YoloController yoloController,
       ObjectDetetectorCamera branchCam) {
     m_Swerve = swerve;
     m_Elevator = elevator;
@@ -41,6 +44,7 @@ public class ActionFactory {
     m_AlgaePivot = pivot;
     m_AlgaeIntake = algaeIntake;
     m_ChezyController = chezyController;
+    m_YoloController = yoloController;
     m_BranchCamera = branchCam;
   }
 
@@ -59,7 +63,7 @@ public class ActionFactory {
       case 5:
         return new AutoIntakeCoral(m_Swerve, m_CoralIntake);
       case 6:
-        return new YoloBranchAlign(m_Swerve, m_BranchCamera, true);
+        return new YoloBranchAlign(m_Swerve, m_YoloController, true);
     }
     return null;
   }

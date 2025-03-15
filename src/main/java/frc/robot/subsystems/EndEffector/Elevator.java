@@ -157,7 +157,6 @@ public class Elevator extends SubsystemBase {
     m_IsAlgae = isAlgae;
   }
 
-
   /**
    * average position between the two motors
    *

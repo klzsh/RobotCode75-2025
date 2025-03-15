@@ -3,8 +3,13 @@ package frc.robot.Constants;
 import static edu.wpi.first.units.Units.*;
 import static java.util.Map.entry;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import java.util.Map;
 
@@ -69,6 +74,21 @@ public class FieldConstants {
           entry(FieldElement.P, 3),
           entry(FieldElement.HT, 1),
           entry(FieldElement.HB, 2));
+
+  public static final Map<FieldPose, Pose2d> fieldPose2d =
+      Map.ofEntries(
+          entry(
+              new FieldPose(Alliance.Blue, FieldElement.HB, Offset.MID),
+              new Pose2d(1.04, 1.02, Rotation2d.fromDegrees(54))),
+          entry(
+              new FieldPose(Alliance.Blue, FieldElement.HT, Offset.MID),
+              new Pose2d(1.08, 7.04, Rotation2d.fromDegrees(-54))),
+          entry(
+              new FieldPose(Alliance.Red, FieldElement.HB, Offset.MID),
+              new Pose2d(16.4, 7.08, Rotation2d.fromDegrees(234))),
+          entry(
+              new FieldPose(Alliance.Red, FieldElement.HT, Offset.MID),
+              new Pose2d(16.4, .94, Rotation2d.fromDegrees(126))));
 
   public static final Distance reefLeftPoseOffset = Meters.of(0.14);
   public static final Distance reefRightPoseOffset = Meters.of(0.5);

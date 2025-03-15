@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Drivetrain;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,10 +13,14 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
 
 /** Add your docs here. */
 public class ChezyController {
+
+  private final TunableNumber driveP = new TunableNumber("ChezyController/Drive P", 2);
+  private final TunableNumber rotationP = new TunableNumber("ChezyController/Rotation P", 3);
 
   private final Swerve m_swerve;
   private final ProfiledPIDController driveController =
@@ -32,10 +37,16 @@ public class ChezyController {
           0.0,
           new TrapezoidProfile.Constraints(0.0, 0.0),
           0.02);
+
   private Translation2d lastSetpointTranslation;
   private double driveErrorAbs;
   private double thetaErrorAbs;
   private double ffMinRadius = 0.2, ffMaxRadius = 0.8;
+
+  private boolean rotationFinished = false;
+
+  @Logged(name = "target", importance = Logged.Importance.INFO)
+  private Pose2d target;
 
   public ChezyController(Swerve swerve) {
     m_swerve = swerve;
@@ -62,12 +73,18 @@ public class ChezyController {
     driveController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceTranslation);
     thetaController.setTolerance(DrivetrainConstants.ControllerConstants.toleranceRadians);
     lastSetpointTranslation = currentPose.getTranslation();
+
+    rotationFinished = false;
   }
 
   public ChassisSpeeds update(Pose2d targetPose) {
+    driveController.setP(driveP.getNumber());
+    thetaController.setP(rotationP.getNumber());
     Pose2d currentPose = m_swerve.getPose();
     driveController.setGoal(0.0);
     thetaController.setGoal(targetPose.getRotation().getRadians());
+
+    target = targetPose;
 
     double currentDistance = currentPose.getTranslation().getDistance(targetPose.getTranslation());
     double ffScaler =
@@ -97,8 +114,10 @@ public class ChezyController {
                 currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
     thetaErrorAbs =
         Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
-    if (thetaErrorAbs < thetaController.getPositionTolerance()) thetaVelocity = 0.0;
-
+    if (thetaErrorAbs < thetaController.getPositionTolerance()) {
+      rotationFinished = true;
+      thetaVelocity = 0.0;
+    }
     // Command speeds
     Translation2d driveVelocity =
         new Pose2d(0, 0, currentPose.getTranslation().minus(targetPose.getTranslation()).getAngle())
@@ -106,6 +125,10 @@ public class ChezyController {
                 new Transform2d(new Translation2d(driveVelocityScalar, 0.0), new Rotation2d()))
             .getTranslation();
     return new ChassisSpeeds(driveVelocity.getX(), driveVelocity.getY(), thetaVelocity);
+  }
+
+  public boolean isRotationFinished() {
+    return rotationFinished;
   }
 
   public boolean isFinished() {

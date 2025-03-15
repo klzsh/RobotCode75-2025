@@ -44,6 +44,7 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+import frc.robot.subsystems.Vision.YoloController;
 import java.util.ArrayList;
 
 /**
@@ -94,6 +95,8 @@ public class RobotContainer {
   //   @Logged
   private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
 
+  private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
+
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
   private final Joystick m_RightStick = new Joystick(rightStickPort);
@@ -133,6 +136,7 @@ public class RobotContainer {
           m_AlgaePivot,
           m_AlgaeIntake,
           m_ChezyController,
+          m_YoloController,
           m_BranchCamera);
 
   private final AutoSelector m_AutoSelector =
@@ -190,9 +194,9 @@ public class RobotContainer {
         new RotateToSimilarFace(m_Swerve)
             .andThen(
                 new YoloBranchAlign(
-                    m_Swerve, m_BranchCamera, false))); // rotate then translate on left trigger
+                    m_Swerve, m_YoloController, false))); // rotate then translate on left trigger
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
-    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
+    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));

@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import java.util.ArrayList;
@@ -38,7 +37,8 @@ class IDVectorPair {
   }
 }
 
-// screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie 
+// screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw peddie screw
+// peddie screw peddie screw peddie screw peddie
 public class PeddieBounds {
 
   public static FieldElement nearestElement(Pose2d pose) {
@@ -123,15 +123,14 @@ public class PeddieBounds {
     return poseToDrive;
   }
 
-  private static Swerve m_Swerve;
   private static List<Translation2d> badHexagonPoints;
+  private static boolean initDone = false;
 
   private static double cosineSimilarity(Translation2d a, Translation2d b) {
     return (a.getX() * b.getX() + a.getY() * b.getY()) / (a.getNorm() * b.getNorm());
   }
 
-  public static void init(Swerve swerve) {
-    m_Swerve = swerve;
+  public static void init() {
     Translation2d reefCenter;
     AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     if (DriverStation.getAlliance().isEmpty()
@@ -213,9 +212,13 @@ public class PeddieBounds {
     return insideBadHexagon(new Translation2d(p.getX(), p.getY()));
   }
 
-  public static FieldElement getReefElement() {
+  public static FieldElement getReefElement(Swerve swerve) {
+    if (!initDone) {
+      init();
+      initDone = true;
+    }
     // calculate current odometry pose
-    Translation2d odometryPose = m_Swerve.getPose().getTranslation();
+    Translation2d odometryPose = swerve.getPose().getTranslation();
     List<IDVectorPair> robotToTag = new ArrayList<>();
     AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
@@ -242,18 +245,18 @@ public class PeddieBounds {
     int tag0id = robotToTag.get(0).id;
     int tag1id = robotToTag.get(1).id;
 
-    boolean isInBadHexagon = insideBadHexagon(odometryPose);
+    // boolean isInBadHexagon = insideBadHexagon(odometryPose);
 
-    double tag0neededAngle = FieldConstants.tagToHeadingMap.get(tag0id);
-    double tag0gyroError = Math.abs(m_Swerve.getRotationDegrees() - tag0neededAngle);
+    // double tag0neededAngle = FieldConstants.tagToHeadingMap.get(tag0id);
+    // double tag0gyroError = Math.abs(swerve.getRotationDegrees() - tag0neededAngle);
 
-    if (isInBadHexagon)
-      return tag0gyroError < 30.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
+    // if (isInBadHexagon)
+    //   return tag0gyroError < 30.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
 
-    if (robotToTag.get(1).vector.getNorm() - robotToTag.get(0).vector.getNorm() >= 0.25)
-      return tag0gyroError < 45.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
+    // if (robotToTag.get(1).vector.getNorm() - robotToTag.get(0).vector.getNorm() >= 0.25)
+    //   return tag0gyroError < 45.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
 
-    ChassisSpeeds speeds = m_Swerve.getChassisSpeeds();
+    ChassisSpeeds speeds = swerve.getChassisSpeeds();
     Translation2d robotMovement =
         new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
 
@@ -265,17 +268,19 @@ public class PeddieBounds {
       bestTag = similar0 >= similar1 ? tag0id : tag1id;
     }
 
-    double bestTagNeededAngle = FieldConstants.tagToHeadingMap.get(bestTag);
-    return Math.abs(m_Swerve.getRotationDegrees() - bestTagNeededAngle) < 45.0
-        ? VisionConstants.tagIDToFieldElement.get(bestTag)
-        : null;
+    return VisionConstants.tagIDToFieldElement.get(bestTag);
+
+    // double bestTagNeededAngle = FieldConstants.tagToHeadingMap.get(bestTag);
+    // return Math.abs(swerve.getRotationDegrees() - bestTagNeededAngle) < 45.0
+    //     ? VisionConstants.tagIDToFieldElement.get(bestTag)
+    //     : null;
   }
 
   private static final double hpThreshold =
       0.5; // section in the middle where bound is determined by vel
 
-  public static FieldElement getHPElement() {
-    Translation2d odometryPose = m_Swerve.getPose().getTranslation();
+  public static FieldElement getHPElement(Swerve swerve) {
+    Translation2d odometryPose = swerve.getPose().getTranslation();
     AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     if (DriverStation.getAlliance().isEmpty()
@@ -293,7 +298,7 @@ public class PeddieBounds {
       } else {
         ChassisSpeeds fieldRelative =
             ChassisSpeeds.fromRobotRelativeSpeeds(
-                m_Swerve.getChassisSpeeds(), m_Swerve.getRotation2D());
+                swerve.getChassisSpeeds(), swerve.getRotation2D());
         return fieldRelative.vyMetersPerSecond > 0 ? FieldElement.HT : FieldElement.HB;
       }
     } else {
@@ -310,7 +315,7 @@ public class PeddieBounds {
       } else {
         ChassisSpeeds fieldRelative =
             ChassisSpeeds.fromRobotRelativeSpeeds(
-                m_Swerve.getChassisSpeeds(), m_Swerve.getRotation2D());
+                swerve.getChassisSpeeds(), swerve.getRotation2D());
         return fieldRelative.vyMetersPerSecond < 0 ? FieldElement.HT : FieldElement.HB;
       }
     }
