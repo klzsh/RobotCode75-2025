@@ -45,6 +45,11 @@ public class ChezyController {
 
   private boolean rotationFinished = false;
 
+  @Logged
+  private double currentRotation;
+  @Logged
+  private double targetRotation;
+
   @Logged(name = "target", importance = Logged.Importance.INFO)
   private Pose2d target;
 
@@ -77,12 +82,22 @@ public class ChezyController {
     rotationFinished = false;
   }
 
+  private double wrap(double angle) {
+    if (angle < -Math.PI) {
+      return angle + 2 * Math.PI;
+    }
+    if (angle > Math.PI) {
+      return angle - 2 * Math.PI;
+    }
+    return angle;
+  }
+
   public ChassisSpeeds update(Pose2d targetPose) {
     driveController.setP(driveP.getNumber());
     thetaController.setP(rotationP.getNumber());
     Pose2d currentPose = m_swerve.getPose();
     driveController.setGoal(0.0);
-    thetaController.setGoal(targetPose.getRotation().getRadians());
+    thetaController.setGoal(0.0);
 
     target = targetPose;
 
@@ -109,9 +124,11 @@ public class ChezyController {
 
     // Calculate theta speed
     double thetaVelocity =
-        thetaController.getSetpoint().velocity * ffScaler * 0.7
+        thetaController.getSetpoint().velocity * ffScaler * 0.3
             + thetaController.calculate(
-                currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+                wrap(currentPose.getRotation().getRadians() - targetPose.getRotation().getRadians()), 0.0);
+    currentRotation = wrap(currentPose.getRotation().getRadians());
+    targetRotation = wrap(targetPose.getRotation().getRadians());
     thetaErrorAbs =
         Math.abs(currentPose.getRotation().minus(targetPose.getRotation()).getRadians());
     if (thetaErrorAbs < thetaController.getPositionTolerance()) {

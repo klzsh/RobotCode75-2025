@@ -19,8 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
+import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -91,9 +93,9 @@ public class RobotContainer {
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
-  //   @Logged
+    @Logged
   private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
-
+  @Logged
   private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
 
   // define OI controls
@@ -194,9 +196,9 @@ public class RobotContainer {
             .andThen(
                 new YoloBranchAlign(
                     m_Swerve, m_YoloController, false))); // rotate then translate on left trigger
-    // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
+    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
     // AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
-    AlignRight.whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController));
+    AlignRight.whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
@@ -207,7 +209,7 @@ public class RobotContainer {
     //     .whileTrue(new InstantCommand(() -> m_BranchCamera.setDriverMode(true)))
     //     .whileFalse(new InstantCommand(() -> m_BranchCamera.setDriverMode(false)));
 
-    resetBranchCam.onTrue(new InstantCommand(() -> m_BranchCamera.reloadPipeline()));
+    resetBranchCam.onTrue(new InstantCommand(() -> m_BranchCamera.reloadPipeline()).ignoringDisable(true));
   }
 
   public void configureControllerBinds() {

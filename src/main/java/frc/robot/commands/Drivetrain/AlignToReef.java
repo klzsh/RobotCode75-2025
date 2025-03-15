@@ -67,7 +67,9 @@ public class AlignToReef extends Command {
     // robot relative y distance from center of branch
     double yOffset = Math.abs(targetPose.relativeTo(m_Swerve.getPose()).getY());
 
-    if (yOffset < 0.1 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
+    m_BranchCamera.updateByUnreadResults();
+
+    if (yOffset < 0.25 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
       ChassisSpeeds yoloSpeeds =
           ChassisSpeeds.fromRobotRelativeSpeeds(
               m_YoloController.update(), m_Swerve.getRotation2D());

@@ -245,6 +245,8 @@ public class PeddieBounds {
     int tag0id = robotToTag.get(0).id;
     int tag1id = robotToTag.get(1).id;
 
+    return VisionConstants.tagIDToFieldElement.get(tag0id);
+
     // boolean isInBadHexagon = insideBadHexagon(odometryPose);
 
     // double tag0neededAngle = FieldConstants.tagToHeadingMap.get(tag0id);
@@ -256,19 +258,19 @@ public class PeddieBounds {
     // if (robotToTag.get(1).vector.getNorm() - robotToTag.get(0).vector.getNorm() >= 0.25)
     //   return tag0gyroError < 45.0 ? VisionConstants.tagIDToFieldElement.get(tag0id) : null;
 
-    ChassisSpeeds speeds = swerve.getChassisSpeeds();
-    Translation2d robotMovement =
-        new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    // ChassisSpeeds speeds = swerve.getChassisSpeeds();
+    // Translation2d robotMovement =
+    //     new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
 
-    int bestTag;
-    if (robotMovement.getNorm() == 0) bestTag = tag0id;
-    else {
-      double similar0 = cosineSimilarity(robotToTag.get(0).vector, robotMovement);
-      double similar1 = cosineSimilarity(robotToTag.get(1).vector, robotMovement);
-      bestTag = similar0 >= similar1 ? tag0id : tag1id;
-    }
+    // int bestTag;
+    // if (robotMovement.getNorm() == 0) bestTag = tag0id;
+    // else {
+    //   double similar0 = cosineSimilarity(robotToTag.get(0).vector, robotMovement);
+    //   double similar1 = cosineSimilarity(robotToTag.get(1).vector, robotMovement);
+    //   bestTag = similar0 >= similar1 ? tag0id : tag1id;
+    // }
 
-    return VisionConstants.tagIDToFieldElement.get(bestTag);
+    // return VisionConstants.tagIDToFieldElement.get(bestTag);
 
     // double bestTagNeededAngle = FieldConstants.tagToHeadingMap.get(bestTag);
     // return Math.abs(swerve.getRotationDegrees() - bestTagNeededAngle) < 45.0

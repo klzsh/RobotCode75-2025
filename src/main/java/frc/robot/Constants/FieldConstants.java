@@ -90,6 +90,6 @@ public class FieldConstants {
               new FieldPose(Alliance.Red, FieldElement.HT, Offset.MID),
               new Pose2d(16.4, .94, Rotation2d.fromDegrees(126))));
 
-  public static final Distance reefLeftPoseOffset = Meters.of(0.14);
-  public static final Distance reefRightPoseOffset = Meters.of(0.5);
+  public static final Distance reefLeftPoseOffset = Meters.of(0.11);
+  public static final Distance reefRightPoseOffset = Meters.of(0.39);
 }
