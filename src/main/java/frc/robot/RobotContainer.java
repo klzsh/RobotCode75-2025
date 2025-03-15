@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
 import frc.robot.commands.Drivetrain.AlignToCage;
+import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -28,6 +29,7 @@ import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
+import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
@@ -172,7 +174,7 @@ public class RobotContainer {
         new InstantCommand(() -> m_AlgaePivot.resetPivotState(), m_AlgaePivot).repeatedly());
     m_Climber.setDefaultCommand(
         new InstantCommand(
-            () -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
+            () -> m_Climber.runCurrent(0), m_Climber));
   }
 
   /**
@@ -193,7 +195,8 @@ public class RobotContainer {
                 new YoloBranchAlign(
                     m_Swerve, m_YoloController, false))); // rotate then translate on left trigger
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
-    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    // AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    AlignRight.whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
@@ -211,18 +214,18 @@ public class RobotContainer {
     // score L* commands
     m_Controller
         .a()
-        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L1, false));
+        .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator).repeatedly());
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no de-algaefy
-        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L2, false));
+        .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator).repeatedly());
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no de-algaefy
-        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L3, false));
+        .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator).repeatedly());
     m_Controller
         .b()
-        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.L4, false));
+        .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator).repeatedly());
     // algae commands
     m_Controller
         .povRight()
@@ -246,9 +249,7 @@ public class RobotContainer {
     m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
         .rightTrigger(0.15)
-        .whileTrue(
-            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
-                .repeatedly());
+        .whileTrue(new ScoreCoral(m_CoralIntake, m_Elevator));
     m_Controller
         .povLeft()
         .whileTrue(
@@ -263,6 +264,15 @@ public class RobotContainer {
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
+
+    // climber commands
+    // Left Y, more than 0.15
+    m_Controller.axisGreaterThan(1, -0.15).whileTrue(new InstantCommand(()->m_Climber.runCurrent(-m_Controller.getLeftY()*75), m_Climber).repeatedly());
+    m_Controller.axisGreaterThan(1, 0.15).whileTrue(new InstantCommand(()->m_Climber.runCurrent(-m_Controller.getLeftY()*75), m_Climber).repeatedly());
+
+    // m_Controller.axisGreaterThan(5, -0.15).whileTrue(new InstantCommand(()->m_Climber.setPositionRequest(climbExtendPosition), m_Climber).repeatedly());
+    // m_Controller.axisGreaterThan(5, 0.15).whileTrue(new InstantCommand(()->m_Climber.setPositionRequest(climbExtendPosition), m_Climber).repeatedly());
+
   }
 
   private void configureChooser() {
