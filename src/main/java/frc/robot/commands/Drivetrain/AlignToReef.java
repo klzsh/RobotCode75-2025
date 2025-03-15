@@ -69,7 +69,7 @@ public class AlignToReef extends Command {
 
     m_BranchCamera.updateByUnreadResults();
 
-    if (yOffset < 0.25 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
+    if (yOffset < 0.15 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
       ChassisSpeeds yoloSpeeds =
           ChassisSpeeds.fromRobotRelativeSpeeds(
               m_YoloController.update(), m_Swerve.getRotation2D());
