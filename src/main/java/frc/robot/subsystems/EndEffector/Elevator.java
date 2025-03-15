@@ -173,6 +173,9 @@ public class Elevator extends SubsystemBase {
 
     return Rotations.of((motor1Position.in(Rotations) + motor2Position.in(Rotations)) / 2);
   }
+  public ElevatorPositions getState(){
+    return m_SetpointPosition;
+  }
 
   /**
    * logs elevator position in rotations
