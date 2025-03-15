@@ -28,7 +28,7 @@ public class AutoScoreL4 extends SequentialCommandGroup {
             // new RotateToSimilarFace(swerve),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, true)),
         new ParallelCommandGroup(
-            new ScoreCoral(coralIntake, false),
+            new ScoreCoral(coralIntake, elevator),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, false)),
         new ParallelCommandGroup(
             new SetElevatorPosition(elevator, ElevatorPositions.L4, false),

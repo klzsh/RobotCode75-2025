@@ -27,7 +27,7 @@ public class AutoScoreL1 extends SequentialCommandGroup {
             // align to branch color
             new SetElevatorPosition(elevator, ElevatorPositions.L1, true)),
         new ParallelCommandGroup(
-            new ScoreCoral(coralIntake, true),
+            new ScoreCoral(coralIntake, elevator),
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
         new ParallelCommandGroup(
             new SetElevatorPosition(elevator, ElevatorPositions.L1, false),

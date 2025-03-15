@@ -7,16 +7,18 @@ package frc.robot.commands.EndEffector.Coral;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
+import frc.robot.subsystems.EndEffector.Elevator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ScoreCoral extends Command {
   /** Creates a new ScoreCoral. */
   private final CoralIntake m_Intake;
 
-  private final boolean isL1;
+  private final Elevator m_Elevator;
 
-  public ScoreCoral(CoralIntake intake, boolean isL1) {
-    this.isL1 = isL1;
+  public ScoreCoral(CoralIntake intake, Elevator elevator) {
+    m_Elevator = elevator;
     m_Intake = intake;
     addRequirements(m_Intake);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,7 +31,7 @@ public class ScoreCoral extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_Intake.setL1(isL1);
+    m_Intake.setL1(m_Elevator.getState() == ElevatorPositions.L1);
     m_Intake.setState(CoralStates.SCORING);
   }
 
