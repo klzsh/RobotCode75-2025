@@ -29,10 +29,7 @@ import frc.robot.Constants.ClimberConstants;
 @Logged(name = "Climber", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class Climber extends SubsystemBase {
 
-  public static enum ClimberPositions {
-    DEFAULT,
-    CLIMB
-  }
+ 
 
   // @Logged(name = "Climber Motor 1", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor1;
@@ -41,9 +38,6 @@ public class Climber extends SubsystemBase {
   private final TalonFX m_ClimberMotor2;
 
   private final DutyCycleEncoder m_ClimberEncoder;
-
-  @Logged(name = "Climber State", importance = Importance.CRITICAL)
-  private ClimberPositions m_ClimberState = ClimberPositions.DEFAULT;
 
   // private Slot0Configs PIDConfig = new Slot0Configs();
   // private final TunableNumber climberKp;
@@ -111,35 +105,9 @@ public class Climber extends SubsystemBase {
     resetPosition();
   }
 
-  public void setState(ClimberPositions state) {
-    m_ClimberState = state;
-  }
-
-  public ClimberPositions getState() {
-    return m_ClimberState;
-  }
-
+  
   public double absoluteEncoderToRotations(double x) {
     return 132.2772 * Math.sin(3.36922 * x);
-  }
-
-  // TODO: rewrite so it does not take in a command xbox controller
-  public void setPositionRequestWithController(CommandXboxController controller) {
-    double leftY = controller.getLeftY();
-    double rightY = controller.getRightY();
-    if (Math.abs(leftY) > 0.2) {
-      runCurrent(-controller.getLeftY() * 75);
-    } else if (rightY > 0.2) {
-      resetPosition();
-      setPositionRequest(climbExtendPosition);
-      // setPositionRequest(Rotations.of(extendSetpoint.getNumber()));
-    } else if (rightY < -0.2) {
-      resetPosition();
-      setPositionRequest(climbPosition);
-      // setPositionRequest(Rotations.of(retractSetpoint.getNumber()));
-    } else {
-      runCurrent(0);
-    }
   }
 
   public void setPositionRequest(Angle position) {
@@ -173,10 +141,6 @@ public class Climber extends SubsystemBase {
   public boolean atPosition() {
     return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations))
         < ClimberConstants.climbDeadband;
-  }
-
-  public boolean isAtPositionAbsolute(Angle position) {
-    return Math.abs(position.in(Rotations) - m_ClimberEncoder.get()) < climbDeadbandAbsolute;
   }
 
   public void runCurrent(double current) {
@@ -222,17 +186,6 @@ public class Climber extends SubsystemBase {
     //   m_ClimberMotor2.getConfigurator().apply(MMConfig);
     // }
 
-    // switch (m_ClimberState) {
-    //   case DEFAULT -> {
-    //     setPositionRequest(Rotations.of(0));
-    //   }
-    //   case CLIMB -> {
-    //     if (getLimitSwitch()) {
-    //       setPositionRequest(getPosition());
-    //     } else {
-    //       setPositionRequest(ClimberConstants.climbPosition);
-    //     }
-    //   }
-    // }
+   
   }
 }
