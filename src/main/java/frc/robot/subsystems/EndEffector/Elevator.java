@@ -75,22 +75,25 @@ public class Elevator extends SubsystemBase {
   private final DynamicMotionMagicTorqueCurrentFOC m_PositionRequest;
   private final TorqueCurrentFOC m_CharacterizationRequest;
 
-  private final TunableNumber mmVelocityUp;
-  private final TunableNumber mmAccelerationUp;
-  private final TunableNumber mmJerkUp;
+  // private final TunableNumber mmVelocityUp;
+  // private final TunableNumber mmAccelerationUp;
+  // private final TunableNumber mmJerkUp;
 
-  private final TunableNumber mmVelocityDown;
-  private final TunableNumber mmAccelerationDown;
-  private final TunableNumber mmJerkDown;
+  // private final TunableNumber mmVelocityDown;
+  // private final TunableNumber mmAccelerationDown;
+  // private final TunableNumber mmJerkDown;
 
-  private final TunableNumber elevatorKp;
-  private final TunableNumber elevatorKi;
-  private final TunableNumber elevatorKd;
-  private final TunableNumber elevatorKs;
-  private final TunableNumber elevatorKa;
-  private final TunableNumber elevatorKv;
-  private final TunableNumber elevatorKg;
-  private Slot0Configs config;
+  // private final TunableNumber elevatorKp;
+  // private final TunableNumber elevatorKi;
+  // private final TunableNumber elevatorKd;
+  // private final TunableNumber elevatorKs;
+  // private final TunableNumber elevatorKa;
+  // private final TunableNumber elevatorKv;
+  // private final TunableNumber elevatorKg;
+  // private Slot0Configs config;
+
+  private final TunableNumber l2Height;
+  private final TunableNumber l3Height;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -117,34 +120,38 @@ public class Elevator extends SubsystemBase {
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
 
-    mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
-    mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
-    mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
+    l2Height = new TunableNumber("Elevator/L2 Height", l2Position.in(Rotations));
+    l3Height = new TunableNumber("Elevator/L3 Height", l3Position.in(Rotations));
 
-    mmVelocityDown = new TunableNumber("Elevator/MM Velocity Down", MotionMagicProfileDown[0]);
-    mmAccelerationDown =
-        new TunableNumber("Elevator/MM Acceleration Down", MotionMagicProfileDown[1]);
-    mmJerkDown = new TunableNumber("Elevator/MM Jerk Down", MotionMagicProfileDown[2]);
 
-    elevatorKp = new TunableNumber("Elevator/kP", kP);
-    elevatorKi = new TunableNumber("Elevator/kI", kI);
-    elevatorKd = new TunableNumber("Elevator/kD", kD);
-    elevatorKs = new TunableNumber("Elevator/kS", kS);
-    elevatorKa = new TunableNumber("Elevator/kA", kA);
-    elevatorKv = new TunableNumber("Elevator/kV", kV);
-    elevatorKg = new TunableNumber("Elevator/kG", kG);
+    // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
+    // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
+    // mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
 
-    config =
-        new Slot0Configs()
-            .withKP(kP)
-            .withKI(kI)
-            .withKD(kD)
-            .withKS(kS)
-            .withKA(kA)
-            .withKV(kV)
-            .withKG(kG)
-            .withGravityType(GravityTypeValue.Elevator_Static)
-            .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
+    // mmVelocityDown = new TunableNumber("Elevator/MM Velocity Down", MotionMagicProfileDown[0]);
+    // mmAccelerationDown =
+    //     new TunableNumber("Elevator/MM Acceleration Down", MotionMagicProfileDown[1]);
+    // mmJerkDown = new TunableNumber("Elevator/MM Jerk Down", MotionMagicProfileDown[2]);
+
+    // elevatorKp = new TunableNumber("Elevator/kP", kP);
+    // elevatorKi = new TunableNumber("Elevator/kI", kI);
+    // elevatorKd = new TunableNumber("Elevator/kD", kD);
+    // elevatorKs = new TunableNumber("Elevator/kS", kS);
+    // elevatorKa = new TunableNumber("Elevator/kA", kA);
+    // elevatorKv = new TunableNumber("Elevator/kV", kV);
+    // elevatorKg = new TunableNumber("Elevator/kG", kG);
+
+    // config =
+    //     new Slot0Configs()
+    //         .withKP(kP)
+    //         .withKI(kI)
+    //         .withKD(kD)
+    //         .withKS(kS)
+    //         .withKA(kA)
+    //         .withKV(kV)
+    //         .withKG(kG)
+    //         .withGravityType(GravityTypeValue.Elevator_Static)
+    //         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign);
   }
 
   /**
@@ -223,15 +230,23 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if (getLowerLimit()) {
-    //   m_ElevatorMotor1.setPosition(Rotations.of(0));
-    //   m_ElevatorMotor2.setPosition(Rotations.of(0));
-    // }
+    if (getLowerLimit() && (getPosition().in(Rotations) >= 0.1 || getPosition().in(Rotations) <= -0.1)) {
+      m_ElevatorMotor1.setPosition(Rotations.of(0));
+      m_ElevatorMotor2.setPosition(Rotations.of(0));
+      System.out.println("Called");
+    }
     // if (getUpperLimit()) {
     //   m_ElevatorMotor1.setPosition(Rotations.of(26));
     //   m_ElevatorMotor2.setPosition(Rotations.of(26));
     // }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
+    if(m_SetpointPosition == ElevatorPositions.L2){
+      currentPosition = l2Height.getNumber();
+    }
+    if(m_SetpointPosition == ElevatorPositions.L3){
+      currentPosition = l3Height.getNumber();
+    }
+
     double algaeOffset =
         (m_IsAlgae
                 && (m_SetpointPosition == ElevatorPositions.L2
@@ -241,40 +256,40 @@ public class Elevator extends SubsystemBase {
     double targetRotations = currentPosition + algaeOffset;
 
     if (getPosition().in(Rotations) < targetRotations) {
-      // m_PositionRequest.Velocity = MotionMagicProfileUp[0];
-      // m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
-      // m_PositionRequest.Jerk = MotionMagicProfileUp[2];
+      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
+      m_PositionRequest.Jerk = MotionMagicProfileUp[2];
 
-      m_PositionRequest.Velocity = mmVelocityUp.getNumber();
-      m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
-      m_PositionRequest.Jerk = mmJerkUp.getNumber();
+      // m_PositionRequest.Velocity = mmVelocityUp.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
+      // m_PositionRequest.Jerk = mmJerkUp.getNumber();
     } else {
-      // m_PositionRequest.Velocity = MotionMagicProfileDown[0];
-      // m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
-      // m_PositionRequest.Jerk = MotionMagicProfileDown[2];
-      m_PositionRequest.Velocity = mmVelocityDown.getNumber();
-      m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
-      m_PositionRequest.Jerk = mmJerkDown.getNumber();
+      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
+      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
+      m_PositionRequest.Jerk = MotionMagicProfileDown[2];
+      // m_PositionRequest.Velocity = mmVelocityDown.getNumber();
+      // m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
+      // m_PositionRequest.Jerk = mmJerkDown.getNumber();
     }
 
-    if (config.kP != elevatorKp.getNumber()
-        || config.kI != elevatorKi.getNumber()
-        || config.kD != elevatorKd.getNumber()
-        || config.kS != elevatorKs.getNumber()
-        || config.kA != elevatorKa.getNumber()
-        || config.kV != elevatorKv.getNumber()
-        || config.kG != elevatorKg.getNumber()) {
-      config.kP = elevatorKp.getNumber();
-      config.kI = elevatorKi.getNumber();
-      config.kD = elevatorKd.getNumber();
-      config.kS = elevatorKs.getNumber();
-      config.kA = elevatorKa.getNumber();
-      config.kV = elevatorKv.getNumber();
-      config.kG = elevatorKg.getNumber();
+    // if (config.kP != elevatorKp.getNumber()
+    //     || config.kI != elevatorKi.getNumber()
+    //     || config.kD != elevatorKd.getNumber()
+    //     || config.kS != elevatorKs.getNumber()
+    //     || config.kA != elevatorKa.getNumber()
+    //     || config.kV != elevatorKv.getNumber()
+    //     || config.kG != elevatorKg.getNumber()) {
+    //   config.kP = elevatorKp.getNumber();
+    //   config.kI = elevatorKi.getNumber();
+    //   config.kD = elevatorKd.getNumber();
+    //   config.kS = elevatorKs.getNumber();
+    //   config.kA = elevatorKa.getNumber();
+    //   config.kV = elevatorKv.getNumber();
+    //   config.kG = elevatorKg.getNumber();
 
-      m_ElevatorMotor1.getConfigurator().apply(config);
-      m_ElevatorMotor2.getConfigurator().apply(config);
-    }
+    //   m_ElevatorMotor1.getConfigurator().apply(config);
+    //   m_ElevatorMotor2.getConfigurator().apply(config);
+    // }
 
     if (getLowerLimit() && m_SetpointPosition == ElevatorPositions.HOME) {
       m_ElevatorMotor1.setControl(m_CharacterizationRequest.withOutput(0));
