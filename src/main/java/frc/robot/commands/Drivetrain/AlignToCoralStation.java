@@ -2,6 +2,7 @@ package frc.robot.commands.Drivetrain;
 
 import static frc.robot.Constants.DrivetrainConstants.swerveKinematics;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -18,13 +19,15 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 public class AlignToCoralStation extends Command {
   private final Swerve m_Swerve;
   private final ChezyController m_ChezyController;
+  private final Offset m_Offset;
   private Pose2d targetPose;
 
   SwerveModuleState[] states = swerveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0));
 
-  public AlignToCoralStation(Swerve swerve, ChezyController chezyController) {
+  public AlignToCoralStation(Swerve swerve, ChezyController chezyController, Offset offset) {
     m_Swerve = swerve;
     m_ChezyController = chezyController;
+    m_Offset = offset;
     addRequirements(m_Swerve);
   }
 
@@ -35,7 +38,7 @@ public class AlignToCoralStation extends Command {
 
     targetPose =
         PeddieBounds.fieldElementToPose2d(
-            m_Swerve, new FieldPose(alliance, PeddieBounds.getHPElement(m_Swerve), Offset.MID));
+            m_Swerve, new FieldPose(alliance, PeddieBounds.getHPElement(m_Swerve), m_Offset));
 
     m_ChezyController.reset(targetPose);
   }
@@ -43,6 +46,8 @@ public class AlignToCoralStation extends Command {
   @Override
   public void execute() {
     ChassisSpeeds speeds = m_ChezyController.update(targetPose);
+    speeds.vxMetersPerSecond = MathUtil.clamp(speeds.vxMetersPerSecond, -1.5, 1.5);
+    speeds.vyMetersPerSecond = MathUtil.clamp(speeds.vyMetersPerSecond, -1.5, 1.5);
     m_Swerve.setFieldRelative(speeds);
   }
 
