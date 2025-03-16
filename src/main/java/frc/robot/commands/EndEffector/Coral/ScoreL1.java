@@ -17,17 +17,17 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ScoreL4 extends SequentialCommandGroup {
-  /** Creates a new ScoreL4. */
-  public ScoreL4(Elevator elevator, CoralIntake coralIntake) {
+public class ScoreL1 extends SequentialCommandGroup {
+  /** Creates a new scoreL1. */
+  public ScoreL1(Elevator elevator, CoralIntake coralIntake) {
     addRequirements(elevator, coralIntake);
     addCommands(
-        new SetElevatorPosition(elevator, ElevatorPositions.L4, false),
+        new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
         new ParallelCommandGroup(
-            new ScoreCoral(coralIntake, false),
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, false)),
+            new ScoreCoral(coralIntake, elevator),
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
         new ParallelCommandGroup(
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, false),
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
             new WaitCommand(coralScoreDelay)),
         new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
   }
