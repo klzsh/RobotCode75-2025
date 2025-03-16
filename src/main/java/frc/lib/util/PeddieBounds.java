@@ -91,7 +91,7 @@ public class PeddieBounds {
             .toPose2d();
     // return tagPose;
     Rotation2d tagHeading = tagPose.getRotation();
-    double bumperSize = 18.5;
+    double bumperSize = 18;
     Pose2d poseToDrive =
         tagPose.transformBy(
             new Transform2d(Inches.of(bumperSize).in(Meters), 0, new Rotation2d(0)));
@@ -115,10 +115,16 @@ public class PeddieBounds {
           poseToDrive.getY(),
           Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
     } else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
+      if (targetPose.offset == Offset.LEFT) {
+        poseToDrive = poseToDrive.transformBy(new Transform2d(0, hpLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+      }
+      if (targetPose.offset == Offset.RIGHT) {
+        poseToDrive = poseToDrive.transformBy(new Transform2d(0, hpRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+      }
       return new Pose2d(
           poseToDrive.getX(),
           poseToDrive.getY(),
-          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 90));
+          Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees()));
     }
     return poseToDrive;
   }

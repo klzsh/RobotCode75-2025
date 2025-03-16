@@ -4,7 +4,9 @@
 
 package frc.robot.commands.Drivetrain;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -59,23 +61,26 @@ public class AlignToReef extends Command {
   @Override
   public void execute() {
     ChassisSpeeds speeds = m_ChezyController.update(targetPose);
-
+    // ChassisSpeeds speeds = m_ChezyController.update(new Pose2d(m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), targetPose.getRotation()));
+    
     // chezy
     ChassisSpeeds chezySpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(speeds, m_Swerve.getRotation2D());
-
+    ChassisSpeeds.fromFieldRelativeSpeeds(speeds, m_Swerve.getRotation2D());
+    
     // robot relative y distance from center of branch
     double yOffset = Math.abs(targetPose.relativeTo(m_Swerve.getPose()).getY());
-
+    
     m_BranchCamera.updateByUnreadResults();
-
+    
     if (yOffset < 0.15 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
       ChassisSpeeds yoloSpeeds =
-          ChassisSpeeds.fromRobotRelativeSpeeds(
-              m_YoloController.update(), m_Swerve.getRotation2D());
-      // add yolo speeds to chezy speeds
-      chezySpeeds.vyMetersPerSecond = yoloSpeeds.vyMetersPerSecond;
-    }
+      ChassisSpeeds.fromRobotRelativeSpeeds(
+        m_YoloController.update(), m_Swerve.getRotation2D());
+        // add yolo speeds to chezy speeds
+        chezySpeeds.vyMetersPerSecond = yoloSpeeds.vyMetersPerSecond;
+      }
+    speeds.vxMetersPerSecond = MathUtil.clamp(speeds.vxMetersPerSecond, -1.5, 1.5);
+    speeds.vyMetersPerSecond = MathUtil.clamp(speeds.vyMetersPerSecond, -1.5, 1.5);
     m_Swerve.setChassisSpeeds(chezySpeeds);
   }
 
