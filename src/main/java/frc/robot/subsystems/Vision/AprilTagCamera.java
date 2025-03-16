@@ -40,7 +40,7 @@ public class AprilTagCamera extends SubsystemBase {
   private AprilTagFieldLayout m_tagLayout =
       // FMA uses welded field layout
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-  private PhotonPoseEstimator m_poseEstimator;
+  public PhotonPoseEstimator m_poseEstimator;
   private EstimatedRobotPose m_pose;
   private Transform3d cameraToRobotPose;
 
@@ -233,7 +233,7 @@ public class AprilTagCamera extends SubsystemBase {
           PhotonUtils.calculateDistanceToTargetMeters(
               cameraToRobotPose.getZ(),
               getAprilTagHeight(target.getFiducialId()),
-              0,
+              cameraToRobotPose.getRotation().getY(),
               Units.degreesToRadians(target.getPitch()));
       if (dist > maxDist) {
         maxDist = dist;
@@ -278,17 +278,6 @@ public class AprilTagCamera extends SubsystemBase {
     // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
     //   return null;
     // }
-    if (maxTagDist(currentPose).isPresent()
-        && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
-      return null;
-    }
-    if (m_result.getMultiTagResult().isPresent()
-        && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.2) {
-      return null;
-    }
-    if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.2) {
-      return null;
-    }
     return m_pose;
   }
 
@@ -296,17 +285,6 @@ public class AprilTagCamera extends SubsystemBase {
     // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
     //   return null;
     // }
-    if (maxTagDist(currentPose).isPresent()
-        && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
-      return null;
-    }
-    if (m_result.getMultiTagResult().isPresent()
-        && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.2) {
-      return null;
-    }
-    if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.2) {
-      return null;
-    }
     if (m_pose != null) {
       return m_pose.estimatedPose.toPose2d();
     } else {
@@ -323,7 +301,7 @@ public class AprilTagCamera extends SubsystemBase {
     return m_result.getTimestampSeconds();
   }
 
-  public void updatePoseEstimator() {
+  public void updatePoseEstimator(Pose2d currentPose) {
     if (m_poseEstimator != null) {
       Optional<EstimatedRobotPose> pose;
       List<PhotonPipelineResult> m_unreadResults;
@@ -331,6 +309,19 @@ public class AprilTagCamera extends SubsystemBase {
       if (!m_unreadResults.isEmpty()) {
         // gets the latest unread result
         m_result = m_unreadResults.get(m_unreadResults.size() - 1);
+        if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+          m_pose = null;
+          return;
+        }
+        if (m_result.getMultiTagResult().isPresent()
+          && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.15) {
+          m_pose = null;
+          return;
+        }
+        if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.15) {
+          m_pose = null;
+          return;
+        }
         pose = m_poseEstimator.update(m_result);
       } else { // Latest result is a duplicate
         pose = Optional.empty();
@@ -397,6 +388,5 @@ public class AprilTagCamera extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updatePoseEstimator();
   }
 }
