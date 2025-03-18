@@ -233,7 +233,7 @@ public class Elevator extends SubsystemBase {
     if (getLowerLimit() && (getPosition().in(Rotations) >= 0.1 || getPosition().in(Rotations) <= -0.1)) {
       m_ElevatorMotor1.setPosition(Rotations.of(0));
       m_ElevatorMotor2.setPosition(Rotations.of(0));
-      System.out.println("Called");
+      // System.out.println("Called");
     }
     // if (getUpperLimit()) {
     //   m_ElevatorMotor1.setPosition(Rotations.of(26));

@@ -70,7 +70,7 @@ public class PeddieBounds {
         nearestTag = tag.ID;
       }
     }
-    System.out.println("Nearest tag: " + nearestTag);
+    // System.out.println("Nearest tag: " + nearestTag);
     return nearestTag;
   }
 

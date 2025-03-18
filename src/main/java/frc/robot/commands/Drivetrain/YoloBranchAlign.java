@@ -36,11 +36,11 @@ public class YoloBranchAlign extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    if (interrupted) {
-      System.out.println("Ended, interrupted");
-    } else {
-      System.out.println("ended, not interrupted");
-    }
+    // if (interrupted) {
+    //   System.out.println("Ended, interrupted");
+    // } else {
+    //   System.out.println("ended, not interrupted");
+    // }
     m_Swerve.stopModules();
   }
 }
