@@ -54,7 +54,7 @@ public class YoloController {
             DrivetrainConstants.ControllerConstants.VisionAlign.xD);
 
     yController.setTolerance(.2);
-    yController.setSetpoint(Math.sin(finalYawSetpointDegrees));
+    yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
   }
 
   double targetSin;
