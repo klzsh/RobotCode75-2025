@@ -389,20 +389,20 @@ public class Swerve extends SubsystemBase {
     return m_gyro.getYaw(true).getValue().in(Degrees);
   }
 
-  @Logged(name = "Left Facing Camera Estimated Pose", importance = Importance.DEBUG)
-  public Pose2d leftCameraEstimatedPose() {
-    return m_LeftFacingCamera.getEstimatedPose2d(getPose());
-  }
+  // @Logged(name = "Left Facing Camera Estimated Pose", importance = Importance.DEBUG)
+  // public Pose2d leftCameraEstimatedPose() {
+  //   return m_LeftFacingCamera.getEstimatedPose2d(getPose());
+  // }
 
-  @Logged(name = "Right Facing Camera Estimated Pose", importance = Importance.DEBUG)
-  public Pose2d rightCameraEstimatedPose() {
-    return m_RightFacingCamera.getEstimatedPose2d(getPose());
-  }
+  // @Logged(name = "Right Facing Camera Estimated Pose", importance = Importance.DEBUG)
+  // public Pose2d rightCameraEstimatedPose() {
+  //   return m_RightFacingCamera.getEstimatedPose2d(getPose());
+  // }
 
-  @Logged(name = "HP Camera Estimated Pose", importance = Importance.DEBUG)
-  public Pose2d hpCameraEstimatedPose() {
-    return m_HPCamera.getEstimatedPose2d(getPose());
-  }
+  // @Logged(name = "HP Camera Estimated Pose", importance = Importance.DEBUG)
+  // public Pose2d hpCameraEstimatedPose() {
+  //   return m_HPCamera.getEstimatedPose2d(getPose());
+  // }
 
   @Override
   public void periodic() {

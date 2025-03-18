@@ -26,7 +26,7 @@ public class YoloBranchAlign extends Command {
   @Override
   public void execute() {
     ChassisSpeeds speeds = m_YoloController.update();
-    m_Swerve.setRobotRelative(speeds);
+    m_Swerve.setChassisSpeeds(speeds);
   }
 
   @Override

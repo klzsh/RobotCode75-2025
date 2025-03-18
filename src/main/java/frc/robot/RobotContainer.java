@@ -124,7 +124,7 @@ public class RobotContainer {
      new JoystickButton(m_LeftStick, autoAlignButton); // trigger
   private final JoystickButton AlignRight =
      new JoystickButton(m_RightStick, autoAlignButton); // trigger
-     
+
   private final JoystickButton SimilarFaceRotate =
       new JoystickButton(m_RightStick, rotateToSimilarFaceButton); // left button
 
@@ -202,10 +202,11 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    AlignLeft.and(() -> m_CoralIntake.getState() == CoralStates.HASGAMEPIECE).whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
-    AlignRight.and(() -> m_CoralIntake.getState() == CoralStates.HASGAMEPIECE).whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT));
-    AlignLeft.and(() -> m_CoralIntake.getState() == CoralStates.DEFAULT).whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
-    AlignRight.and(() -> m_CoralIntake.getState() == CoralStates.DEFAULT).whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
+    // AlignLeft.and(() -> m_CoralIntake.getBeamBreak()).whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
+    AlignRight.and(() -> m_CoralIntake.getBeamBreak()).whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT));
+    // AlignLeft.and(() -> !m_CoralIntake.getBeamBreak()).whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
+    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    AlignRight.and(() -> !m_CoralIntake.getBeamBreak()).whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));

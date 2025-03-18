@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Vision;
 
+import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -19,6 +20,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +38,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 @Logged(strategy = Strategy.OPT_IN)
 public class AprilTagCamera extends SubsystemBase {
+  private final String cameraName;
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
   private AprilTagFieldLayout m_tagLayout =
@@ -44,13 +48,25 @@ public class AprilTagCamera extends SubsystemBase {
   private EstimatedRobotPose m_pose;
   private Transform3d cameraToRobotPose;
 
+  private final double ambiguityThreshold;
+  private final double distanceThreshold;
+  private final double reprojectionErrorThreshold;
+  private double ambiguity = 0;
+  private double reprojError = 0;
+  private double tagDist = 0;
+
   public AprilTagCamera(String name, Transform3d cameraPose) {
+    cameraName = name;
+
     cameraToRobotPose = cameraPose;
     m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
     m_poseEstimator =
         new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
     m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
+    ambiguityThreshold = cameraName == "HP_Cam" ? 0.07 : 0.15;
+    distanceThreshold = maxTagDistanceThreshold;
+    reprojectionErrorThreshold = 0.5;
   }
 
   public boolean hasTarget() {
@@ -309,16 +325,37 @@ public class AprilTagCamera extends SubsystemBase {
       if (!m_unreadResults.isEmpty()) {
         // gets the latest unread result
         m_result = m_unreadResults.get(m_unreadResults.size() - 1);
-        if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
+        if(maxTagDist(currentPose).isPresent()) {
+          tagDist = maxTagDist(currentPose).getAsDouble();
+        }
+        
+        if (m_result.getMultiTagResult().isPresent()) {
+          reprojError = m_result.getMultiTagResult().get().estimatedPose.bestReprojErr;
+        }
+
+        if (getBestTarget().isPresent()) {
+          ambiguity = getBestTarget().get().poseAmbiguity;
+        }
+        for (PhotonTrackedTarget target : m_result.getTargets()) {
+          if (target.getFiducialId() == 3 || target.getFiducialId() == 16) {
+            m_pose = null;
+            return;
+          }
+        }
+        if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
           m_pose = null;
           return;
         }
+
+
         if (m_result.getMultiTagResult().isPresent()
-          && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.15) {
+          && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > reprojectionErrorThreshold) {
           m_pose = null;
           return;
         }
-        if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.15) {
+
+
+        if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
           m_pose = null;
           return;
         }
@@ -336,6 +373,21 @@ public class AprilTagCamera extends SubsystemBase {
 
   private Pose3d getTagPose(int id) {
     return m_tagLayout.getTagPose(id).get();
+  }
+
+  @Logged(name = "Ambiguity", importance = Importance.DEBUG)
+  public double getAmbiguity() {
+    return ambiguity;
+  }
+
+  @Logged(name = "Tag Distance", importance = Importance.DEBUG)
+  public double getTagDist() {
+    return tagDist;
+  }
+    
+  @Logged(name = "Reprojection Error", importance = Importance.DEBUG)
+  public double getReprojError() {
+    return reprojError;
   }
 
   /**

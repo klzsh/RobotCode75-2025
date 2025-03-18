@@ -57,9 +57,10 @@ public class YoloController {
     yController.setSetpoint(Math.sin(finalYawSetpointDegrees));
   }
 
+  double targetSin;
   public double getAlignCommand() {
     double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
-    double targetSin = Math.sin(targetYaw);
+    targetSin = Math.sin(Math.toRadians(targetYaw));
     yCommand = yController.calculate(targetSin) * -Math.signum(targetYaw);
     return yCommand;
   }
@@ -67,16 +68,20 @@ public class YoloController {
   public void reset(boolean alignInPlace) {
     isAlignInPlace = alignInPlace;
     if (isAlignInPlace) {
-      yController.setP(0.1);
-      yController.setD(0);
-      yController.setTolerance(2);
+      yController.setP(0.75);
+      yController.setD(0.013);
+      yController.setTolerance(.7);
+      // yController.setP(strafePID[0].getNumber());
+      // yController.setI(strafePID[1].getNumber());
+      // yController.setD(strafePID[2].getNumber());
+      // yController.setTolerance(strafePID[3].getNumber());
     } else {
       yController.setP(strafePID[0].getNumber());
       yController.setI(strafePID[1].getNumber());
       yController.setD(strafePID[2].getNumber());
       yController.setTolerance(strafePID[3].getNumber());
     }
-    yController.setSetpoint(Math.sin(finalYawSetpointDegrees));
+    yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
     startTime = -1;
   }
 
@@ -88,7 +93,7 @@ public class YoloController {
     yController.setI(strafePID[1].getNumber());
     yController.setD(strafePID[2].getNumber());
     yController.setTolerance(strafePID[3].getNumber());
-    yController.setSetpoint(Math.sin(finalYawSetpointDegrees));
+    yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
     // yController.setP(0.07);
     // yController.setTolerance(0.2);
 
@@ -118,6 +123,17 @@ public class YoloController {
       }
     }
   }
+
+  @Logged(name="tag sin", importance = Importance.CRITICAL)
+  public double tagSin() {
+    return targetSin;
+  }
+
+  @Logged(name = "target sin", importance = Importance.CRITICAL)
+  public double targetYawSin() {
+    return Math.sin(Math.toRadians(finalYawSetpointDegrees));
+  }
+
   @Logged
   public boolean atGoal() {
     // should be stalling when driving into reef

@@ -1,10 +1,12 @@
 package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
+import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -64,6 +66,10 @@ public class ActionFactory {
         return new AutoIntakeCoral(m_Swerve, m_CoralIntake);
       case 6:
         return new YoloBranchAlign(m_Swerve, m_YoloController, true);
+      case 7:
+        return new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT);
+      case 8:
+        return new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT);
     }
     return null;
   }
@@ -82,6 +88,10 @@ public class ActionFactory {
         return "Intake";
       case 6:
         return "YOLO";
+      case 7: 
+        return "Align to Reef Left";
+      case 8:
+        return "Align to Reef Right";
     }
     return null;
   }
