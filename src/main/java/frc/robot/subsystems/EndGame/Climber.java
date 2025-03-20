@@ -23,13 +23,10 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.ClimberConstants;
 
 @Logged(name = "Climber", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class Climber extends SubsystemBase {
-
- 
 
   // @Logged(name = "Climber Motor 1", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor1;
@@ -105,7 +102,6 @@ public class Climber extends SubsystemBase {
     resetPosition();
   }
 
-  
   public double absoluteEncoderToRotations(double x) {
     return 132.2772 * Math.sin(3.36922 * x);
   }
@@ -186,6 +182,5 @@ public class Climber extends SubsystemBase {
     //   m_ClimberMotor2.getConfigurator().apply(MMConfig);
     // }
 
-   
   }
 }

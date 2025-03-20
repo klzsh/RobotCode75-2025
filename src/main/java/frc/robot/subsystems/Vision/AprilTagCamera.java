@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.Vision;
 
-import static edu.wpi.first.units.Units.Rotation;
 import static frc.robot.Constants.VisionConstants.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -20,8 +19,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -330,10 +327,10 @@ public class AprilTagCamera extends SubsystemBase {
         tagDist = 1;
         reprojError = 1;
         ambiguity = 1;
-        if(maxTagDist(currentPose).isPresent()) {
+        if (maxTagDist(currentPose).isPresent()) {
           tagDist = maxTagDist(currentPose).getAsDouble();
         }
-        
+
         if (m_result.getMultiTagResult().isPresent()) {
           reprojError = m_result.getMultiTagResult().get().estimatedPose.bestReprojErr;
         }
@@ -342,27 +339,29 @@ public class AprilTagCamera extends SubsystemBase {
           ambiguity = getBestTarget().get().poseAmbiguity;
         }
 
-
         for (PhotonTrackedTarget target : m_result.getTargets()) {
-          if (target.getFiducialId() == 3 || target.getFiducialId() == 16 || target.getFiducialId() == 2) {
+          if (target.getFiducialId() == 3
+              || target.getFiducialId() == 16
+              || target.getFiducialId() == 2) {
             m_pose = null;
             return;
           }
         }
-        if (maxTagDist(currentPose).isPresent() && maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
+        if (maxTagDist(currentPose).isPresent()
+            && maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
           m_pose = null;
           return;
         }
-
 
         if (m_result.getMultiTagResult().isPresent()
-          && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > reprojectionErrorThreshold) {
+            && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr
+                > reprojectionErrorThreshold) {
           m_pose = null;
           return;
         }
 
-
-        if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
+        if (getBestTarget().isPresent()
+            && getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
           m_pose = null;
           return;
         }
@@ -391,7 +390,7 @@ public class AprilTagCamera extends SubsystemBase {
   public double getTagDist() {
     return tagDist;
   }
-    
+
   @Logged(name = "Reprojection Error", importance = Importance.DEBUG)
   public double getReprojError() {
     return reprojError;
@@ -446,6 +445,5 @@ public class AprilTagCamera extends SubsystemBase {
   // }
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 }

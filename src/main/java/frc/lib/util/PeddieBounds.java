@@ -116,10 +116,14 @@ public class PeddieBounds {
           Rotation2d.fromDegrees(poseToDrive.getRotation().getDegrees() - 180));
     } else if (FieldPose.fieldElementIsHPStation(targetPose.fieldElement)) {
       if (targetPose.offset == Offset.LEFT) {
-        poseToDrive = poseToDrive.transformBy(new Transform2d(0, hpLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+        poseToDrive =
+            poseToDrive.transformBy(
+                new Transform2d(0, hpLeftPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
       }
       if (targetPose.offset == Offset.RIGHT) {
-        poseToDrive = poseToDrive.transformBy(new Transform2d(0, hpRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+        poseToDrive =
+            poseToDrive.transformBy(
+                new Transform2d(0, hpRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
       }
       return new Pose2d(
           poseToDrive.getX(),

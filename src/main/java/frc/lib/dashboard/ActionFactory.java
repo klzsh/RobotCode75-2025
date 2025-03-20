@@ -67,9 +67,11 @@ public class ActionFactory {
       case 6:
         return new YoloBranchAlign(m_Swerve, m_YoloController, true);
       case 7:
-        return new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT);
+        return new AlignToReef(
+            m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT);
       case 8:
-        return new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT);
+        return new AlignToReef(
+            m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT);
     }
     return null;
   }
@@ -88,7 +90,7 @@ public class ActionFactory {
         return "Intake";
       case 6:
         return "YOLO";
-      case 7: 
+      case 7:
         return "Align to Reef Left";
       case 8:
         return "Align to Reef Right";

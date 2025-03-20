@@ -7,8 +7,8 @@ package frc.robot.commands.EndEffector.Coral;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
-import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ScoreCoral extends Command {

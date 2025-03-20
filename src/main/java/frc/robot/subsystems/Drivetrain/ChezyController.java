@@ -45,10 +45,8 @@ public class ChezyController {
 
   private boolean rotationFinished = false;
 
-  @Logged
-  private double currentRotation;
-  @Logged
-  private double targetRotation;
+  @Logged private double currentRotation;
+  @Logged private double targetRotation;
 
   @Logged(name = "target", importance = Logged.Importance.INFO)
   private Pose2d target;
@@ -126,7 +124,9 @@ public class ChezyController {
     double thetaVelocity =
         thetaController.getSetpoint().velocity * ffScaler * 0.3
             + thetaController.calculate(
-                wrap(currentPose.getRotation().getRadians() - targetPose.getRotation().getRadians()), 0.0);
+                wrap(
+                    currentPose.getRotation().getRadians() - targetPose.getRotation().getRadians()),
+                0.0);
     currentRotation = wrap(currentPose.getRotation().getRadians());
     targetRotation = wrap(targetPose.getRotation().getRadians());
     thetaErrorAbs =

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
+
 @Logged(name = "YOLO Controller", importance = Importance.DEBUG, strategy = Strategy.OPT_IN)
 public class YoloController {
   private final TunableNumber[] strafePID = {
@@ -32,8 +33,7 @@ public class YoloController {
   // private final PIDController xController;
   private final PIDController yController;
   // private double xCommand;
-  @Logged
-  private double yCommand;
+  @Logged private double yCommand;
 
   // private final TunableNumber inPlaceYP;
   // private final TunableNumber inPlaceYD;
@@ -58,6 +58,7 @@ public class YoloController {
   }
 
   double targetSin;
+
   public double getAlignCommand() {
     double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
     targetSin = Math.sin(Math.toRadians(targetYaw));
@@ -124,7 +125,7 @@ public class YoloController {
     }
   }
 
-  @Logged(name="tag sin", importance = Importance.CRITICAL)
+  @Logged(name = "tag sin", importance = Importance.CRITICAL)
   public double tagSin() {
     return targetSin;
   }

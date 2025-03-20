@@ -87,10 +87,11 @@ public class CoralIntake extends SubsystemBase {
 
     m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
 
-    scoreSpeed = new TunableNumber("Coral Intake/Score Speed",
-    coralScoreSpeed.in(RotationsPerSecond));
-    rotationsAfterIntake = new TunableNumber("Coral Intake/Rotations After Intake",
-    coralRotationsAfterIntake.in(Rotations));
+    scoreSpeed =
+        new TunableNumber("Coral Intake/Score Speed", coralScoreSpeed.in(RotationsPerSecond));
+    rotationsAfterIntake =
+        new TunableNumber(
+            "Coral Intake/Rotations After Intake", coralRotationsAfterIntake.in(Rotations));
 
     // coralVelocitykP = new TunableNumber("Coral Intake/Velocity Kp", coralVelocityKP);
     // coralVelocitykI = new TunableNumber("Coral Intake/Velocity Ki", coralVelocityKI);
@@ -126,15 +127,17 @@ public class CoralIntake extends SubsystemBase {
   }
 
   private boolean atPosition() {
-    return m_CoralMotor.getPosition(true).getValue().in(Rotations) > coralRotationsAfterIntake.in(Rotations);
+    return m_CoralMotor.getPosition(true).getValue().in(Rotations)
+        > coralRotationsAfterIntake.in(Rotations);
   }
 
   @Logged(name = "Velocity", importance = Importance.CRITICAL)
   public double getVelocity() {
     return m_CoralMotor.getVelocity(true).getValue().in(RotationsPerSecond);
   }
+
   @Logged(name = "Position", importance = Importance.CRITICAL)
-  public double getPosition(){
+  public double getPosition() {
     return m_CoralMotor.getPosition(true).getValue().in(Rotations);
   }
 
@@ -189,8 +192,8 @@ public class CoralIntake extends SubsystemBase {
           m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeedL1).withSlot(0));
         } else {
           // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
-          m_CoralMotor.setControl(m_VelocityRequest.withVelocity(scoreSpeed.getNumber()).withSlot(0));
-
+          m_CoralMotor.setControl(
+              m_VelocityRequest.withVelocity(scoreSpeed.getNumber()).withSlot(0));
         }
       }
       case INTAKING -> {

@@ -10,12 +10,9 @@ import static frc.robot.Constants.ElevatorConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.DynamicMotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -123,7 +120,6 @@ public class Elevator extends SubsystemBase {
     l2Height = new TunableNumber("Elevator/L2 Height", l2Position.in(Rotations));
     l3Height = new TunableNumber("Elevator/L3 Height", l3Position.in(Rotations));
 
-
     // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
     // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
     // mmJerkUp = new TunableNumber("Elevator/MM Jerk Up", MotionMagicProfileUp[2]);
@@ -180,7 +176,8 @@ public class Elevator extends SubsystemBase {
 
     return Rotations.of((motor1Position.in(Rotations) + motor2Position.in(Rotations)) / 2);
   }
-  public ElevatorPositions getState(){
+
+  public ElevatorPositions getState() {
     return m_SetpointPosition;
   }
 
@@ -230,7 +227,8 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (getLowerLimit() && (getPosition().in(Rotations) >= 0.1 || getPosition().in(Rotations) <= -0.1)) {
+    if (getLowerLimit()
+        && (getPosition().in(Rotations) >= 0.1 || getPosition().in(Rotations) <= -0.1)) {
       m_ElevatorMotor1.setPosition(Rotations.of(0));
       m_ElevatorMotor2.setPosition(Rotations.of(0));
       // System.out.println("Called");
@@ -240,10 +238,10 @@ public class Elevator extends SubsystemBase {
     //   m_ElevatorMotor2.setPosition(Rotations.of(26));
     // }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
-    if(m_SetpointPosition == ElevatorPositions.L2){
+    if (m_SetpointPosition == ElevatorPositions.L2) {
       currentPosition = l2Height.getNumber();
     }
-    if(m_SetpointPosition == ElevatorPositions.L3){
+    if (m_SetpointPosition == ElevatorPositions.L3) {
       currentPosition = l3Height.getNumber();
     }
 
