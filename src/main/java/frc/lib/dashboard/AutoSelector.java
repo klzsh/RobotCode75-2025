@@ -266,12 +266,13 @@ public class AutoSelector {
             lastPose = lastPose.substring(0, 1);
           }
           if (!isOdometryReset) {
+            // TODO: Use start pose to set gyro
             sequential.addCommands(
                 Commands.runOnce(
                     () ->
                         m_swerve.zeroGyro(
                             Rotation2d.fromDegrees(
-                                DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0))),
+                                DriverStation.getAlliance().get() == Alliance.Blue ? 240 : 60))),
                 factory.resetOdometry("" + lastPose + "-" + point));
             isOdometryReset = true;
           }
