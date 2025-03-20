@@ -106,7 +106,7 @@ public class RobotContainer {
   private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
 
   // odometry
-  private final OdometryWrapper m_Odometry = new OdometryWrapper(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
+  private final OdometryWrapper m_Odometry = new OdometryWrapper(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera/*, m_HPCamera*/);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
