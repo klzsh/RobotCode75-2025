@@ -29,5 +29,8 @@ public class OdometryWrapper extends SubsystemBase {
       m_Cameras[i].updatePoseEstimator(m_Swerve.getPose());
       m_Swerve.updatePoseByVision(m_Cameras[i]);
     }
+    // m_Swerve.updatePoseByVision(m_Cameras[i]);
+    // 
+
   }
 }

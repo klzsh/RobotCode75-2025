@@ -55,6 +55,8 @@ public class AprilTagCamera extends SubsystemBase {
   private double reprojError = 0;
   private double tagDist = 0;
 
+  private double cameraReliabilityScore;
+
   public AprilTagCamera(String name, Transform3d cameraPose) {
     cameraName = name;
 
@@ -325,6 +327,9 @@ public class AprilTagCamera extends SubsystemBase {
       if (!m_unreadResults.isEmpty()) {
         // gets the latest unread result
         m_result = m_unreadResults.get(m_unreadResults.size() - 1);
+        tagDist = 1;
+        reprojError = 1;
+        ambiguity = 1;
         if(maxTagDist(currentPose).isPresent()) {
           tagDist = maxTagDist(currentPose).getAsDouble();
         }
@@ -336,8 +341,10 @@ public class AprilTagCamera extends SubsystemBase {
         if (getBestTarget().isPresent()) {
           ambiguity = getBestTarget().get().poseAmbiguity;
         }
+
+
         for (PhotonTrackedTarget target : m_result.getTargets()) {
-          if (target.getFiducialId() == 3 || target.getFiducialId() == 16) {
+          if (target.getFiducialId() == 3 || target.getFiducialId() == 16 || target.getFiducialId() == 2) {
             m_pose = null;
             return;
           }
