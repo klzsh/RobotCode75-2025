@@ -72,15 +72,16 @@ public class AlignToReef extends Command {
     
     m_BranchCamera.updateByUnreadResults();
     
-    if (yOffset < 0.1 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
-      ChassisSpeeds yoloSpeeds =
-      ChassisSpeeds.fromRobotRelativeSpeeds(
-        m_YoloController.update(), m_Swerve.getRotation2D());
+    if (yOffset < 0.25 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
+      System.out.println("I have switched to YOLO");
+      ChassisSpeeds yoloSpeeds = m_YoloController.update();
         // add yolo speeds to chezy speeds
         chezySpeeds.vyMetersPerSecond = yoloSpeeds.vyMetersPerSecond;
+      } else {
+        System.out.println("Not using YOLO");
       }
-    speeds.vxMetersPerSecond = MathUtil.clamp(speeds.vxMetersPerSecond, -1.5, 1.5);
-    speeds.vyMetersPerSecond = MathUtil.clamp(speeds.vyMetersPerSecond, -1.5, 1.5);
+    chezySpeeds.vxMetersPerSecond = MathUtil.clamp(chezySpeeds.vxMetersPerSecond, -1.5, 1.5);
+    chezySpeeds.vyMetersPerSecond = MathUtil.clamp(chezySpeeds.vyMetersPerSecond, -1.5, 1.5);
     m_Swerve.setChassisSpeeds(chezySpeeds);
   }
 
