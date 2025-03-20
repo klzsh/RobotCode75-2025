@@ -70,7 +70,7 @@ public class YoloController {
     if (isAlignInPlace) {
       yController.setP(0.75);
       yController.setD(0.013);
-      yController.setTolerance(.7);
+      yController.setTolerance(.02);
       // yController.setP(strafePID[0].getNumber());
       // yController.setI(strafePID[1].getNumber());
       // yController.setD(strafePID[2].getNumber());
