@@ -45,7 +45,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
         new ParallelCommandGroup(
             // new ChezyPose(swerve, chezyController, new
             // FieldPose(DriverStation.getAlliance().get(), elem, Offset.MID), false),
-            new SetElevatorPosition(elevator, elevatorHeight, true)),
+            new SetElevatorPosition(elevator, elevatorHeight, true, false)),
         new ParallelCommandGroup(
                 new InstantCommand(
                         () -> {
@@ -56,7 +56,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
                         pivot)
                     .repeatedly()
                     .until(() -> intake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-                new SetElevatorPosition(elevator, elevatorHeight, true))
+                new SetElevatorPosition(elevator, elevatorHeight, true, false))
             .until(() -> intake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
         new ParallelCommandGroup(
             new InstantCommand(
@@ -64,7 +64,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
                   swerve.setRobotRelative(new ChassisSpeeds(-0.25, 0, 0));
                 }),
             new WaitCommand(0.5),
-            new SetElevatorPosition(elevator, elevatorHeight, true)),
+            new SetElevatorPosition(elevator, elevatorHeight, true, false)),
         new InstantCommand(
                 () -> {
                   pivot.setPivotState(PivotState.RETRACTED);

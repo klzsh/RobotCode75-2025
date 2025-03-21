@@ -25,13 +25,13 @@ public class AutoScoreL1 extends SequentialCommandGroup {
         new IntakeCoral(coralIntake),
         new ParallelCommandGroup(
             // align to branch color
-            new SetElevatorPosition(elevator, ElevatorPositions.L1, true)),
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false, false)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake, elevator),
-            new SetElevatorPosition(elevator, ElevatorPositions.L1, false)),
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false, false)),
         new ParallelCommandGroup(
-            new SetElevatorPosition(elevator, ElevatorPositions.L1, false),
+            new SetElevatorPosition(elevator, ElevatorPositions.L1, false, false),
             new WaitCommand(coralScoreDelay)),
-        new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
+        new SetElevatorPosition(elevator, ElevatorPositions.HOME, false, true));
   }
 }

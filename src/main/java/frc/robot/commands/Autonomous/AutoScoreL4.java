@@ -26,13 +26,13 @@ public class AutoScoreL4 extends SequentialCommandGroup {
         new ParallelCommandGroup(
             // align to branch color
             // new RotateToSimilarFace(swerve),
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, true)),
+            new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake, elevator),
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, false)),
-        new ParallelCommandGroup(
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, false),
-            new WaitCommand(coralScoreDelay)),
-        new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
+            new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false)),
+        // new ParallelCommandGroup(
+            // new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false),
+            // new WaitCommand(coralScoreDelay)),
+        new SetElevatorPosition(elevator, ElevatorPositions.HOME, false, true));
   }
 }

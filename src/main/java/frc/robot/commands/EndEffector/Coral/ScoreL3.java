@@ -22,13 +22,13 @@ public class ScoreL3 extends SequentialCommandGroup {
   public ScoreL3(Elevator elevator, CoralIntake coralIntake) {
     addRequirements(elevator, coralIntake);
     addCommands(
-        new SetElevatorPosition(elevator, ElevatorPositions.L3, false),
+        new SetElevatorPosition(elevator, ElevatorPositions.L3, false, false),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake, elevator),
-            new SetElevatorPosition(elevator, ElevatorPositions.L3, false)),
+            new SetElevatorPosition(elevator, ElevatorPositions.L3, false, false)),
         new ParallelCommandGroup(
-            new SetElevatorPosition(elevator, ElevatorPositions.L3, false),
+            new SetElevatorPosition(elevator, ElevatorPositions.L3, false, false),
             new WaitCommand(coralScoreDelay)),
-        new SetElevatorPosition(elevator, ElevatorPositions.HOME, false));
+        new SetElevatorPosition(elevator, ElevatorPositions.HOME, false, false));
   }
 }

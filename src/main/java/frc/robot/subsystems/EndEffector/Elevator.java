@@ -214,6 +214,19 @@ public class Elevator extends SubsystemBase {
             deadband.in(Rotations))
         == 0.0;
   }
+  public boolean isBelowPosition(ElevatorPositions position, boolean isAlgae){
+    if(position == ElevatorPositions.HOME){
+      return getLowerLimit();
+    } 
+    double currentPosition = getPosition().in(Rotations);
+    double algaeOffset =
+        (isAlgae && (position == ElevatorPositions.L2 || position == ElevatorPositions.L3))
+            ? algaeRemovalOffset.in(Rotations)
+            // ? AlgaeOffsetPrePickupRotations.getNumber()
+            : 0;
+    currentPosition += algaeOffset;
+    return currentPosition <= position.Rotations.in(Rotations);
+  }
 
   @Logged(name = "Upper Limit", importance = Importance.CRITICAL)
   public boolean getUpperLimit() {
