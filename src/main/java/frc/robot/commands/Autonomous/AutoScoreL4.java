@@ -4,11 +4,8 @@
 
 package frc.robot.commands.Autonomous;
 
-import static frc.robot.Constants.EndEffectorConstants.coralScoreDelay;
-
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
@@ -31,8 +28,8 @@ public class AutoScoreL4 extends SequentialCommandGroup {
             new ScoreCoral(coralIntake, elevator),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false)),
         // new ParallelCommandGroup(
-            // new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false),
-            // new WaitCommand(coralScoreDelay)),
+        // new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false),
+        // new WaitCommand(coralScoreDelay)),
         new SetElevatorPosition(elevator, ElevatorPositions.HOME, false, true));
   }
 }

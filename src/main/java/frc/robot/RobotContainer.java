@@ -29,14 +29,9 @@ import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
-import frc.robot.commands.EndEffector.Coral.ScoreL1;
-import frc.robot.commands.EndEffector.Coral.ScoreL2;
-import frc.robot.commands.EndEffector.Coral.ScoreL3;
-import frc.robot.commands.EndEffector.Coral.ScoreL4;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
@@ -202,14 +197,16 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    AlignLeft.and(() -> m_CoralIntake.getBeamBreak()).whileTrue(new AlignToReef(m_Swerve,
-        m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
+    AlignLeft.and(() -> m_CoralIntake.getBeamBreak())
+        .whileTrue(
+            new AlignToReef(
+                m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
             new AlignToReef(
                 m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT));
-    AlignLeft.and(() -> !m_CoralIntake.getBeamBreak()).whileTrue(new
-        AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
+    AlignLeft.and(() -> !m_CoralIntake.getBeamBreak())
+        .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
     AlignRight.and(() -> !m_CoralIntake.getBeamBreak())
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));

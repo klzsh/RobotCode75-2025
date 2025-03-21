@@ -17,7 +17,8 @@ public class SetElevatorPosition extends Command {
   private final boolean m_IsAlgae;
   private final boolean m_LastAutoCommand;
 
-  public SetElevatorPosition(Elevator elevator, ElevatorPositions position, boolean isAlgae, boolean lastAutoCommand) {
+  public SetElevatorPosition(
+      Elevator elevator, ElevatorPositions position, boolean isAlgae, boolean lastAutoCommand) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_LastAutoCommand = lastAutoCommand;
     m_Elevator = elevator;
@@ -43,7 +44,7 @@ public class SetElevatorPosition extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(m_LastAutoCommand){
+    if (m_LastAutoCommand) {
       return m_Elevator.isBelowPosition(ElevatorPositions.L2, false);
     } else {
       return m_Elevator.isAtPosition(m_Position, m_IsAlgae);
