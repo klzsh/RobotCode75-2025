@@ -1,6 +1,9 @@
 package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
@@ -8,12 +11,14 @@ import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
+import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import frc.robot.subsystems.Vision.YoloController;
 
@@ -72,6 +77,12 @@ public class ActionFactory {
       case 8:
         return new AlignToReef(
             m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT);
+      case 9:
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                new WaitCommand(0.75),
+                new WaitCommand(0.02).repeatedly().until(() -> m_CoralIntake.getBeamBreak())),
+            new SetElevatorPosition(m_Elevator, ElevatorPositions.L2, false, false).repeatedly());
     }
     return null;
   }
@@ -94,6 +105,8 @@ public class ActionFactory {
         return "Align to Reef Left";
       case 8:
         return "Align to Reef Right";
+      case 9:
+        return "Preraise Elevator";
     }
     return null;
   }

@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -238,7 +238,7 @@ public class AutoSelector {
 
     String lastPose = "";
     for (int i = 0; i < words.length; i++) {
-      ParallelCommandGroup parallelGroup = new ParallelCommandGroup();
+      ParallelRaceGroup parallelGroup = new ParallelRaceGroup();
       StringBuilder pointString = new StringBuilder();
       StringBuilder actionString = new StringBuilder();
       for (int j = 0; j < words[i].length(); j++) {
