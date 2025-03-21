@@ -202,15 +202,15 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    // AlignLeft.and(() -> m_CoralIntake.getBeamBreak()).whileTrue(new AlignToReef(m_Swerve,
-    // m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
+    AlignLeft.and(() -> m_CoralIntake.getBeamBreak()).whileTrue(new AlignToReef(m_Swerve,
+        m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
             new AlignToReef(
                 m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT));
-    // AlignLeft.and(() -> !m_CoralIntake.getBeamBreak()).whileTrue(new
-    // AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
-    AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    AlignLeft.and(() -> !m_CoralIntake.getBeamBreak()).whileTrue(new
+        AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
+    // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
     AlignRight.and(() -> !m_CoralIntake.getBeamBreak())
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
@@ -247,24 +247,24 @@ public class RobotContainer {
     //     .b()
     //     .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L4, false),
     // m_Elevator).repeatedly());
-    m_Controller
-        .a()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
-        .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    m_Controller
-        .x()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
-        .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    m_Controller
-        .y()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
-        .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    m_Controller
-        .b()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
-        .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .a()
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
+    //     .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .x()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
+    //     .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .y()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
+    //     .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .b()
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
+    //     .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
     // algae commands
     m_Controller
         .povRight()
@@ -298,44 +298,46 @@ public class RobotContainer {
     // overrides
     m_Controller
         .a()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .x()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .y()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .b()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
                 .repeatedly());
+
+    m_Controller.rightTrigger(0.15).whileTrue(new ScoreCoral(m_CoralIntake, m_Elevator));
     // dealgaefy commands
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
     // climber commands
     // Left Y, more than 0.15
