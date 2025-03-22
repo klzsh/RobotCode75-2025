@@ -20,6 +20,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,6 +59,8 @@ public class Climber extends SubsystemBase {
 
   private final TorqueCurrentFOC m_TestRequest;
 
+  private final DigitalInput m_ClimberLimitSwitch;
+
   public Climber() {
     m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
@@ -73,6 +76,8 @@ public class Climber extends SubsystemBase {
 
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
     m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
+
+    m_ClimberLimitSwitch = new DigitalInput(7);
 
     // retractSetpoint = new TunableNumber("Climber/Retract Setpoint", climbPosition.in(Rotations));
     // extendSetpoint = new TunableNumber("Climber/Extend Setpoint",
@@ -102,18 +107,29 @@ public class Climber extends SubsystemBase {
     resetPosition();
   }
 
+  @Logged(name = "Climber Limit Switch", importance = Importance.CRITICAL)
+  public boolean getLimitSwitch() {
+    return m_ClimberLimitSwitch.get();
+  }
+
   public double absoluteEncoderToRotations(double x) {
-    return 132.2772 * Math.sin(3.36922 * x);
+    return 132.2772 * Math.sin(3.36922 * x) + 11.17;
   }
 
   public void setPositionRequest(Angle position) {
+    if ((getLimitSwitch() || atPosition(position)) && position.in(Rotations) < getPositionRotations()) {
+      m_ClimberMotor1.setControl(
+        m_TestRequest.withOutput(0));
+      m_ClimberMotor2.setControl(
+        m_TestRequest.withOutput(0));
+    }
     m_ClimberMotor1.setControl(
-        m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
+        m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
     m_ClimberMotor2.setControl(
-        m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
+        m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
   }
 
-  // @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
+  @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
   public double getAbsolutePosition() {
     return m_ClimberEncoder.get();
   }
@@ -134,8 +150,8 @@ public class Climber extends SubsystemBase {
     return Rotations.of((motor1Position.in(Rotations) + motor2Position.in(Rotations)) / 2);
   }
 
-  public boolean atPosition() {
-    return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations))
+  public boolean atPosition(Angle position) {
+    return Math.abs(getPosition().in(Rotations) - position.in(Rotations))
         < ClimberConstants.climbDeadband;
   }
 
@@ -146,12 +162,23 @@ public class Climber extends SubsystemBase {
   }
 
   public void resetPosition() {
-    m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
-    m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    // m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    // m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    if (getLimitSwitch()) {
+      m_ClimberMotor1.setPosition(0);
+      m_ClimberMotor2.setPosition(0);
+    } else {
+      m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+      m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    }
   }
 
   @Override
   public void periodic() {
+
+    if (getLimitSwitch()) {
+      resetPosition();
+    }
     // if (climberKp.getNumber() != PIDConfig.kP
     //     || climberKd.getNumber() != PIDConfig.kD
     //     || climberKs.getNumber() != PIDConfig.kS
