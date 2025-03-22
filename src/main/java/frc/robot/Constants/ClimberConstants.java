@@ -92,7 +92,7 @@ public final class ClimberConstants {
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardSoftLimit.in(Rotations);
-      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
           reverseSoftLimit.in(Rotations);
 

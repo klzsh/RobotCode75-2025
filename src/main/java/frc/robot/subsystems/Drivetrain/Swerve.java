@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
 import frc.robot.Constants.DrivetrainConstants.BackRight;
 import frc.robot.Constants.DrivetrainConstants.FrontLeft;
@@ -80,17 +81,17 @@ public class Swerve extends SubsystemBase {
   private final AprilTagCamera m_HPCamera;
 
   // do this later
-  // private final TunableNumber xKP;
-  // private final TunableNumber xKI;
-  // private final TunableNumber xKD;
+  private final TunableNumber xKP;
+  private final TunableNumber xKI;
+  private final TunableNumber xKD;
 
-  // private final TunableNumber yKP;
-  // private final TunableNumber yKI;
-  // private final TunableNumber yKD;
+  private final TunableNumber yKP;
+  private final TunableNumber yKI;
+  private final TunableNumber yKD;
 
-  // private final TunableNumber rotationKP;
-  // private final TunableNumber rotationKI;
-  // private final TunableNumber rotationKD;
+  private final TunableNumber rotationKP;
+  private final TunableNumber rotationKI;
+  private final TunableNumber rotationKD;
 
   // private final TunableNumber maxAutosSpeed;
 
@@ -148,16 +149,16 @@ public class Swerve extends SubsystemBase {
     // driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
     // driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
 
-    // xKP = new TunableNumber("Autos/X-KP", 2.65);
-    // xKI = new TunableNumber("Autos/X-KI", 0);
-    // xKD = new TunableNumber("Autos/X-KD", 0);
+    xKP = new TunableNumber("Autos/X-KP", 2.65);
+    xKI = new TunableNumber("Autos/X-KI", 0);
+    xKD = new TunableNumber("Autos/X-KD", 0);
 
-    // yKP = new TunableNumber("Autos/Y-KP", 3.9);
-    // yKI = new TunableNumber("Autos/Y-KI", 0);
-    // yKD = new TunableNumber("Autos/Y-KD", 0);
-    // rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
-    // rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
-    // rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
+    yKP = new TunableNumber("Autos/Y-KP", 3.9);
+    yKI = new TunableNumber("Autos/Y-KI", 0);
+    yKD = new TunableNumber("Autos/Y-KD", 0);
+    rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
+    rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
+    rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
 
     // maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
 
@@ -462,26 +463,26 @@ public class Swerve extends SubsystemBase {
     //     mod.setDrivePIDS(drivePIDS);
     //   }
     // }
-    // if (xKP.getNumber() != xController.getP()
-    //     || xKI.getNumber() != xController.getI()
-    //     || xKD.getNumber() != xController.getD()) {
-    //   xController.setP(xKP.getNumber());
-    //   xController.setI(xKI.getNumber());
-    //   xController.setD(xKD.getNumber());
-    // }
-    // if (yKP.getNumber() != yController.getP()
-    //     || yKI.getNumber() != yController.getI()
-    //     || yKD.getNumber() != yController.getD()) {
-    //   yController.setP(yKP.getNumber());
-    //   yController.setI(yKI.getNumber());
-    //   yController.setD(yKD.getNumber());
-    // }
-    // if (rotationKP.getNumber() != rController.getP()
-    //     || rotationKI.getNumber() != rController.getI()
-    //     || rotationKD.getNumber() != rController.getD()) {
-    //   rController.setP(rotationKP.getNumber());
-    //   rController.setI(rotationKI.getNumber());
-    //   rController.setD(rotationKD.getNumber());
-    // }
+    if (xKP.getNumber() != xController.getP()
+        || xKI.getNumber() != xController.getI()
+        || xKD.getNumber() != xController.getD()) {
+      xController.setP(xKP.getNumber());
+      xController.setI(xKI.getNumber());
+      xController.setD(xKD.getNumber());
+    }
+    if (yKP.getNumber() != yController.getP()
+        || yKI.getNumber() != yController.getI()
+        || yKD.getNumber() != yController.getD()) {
+      yController.setP(yKP.getNumber());
+      yController.setI(yKI.getNumber());
+      yController.setD(yKD.getNumber());
+    }
+    if (rotationKP.getNumber() != rController.getP()
+        || rotationKI.getNumber() != rController.getI()
+        || rotationKD.getNumber() != rController.getD()) {
+      rController.setP(rotationKP.getNumber());
+      rController.setI(rotationKI.getNumber());
+      rController.setD(rotationKD.getNumber());
+    }
   }
 }

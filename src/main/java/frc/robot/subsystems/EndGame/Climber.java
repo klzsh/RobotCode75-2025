@@ -17,7 +17,6 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -67,7 +66,7 @@ public class Climber extends SubsystemBase {
 
   private final DigitalInput m_ClimberLimitSwitch;
 
-  @Logged(name="at position", importance = Importance.CRITICAL)
+  @Logged(name = "at position", importance = Importance.CRITICAL)
   private boolean atPosition = false;
 
   public Climber() {
@@ -86,7 +85,7 @@ public class Climber extends SubsystemBase {
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
     m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
 
-    m_ClimberLimitSwitch = new DigitalInput(7);
+    m_ClimberLimitSwitch = new DigitalInput(8);
 
     // retractSetpoint = new TunableNumber("Climber/Retract Setpoint", climbPosition.in(Rotations));
     // extendSetpoint = new TunableNumber("Climber/Extend Setpoint",
@@ -126,17 +125,16 @@ public class Climber extends SubsystemBase {
   }
 
   public void setPositionRequest(Angle position) {
-    if ((getLimitSwitch() || atPosition(position)) && position.in(Rotations) <= getPositionRotations()) {
-      m_ClimberMotor1.setControl(
-        m_TestRequest.withOutput(0));
-      m_ClimberMotor2.setControl(
-        m_TestRequest.withOutput(0));
-        atPosition = true;
+    if ((getLimitSwitch() || atPosition(position))
+        && position.in(Rotations) <= getPositionRotations()) {
+      m_ClimberMotor1.setControl(m_TestRequest.withOutput(0));
+      m_ClimberMotor2.setControl(m_TestRequest.withOutput(0));
+      atPosition = true;
     } else {
       m_ClimberMotor1.setControl(
-        m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
+          m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
       m_ClimberMotor2.setControl(
-        m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
+          m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
       atPosition = false;
     }
   }
@@ -225,6 +223,5 @@ public class Climber extends SubsystemBase {
       m_ClimberMotor1.getConfigurator().apply(MMConfig);
       m_ClimberMotor2.getConfigurator().apply(MMConfig);
     }
-
   }
 }

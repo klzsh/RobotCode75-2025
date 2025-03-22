@@ -9,6 +9,7 @@ import static frc.robot.Constants.ClimberConstants.climbPosition;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
+import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -22,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Autonomous.TestFullAuto;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.AlignToReef;
@@ -30,6 +30,7 @@ import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
+import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
@@ -50,8 +51,6 @@ import frc.robot.subsystems.Vision.OdometryWrapper;
 import frc.robot.subsystems.Vision.YoloController;
 import java.util.ArrayList;
 
-import choreo.auto.AutoFactory;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -61,15 +60,15 @@ import choreo.auto.AutoFactory;
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-//   @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-//   @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-//   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
@@ -81,25 +80,26 @@ public class RobotContainer {
   @Logged(name = "Swerve", importance = Importance.CRITICAL)
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-//   @Logged(name = "Elevator", importance = Importance.CRITICAL)
+    @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
-//   @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
+    @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-//   @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
+    // @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-//   @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
+    // @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
-  @Logged private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
+//   @Logged 
+  private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
 
-  @Logged
+//   @Logged
   private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
 
   // odometry
@@ -132,6 +132,8 @@ public class RobotContainer {
   private final JoystickButton resetBranchCam =
       new JoystickButton(m_LeftStick, resetBranchCamButton);
 
+  private final JoystickButton YoloAlign = new JoystickButton(m_RightStick, yoloAlignButton);
+
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
   private final AutoFactory m_factory =
@@ -149,9 +151,9 @@ public class RobotContainer {
           m_YoloController,
           m_BranchCamera);
 
-//   private final AutoSelector m_AutoSelector =
-//       new AutoSelector(
-//           m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
+  private final AutoSelector m_AutoSelector =
+      new AutoSelector(
+          m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -202,10 +204,12 @@ public class RobotContainer {
     Xstance.whileTrue(new XStance(m_Swerve));
     AlignLeft.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
+            // new YoloBranchAlign(m_Swerve, m_YoloController, false)
             new AlignToReef(
                 m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
+            // new YoloBranchAlign(m_Swerve, m_YoloController, false)
             new AlignToReef(
                 m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT));
     AlignLeft.and(() -> !m_CoralIntake.getBeamBreak())
@@ -216,6 +220,9 @@ public class RobotContainer {
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
+
+    YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
         .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
@@ -365,8 +372,8 @@ public class RobotContainer {
   }
 
   private void configureChooser() {
-    // m_AutoSelector.setupAutoTab();
-    // m_AutoSelector.clearAll();
+    m_AutoSelector.setupAutoTab();
+    m_AutoSelector.clearAll();
   }
 
   /**
@@ -375,7 +382,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // m_AutoSelector.generatePaths();
-    return new TestFullAuto(m_Swerve, m_factory);// m_AutoSelector.getAutoCommand();
+    m_AutoSelector.generatePaths();
+    return m_AutoSelector.getAutoCommand();
   }
 }

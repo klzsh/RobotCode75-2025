@@ -77,10 +77,13 @@ public class YoloController {
       // yController.setD(strafePID[2].getNumber());
       // yController.setTolerance(strafePID[3].getNumber());
     } else {
-      yController.setP(strafePID[0].getNumber());
-      yController.setI(strafePID[1].getNumber());
-      yController.setD(strafePID[2].getNumber());
-      yController.setTolerance(strafePID[3].getNumber());
+      // yController.setP(strafePID[0].getNumber());
+      // yController.setI(strafePID[1].getNumber());
+      // yController.setD(strafePID[2].getNumber());
+      // yController.setTolerance(strafePID[3].getNumber());
+      yController.setP(0.75);
+      yController.setD(0.013);
+      yController.setTolerance(.02);
     }
     yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
     startTime = -1;
