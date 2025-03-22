@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose.Offset;
+import frc.robot.commands.Autonomous.TestFullAuto;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.AlignToReef;
@@ -49,6 +50,8 @@ import frc.robot.subsystems.Vision.OdometryWrapper;
 import frc.robot.subsystems.Vision.YoloController;
 import java.util.ArrayList;
 
+import choreo.auto.AutoFactory;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -58,15 +61,15 @@ import java.util.ArrayList;
 @Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // define subsystems first
-  @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
+//   @Logged(name = "Left Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_LeftFacingCamera =
       new AprilTagCamera("Center_Cam", LeftFacingCameraPose);
 
-  @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
+//   @Logged(name = "Right Facing Mod Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+//   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
@@ -78,19 +81,19 @@ public class RobotContainer {
   @Logged(name = "Swerve", importance = Importance.CRITICAL)
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-  @Logged(name = "Elevator", importance = Importance.CRITICAL)
+//   @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
-  @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
+//   @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-  @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
+//   @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
+//   @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
@@ -131,9 +134,9 @@ public class RobotContainer {
 
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
-  // private final AutoFactory m_factory =
-  //     new AutoFactory(
-  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
+  private final AutoFactory m_factory =
+      new AutoFactory(
+          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   private final ActionFactory m_ActionFactory =
       new ActionFactory(
@@ -146,9 +149,9 @@ public class RobotContainer {
           m_YoloController,
           m_BranchCamera);
 
-  private final AutoSelector m_AutoSelector =
-      new AutoSelector(
-          m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
+//   private final AutoSelector m_AutoSelector =
+//       new AutoSelector(
+//           m_ActionFactory, m_Swerve, new ArrayList<Command>(), new ArrayList<Command>());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -362,8 +365,8 @@ public class RobotContainer {
   }
 
   private void configureChooser() {
-    m_AutoSelector.setupAutoTab();
-    m_AutoSelector.clearAll();
+    // m_AutoSelector.setupAutoTab();
+    // m_AutoSelector.clearAll();
   }
 
   /**
@@ -372,7 +375,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    m_AutoSelector.generatePaths();
-    return m_AutoSelector.getAutoCommand();
+    // m_AutoSelector.generatePaths();
+    return new TestFullAuto(m_Swerve, m_factory);// m_AutoSelector.getAutoCommand();
   }
 }
