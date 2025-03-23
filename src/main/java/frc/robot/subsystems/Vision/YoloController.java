@@ -35,6 +35,9 @@ public class YoloController {
   // private double xCommand;
   @Logged private double yCommand;
 
+  // for smoothify
+  // private double targetYaw = -100;
+
   // private final TunableNumber inPlaceYP;
   // private final TunableNumber inPlaceYD;
 
@@ -86,6 +89,9 @@ public class YoloController {
     yController.setSetpoint(finalYawSetpointDegrees);
     desiredSpeeds = new ChassisSpeeds(0, 0, 0);
     startTime = -1;
+
+    // for smoothify
+    // targetYaw = -100;
   }
 
   public ChassisSpeeds update() {
@@ -104,8 +110,22 @@ public class YoloController {
 
     if (!isAlignInPlace) {
       if (!m_BranchDetectorCamera.hasTargets()) {
-        desiredSpeeds = new ChassisSpeeds(.1, 0, 0);
+        if (!desiredSpeeds.equals(new ChassisSpeeds(0,0,0))) { // not fresh command
+          desiredSpeeds.vyMetersPerSecond = desiredSpeeds.vyMetersPerSecond * .75; // should move in same direction but slower
+        }
+        else {
+          desiredSpeeds = new ChassisSpeeds(.1, 0, 0);
+        }
       } else {
+        
+        // potential smoothify code?
+        // if (targetYaw != -100 && Math.abs(targetYaw - m_BranchDetectorCamera.getTargetYaw(0).getAsDouble()) > 10) {
+        //   targetYaw = targetYaw * .9;
+        // }
+        // else {
+        //   targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
+        // }
+
         double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
 
         yCommand = yController.calculate(targetYaw);
