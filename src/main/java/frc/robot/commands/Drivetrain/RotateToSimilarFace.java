@@ -11,9 +11,9 @@ public class RotateToSimilarFace extends Command {
   private double targetHeading;
   private RotationController m_RotationController;
 
-  public RotateToSimilarFace(Swerve swerve) {
+  public RotateToSimilarFace(Swerve swerve, RotationController controller) {
     m_Swerve = swerve;
-    m_RotationController = new RotationController(swerve);
+    m_RotationController = controller;
     addRequirements(m_Swerve);
   }
 

@@ -10,38 +10,43 @@ import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.maxAng
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.maxAngularVelocity;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.toleranceRadians;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Strategy;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.lib.dashboard.TunableNumber;
 
 /** Add your docs here. */
 
 // for implementation look here:
 // https://github.com/Mechanical-Advantage/RobotCode2024/blob/main/src/main/java/org/littletonrobotics/frc2024/subsystems/drive/controllers/HeadingController.java
 // TODO: Document
-// @Logged(name = "Rotation Controller", strategy = Strategy.OPT_IN)
+@Logged(name = "Rotation Controller", strategy = Strategy.OPT_IN)
 public class RotationController {
   private double output;
 
   private final Swerve swerve;
 
-  private ProfiledPIDController controller;
+  private PIDController controller;
+  
+  // private TunableNumber kpNumber = new TunableNumber("RotationController/Kp", kp);
+  // private TunableNumber kdNumber = new TunableNumber("RotationController/Kd", kd);
 
   public RotationController(Swerve swerve) {
     controller =
-        new ProfiledPIDController(
+        new PIDController(
             kp,
             0, // no I term
-            kd,
-            new TrapezoidProfile.Constraints(0.5, 1),
-            loopPeriodSeconds);
+            kd);
     controller.enableContinuousInput(-Math.PI, Math.PI);
 
     controller.setTolerance(toleranceRadians);
     this.swerve = swerve;
 
-    controller.reset(
-        swerve.getRotation2D().getRadians(), swerve.getChassisSpeeds().omegaRadiansPerSecond);
+    // controller.reset(
+    //     swerve.getRotation2D().getRadians(), swerve.getChassisSpeeds().omegaRadiansPerSecond);
   }
 
   // @Logged(name = "output", importance = Importance.INFO)
@@ -52,12 +57,15 @@ public class RotationController {
   public void update(Rotation2d setpoint) {
     // Update controller
 
-    controller.setConstraints(
-        new TrapezoidProfile.Constraints(
-            maxAngularVelocity.in(RadiansPerSecond),
-            maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
+    // controller.setP(kpNumber.getNumber());
+    // controller.setD(kdNumber.getNumber());
 
-    controller.setGoal(setpoint.getRadians());
+    // controller.setConstraints(
+    //     new TrapezoidProfile.Constraints(
+    //         maxAngularVelocity.in(RadiansPerSecond),
+    //         maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
+
+    controller.setSetpoint(setpoint.getRadians());
     this.output = controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
   }
 
@@ -68,6 +76,6 @@ public class RotationController {
   }
 
   public boolean atGoal() {
-    return controller.atGoal();
+    return controller.atSetpoint();
   }
 }
