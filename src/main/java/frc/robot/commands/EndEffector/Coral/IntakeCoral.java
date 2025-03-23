@@ -33,6 +33,8 @@ public class IntakeCoral extends Command {
   public void end(boolean interrupted) {
     if (interrupted) {
       m_coralIntake.setState(CoralStates.DEFAULT);
+    } else {
+      m_coralIntake.setState(CoralStates.POSITIONING);
     }
   }
 

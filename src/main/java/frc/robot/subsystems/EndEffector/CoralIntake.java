@@ -206,7 +206,7 @@ public class CoralIntake extends SubsystemBase {
         //         .withSlot(1));
         m_CoralMotor.setControl(
             m_PositionRequest
-                .withPosition(rotationsAfterIntake.getNumber() * coralMotorGearRatio)
+                .withPosition(coralRotationsAfterIntake.in(Rotations) * coralMotorGearRatio)
                 .withSlot(1));
       }
       case REVERSING -> {
