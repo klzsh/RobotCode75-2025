@@ -238,12 +238,14 @@ public class Elevator extends SubsystemBase {
   public boolean getLowerLimit() {
     return !m_lowerLimitSwitch.get() || !m_backupLimitSwitch.get();
   }
+
   @Logged(name = "Lower Limit One", importance = Importance.CRITICAL)
-  public boolean getLowerLimitOne(){
+  public boolean getLowerLimitOne() {
     return !m_lowerLimitSwitch.get();
   }
+
   @Logged(name = "Lower Limit Two", importance = Importance.CRITICAL)
-  public boolean getLowerLimitTwo(){
+  public boolean getLowerLimitTwo() {
     return !m_backupLimitSwitch.get();
   }
 
