@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -68,7 +69,7 @@ public class RobotContainer {
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  //   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+    // @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
@@ -80,7 +81,7 @@ public class RobotContainer {
   @Logged(name = "Swerve", importance = Importance.CRITICAL)
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-    @Logged(name = "Elevator", importance = Importance.CRITICAL)
+    // @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
     @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
@@ -204,14 +205,16 @@ public class RobotContainer {
     Xstance.whileTrue(new XStance(m_Swerve));
     AlignLeft.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-            // new YoloBranchAlign(m_Swerve, m_YoloController, false)
-            new AlignToReef(
-                m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
+            new SequentialCommandGroup(new RotateToSimilarFace(m_Swerve), new YoloBranchAlign(m_Swerve, m_YoloController, false))
+            // new AlignToReef(
+            //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT)
+            );
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-            // new YoloBranchAlign(m_Swerve, m_YoloController, false)
-            new AlignToReef(
-                m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT));
+            new SequentialCommandGroup(new RotateToSimilarFace(m_Swerve), new YoloBranchAlign(m_Swerve, m_YoloController, true))
+            // new AlignToReef(
+            //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT)
+                );
     AlignLeft.and(() -> !m_CoralIntake.getBeamBreak())
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
@@ -292,7 +295,7 @@ public class RobotContainer {
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
     // coral commands
-    m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
+    m_Controller.povUp().onTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
         // .rightTrigger(0.15)
         .povDown()
