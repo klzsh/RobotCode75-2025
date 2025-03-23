@@ -10,7 +10,6 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -27,6 +26,7 @@ public class YoloController {
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
   private boolean isAlignInPlace;
+  private ChassisSpeeds desiredSpeeds;
 
   // private final PIDController rotationController; // add if needed, poss just pass through a
   // heading or do this as a seperate command
@@ -38,7 +38,7 @@ public class YoloController {
   // private final TunableNumber inPlaceYP;
   // private final TunableNumber inPlaceYD;
 
-  private final double finalYawSetpointDegrees = -1.1;
+  private final double finalYawSetpointDegrees = -2.2;
   private final double driveIntoReefSpeed = .5;
   private final double stallSpeedThreshold = .05;
   double startTime = -1;
@@ -47,6 +47,7 @@ public class YoloController {
   public YoloController(Swerve swerve, ObjectDetetectorCamera branchCam) {
     m_Swerve = swerve;
     m_BranchDetectorCamera = branchCam;
+    desiredSpeeds = new ChassisSpeeds();
     yController =
         new PIDController(
             DrivetrainConstants.ControllerConstants.VisionAlign.xP,
@@ -54,24 +55,21 @@ public class YoloController {
             DrivetrainConstants.ControllerConstants.VisionAlign.xD);
 
     yController.setTolerance(.2);
-    yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
+    yController.setSetpoint(finalYawSetpointDegrees);
   }
-
-  double targetSin;
 
   public double getAlignCommand() {
     double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
-    targetSin = Math.sin(Math.toRadians(targetYaw));
-    yCommand = yController.calculate(targetSin) * -Math.signum(targetYaw);
+    yCommand = yController.calculate(targetYaw) * -Math.signum(targetYaw);
     return yCommand;
   }
 
   public void reset(boolean alignInPlace) {
     isAlignInPlace = alignInPlace;
     if (isAlignInPlace) {
-      yController.setP(0.75);
-      yController.setD(0.013);
-      yController.setTolerance(.02);
+      yController.setP(0.1);
+      yController.setD(0.01);
+      yController.setTolerance(1);
       // yController.setP(strafePID[0].getNumber());
       // yController.setI(strafePID[1].getNumber());
       // yController.setD(strafePID[2].getNumber());
@@ -81,11 +79,12 @@ public class YoloController {
       // yController.setI(strafePID[1].getNumber());
       // yController.setD(strafePID[2].getNumber());
       // yController.setTolerance(strafePID[3].getNumber());
-      yController.setP(0.75);
-      yController.setD(0.013);
-      yController.setTolerance(.02);
+      yController.setP(0.7);
+      yController.setD(0);
+      yController.setTolerance(.2);
     }
-    yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
+    yController.setSetpoint(finalYawSetpointDegrees);
+    desiredSpeeds = new ChassisSpeeds(0, 0, 0);
     startTime = -1;
   }
 
@@ -97,45 +96,36 @@ public class YoloController {
     yController.setI(strafePID[1].getNumber());
     yController.setD(strafePID[2].getNumber());
     yController.setTolerance(strafePID[3].getNumber());
-    yController.setSetpoint(Math.sin(Math.toRadians(finalYawSetpointDegrees)));
+    yController.setSetpoint(finalYawSetpointDegrees);
     // yController.setP(0.07);
     // yController.setTolerance(0.2);
-
-    SmartDashboard.putBoolean("YOLO yAtSetpoint", yController.atSetpoint());
 
     m_BranchDetectorCamera.updateByUnreadResults();
 
     if (!isAlignInPlace) {
-      // has drive forward and strafe
       if (!m_BranchDetectorCamera.hasTargets()) {
-        return new ChassisSpeeds(0.1, 0, 0);
+        desiredSpeeds = new ChassisSpeeds(.1, 0, 0);
       } else {
-        // if we have a target, strafe to align with it
-        yCommand = getAlignCommand();
-        return new ChassisSpeeds(driveIntoReefSpeed, yCommand, 0);
+        double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
+
+        yCommand = yController.calculate(targetYaw);
+
+        desiredSpeeds.vxMetersPerSecond = driveIntoReefSpeed;
+        desiredSpeeds.vyMetersPerSecond = yCommand;
       }
     } else {
-      // has strafe only
       if (!m_BranchDetectorCamera.hasTargets()) {
-        // if we don't have a target, just go left
-        System.out.println("no target and its all mannans fault. MANNAN YOU ARE A BRICK");
-        return new ChassisSpeeds(0, 0.05 * Math.signum(yCommand), 0);
+        desiredSpeeds =
+            new ChassisSpeeds(0, -.05, 0); // scoot toward direction of last seen target and shi
       } else {
-        // if we have a target, strafe to align with it
-        yCommand = getAlignCommand();
-        return new ChassisSpeeds(0, yCommand, 0);
+        double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();
+
+        yCommand = yController.calculate(targetYaw);
+        desiredSpeeds.vxMetersPerSecond = 0; // can't push into reef while trying to align
+        desiredSpeeds.vyMetersPerSecond = yCommand;
       }
     }
-  }
-
-  @Logged(name = "tag sin", importance = Importance.CRITICAL)
-  public double tagSin() {
-    return targetSin;
-  }
-
-  @Logged(name = "target sin", importance = Importance.CRITICAL)
-  public double targetYawSin() {
-    return Math.sin(Math.toRadians(finalYawSetpointDegrees));
+    return desiredSpeeds;
   }
 
   @Logged
@@ -145,9 +135,8 @@ public class YoloController {
     // actual vx less than stall speed
 
     if (!isAlignInPlace) {
-      // return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold
-      //     && Timer.getFPGATimestamp() - startTime >= 0.5;
-      return false;
+      return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold
+          && Timer.getFPGATimestamp() - startTime >= 0.5;
     } else {
       return yController.atSetpoint();
     }
