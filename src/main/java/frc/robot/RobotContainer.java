@@ -26,7 +26,6 @@ import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
-import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -36,6 +35,7 @@ import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
 import frc.robot.subsystems.Drivetrain.ChezyController;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -69,7 +69,7 @@ public class RobotContainer {
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-    // @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+  @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
@@ -81,31 +81,34 @@ public class RobotContainer {
   @Logged(name = "Swerve", importance = Importance.CRITICAL)
   private final Swerve m_Swerve = new Swerve(m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
-    // @Logged(name = "Elevator", importance = Importance.CRITICAL)
+  @Logged(name = "Elevator", importance = Importance.CRITICAL)
   private final Elevator m_Elevator = new Elevator();
 
-    @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
+  @Logged(name = "Coral Intake", importance = Importance.CRITICAL)
   private final CoralIntake m_CoralIntake = new CoralIntake();
 
   @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-    // @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
+  // @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-    // @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
+  // @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
-//   @Logged 
+  //   @Logged
   private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
 
-//   @Logged
+  //   @Logged
   private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
+
+  @Logged
+  private RotationController m_RotationController = new RotationController(m_Swerve);
 
   // odometry
   private final OdometryWrapper m_Odometry =
-      new OdometryWrapper(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera /*, m_HPCamera*/);
+      new OdometryWrapper(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -176,11 +179,9 @@ public class RobotContainer {
             () -> -m_LeftStick.getX(),
             () -> -m_RightStick.getX()));
 
-    m_Elevator
-        .setDefaultCommand( // TODO change this to L1 or L2 as home depending on elev stability
-            new InstantCommand(
-                    () -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
-                .repeatedly());
+    m_Elevator.setDefaultCommand(
+        new InstantCommand(() -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
+            .repeatedly());
     m_CoralIntake.setDefaultCommand(
         new InstantCommand(() -> m_CoralIntake.setState(m_CoralIntake.getState()), m_CoralIntake)
             .repeatedly());
@@ -205,16 +206,18 @@ public class RobotContainer {
     Xstance.whileTrue(new XStance(m_Swerve));
     AlignLeft.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-            new SequentialCommandGroup(new RotateToSimilarFace(m_Swerve), new YoloBranchAlign(m_Swerve, m_YoloController, false))
+                new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
+                new YoloBranchAlign(m_Swerve, m_YoloController, false))
             // new AlignToReef(
             //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT)
             );
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-            new SequentialCommandGroup(new RotateToSimilarFace(m_Swerve), new YoloBranchAlign(m_Swerve, m_YoloController, true))
+                new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
+                new YoloBranchAlign(m_Swerve, m_YoloController, true))
             // new AlignToReef(
             //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT)
-                );
+            );
     AlignLeft.and(() -> !m_CoralIntake.getBeamBreak())
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
@@ -222,7 +225,7 @@ public class RobotContainer {
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
-    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
+    // SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 
     YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
 
