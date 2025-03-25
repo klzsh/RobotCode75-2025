@@ -45,6 +45,7 @@ public class YoloController {
   // private final TunableNumber inPlaceYD;
 
   private final double finalYawSetpointDegrees = -2.2;
+  private final double finalYawSetpointAutos = -2.5;
   private final double driveIntoReefSpeed = .5;
   private final double stallSpeedThreshold = .05;
   double startTime = -1;
@@ -90,7 +91,7 @@ public class YoloController {
       yController.setTolerance(.025);
     }
     if (DriverStation.isAutonomous()) {
-      yController.setSetpoint(finalYawSetpointDegrees - .3);
+      yController.setSetpoint(finalYawSetpointAutos);
     } else {
       yController.setSetpoint(finalYawSetpointDegrees);
     }
