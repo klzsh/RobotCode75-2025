@@ -20,6 +20,7 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
@@ -179,6 +180,11 @@ public class CoralIntake extends SubsystemBase {
       m_CoralIntakeState = CoralStates.DEFAULT;
     }
 
+    double scoreMultiplier = 1;
+    if (DriverStation.isAutonomous()) {
+      scoreMultiplier = 2;
+    }
+
     switch (m_CoralIntakeState) {
       case HASGAMEPIECE -> {
         // motors do not move, beam break is broken
@@ -193,11 +199,11 @@ public class CoralIntake extends SubsystemBase {
         } else {
           // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
           m_CoralMotor.setControl(
-              m_VelocityRequest.withVelocity(scoreSpeed.getNumber()).withSlot(0));
+              m_VelocityRequest.withVelocity(scoreSpeed.getNumber() * scoreMultiplier).withSlot(0));
         }
       }
       case INTAKING -> {
-        m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralIntakeSpeed).withSlot(0));
+        m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralIntakeSpeed.times(scoreMultiplier)).withSlot(0));
       }
       case POSITIONING -> {
         // m_CoralMotor.setControl(
