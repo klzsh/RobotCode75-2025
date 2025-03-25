@@ -2,6 +2,7 @@ package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.util.FieldPose.Offset;
@@ -9,10 +10,13 @@ import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
+import frc.robot.commands.Autonomous.ChoppedPreraiseElevator;
 import frc.robot.commands.Drivetrain.AlignToReef;
+import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.ChezyController;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
@@ -34,6 +38,7 @@ public class ActionFactory {
   private AlgaeIntake m_AlgaeIntake;
   private ChezyController m_ChezyController;
   private YoloController m_YoloController;
+  private RotationController m_RotationController;
   private ObjectDetetectorCamera m_BranchCamera;
 
   public ActionFactory(
@@ -44,6 +49,7 @@ public class ActionFactory {
       AlgaeIntake algaeIntake,
       ChezyController chezyController,
       YoloController yoloController,
+      RotationController rotationController,
       ObjectDetetectorCamera branchCam) {
     m_Swerve = swerve;
     m_Elevator = elevator;
@@ -52,6 +58,7 @@ public class ActionFactory {
     m_AlgaeIntake = algaeIntake;
     m_ChezyController = chezyController;
     m_YoloController = yoloController;
+    m_RotationController = rotationController;
     m_BranchCamera = branchCam;
   }
 
@@ -64,7 +71,8 @@ public class ActionFactory {
         //   return new AutoDealgaefy(
         //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_ChezyController);
       case 3:
-        return new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake);
+        return new ParallelRaceGroup(new AutoScoreL4(m_Elevator, m_CoralIntake),
+            new WaitCommand(1).onlyWhile(() -> !m_CoralIntake.getBeamBreak()));
       case 4:
         return new AutoScoreProcessor(m_Swerve, m_ChezyController, m_AlgaeIntake, m_AlgaePivot);
       case 5:
@@ -72,17 +80,12 @@ public class ActionFactory {
       case 6:
         return new YoloBranchAlign(m_Swerve, m_YoloController, true);
       case 7:
-        return new AlignToReef(
-            m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT);
+        return new ChoppedPreraiseElevator(m_Swerve, m_Elevator);
       case 8:
-        return new AlignToReef(
-            m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT);
-      case 9:
-        return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                new WaitCommand(0.75),
-                new WaitCommand(0.02).repeatedly().until(() -> m_CoralIntake.getBeamBreak())),
-            new SetElevatorPosition(m_Elevator, ElevatorPositions.L2, false, false).repeatedly());
+        return new ParallelCommandGroup(
+          new YoloBranchAlign(m_Swerve, m_YoloController, true),
+          new AutoScoreL4(m_Elevator, m_CoralIntake)
+        );
     }
     return null;
   }
@@ -102,11 +105,9 @@ public class ActionFactory {
       case 6:
         return "YOLO";
       case 7:
-        return "Align to Reef Left";
-      case 8:
-        return "Align to Reef Right";
-      case 9:
         return "Preraise Elevator";
+      case 8:
+        return "YOLO+L4";
     }
     return null;
   }
