@@ -4,11 +4,14 @@
 
 package frc.robot.subsystems.Vision;
 
+import java.sql.Driver;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
@@ -16,12 +19,12 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 
 @Logged(name = "YOLO Controller", importance = Importance.DEBUG, strategy = Strategy.OPT_IN)
 public class YoloController {
-  private final TunableNumber[] strafePID = {
-    new TunableNumber("YOLO Align/P", 0.08),
-    new TunableNumber("YOLO Align/I", 0),
-    new TunableNumber("YOLO Align/D", 0.005),
-    new TunableNumber("YOLO Align/Tolerance", 0.025)
-  };
+  // private final TunableNumber[] strafePID = {
+  //   new TunableNumber("YOLO Align/P", 0.035),
+  //   new TunableNumber("YOLO Align/I", 0),
+  //   new TunableNumber("YOLO Align/D", 0.002),
+  //   new TunableNumber("YOLO Align/Tolerance", 0.25)
+  // };
 
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_BranchDetectorCamera;
@@ -70,9 +73,9 @@ public class YoloController {
   public void reset(boolean alignInPlace) {
     isAlignInPlace = alignInPlace;
     if (isAlignInPlace) {
-      yController.setP(0.1);
-      yController.setD(0.01);
-      yController.setTolerance(1);
+      yController.setP(.035);
+      yController.setD(0.002);
+      yController.setTolerance(.2);
       // yController.setP(strafePID[0].getNumber());
       // yController.setI(strafePID[1].getNumber());
       // yController.setD(strafePID[2].getNumber());
@@ -82,11 +85,15 @@ public class YoloController {
       // yController.setI(strafePID[1].getNumber());
       // yController.setD(strafePID[2].getNumber());
       // yController.setTolerance(strafePID[3].getNumber());
-      yController.setP(0.7);
-      yController.setD(0);
-      yController.setTolerance(.2);
+      yController.setP(0.08);
+      yController.setD(0.005);
+      yController.setTolerance(.025);
     }
-    yController.setSetpoint(finalYawSetpointDegrees);
+    if (DriverStation.isAutonomous()) {
+      yController.setSetpoint(finalYawSetpointDegrees - .3);
+    } else {
+      yController.setSetpoint(finalYawSetpointDegrees);
+    }
     desiredSpeeds = new ChassisSpeeds(0, 0, 0);
     startTime = -1;
 
@@ -98,10 +105,10 @@ public class YoloController {
     if (startTime == -1) {
       startTime = Timer.getFPGATimestamp();
     }
-    yController.setP(strafePID[0].getNumber());
-    yController.setI(strafePID[1].getNumber());
-    yController.setD(strafePID[2].getNumber());
-    yController.setTolerance(strafePID[3].getNumber());
+    // yController.setP(strafePID[0].getNumber());
+    // yController.setI(strafePID[1].getNumber());
+    // yController.setD(strafePID[2].getNumber());
+    // yController.setTolerance(strafePID[3].getNumber());
     yController.setSetpoint(finalYawSetpointDegrees);
     // yController.setP(0.07);
     // yController.setTolerance(0.2);
@@ -156,7 +163,7 @@ public class YoloController {
 
     if (!isAlignInPlace) {
       return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold
-          && Timer.getFPGATimestamp() - startTime >= 0.5;
+          && Timer.getFPGATimestamp() - startTime >= 0.2;
     } else {
       return yController.atSetpoint();
     }

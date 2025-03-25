@@ -26,6 +26,7 @@ public class AlignToReef extends Command {
   private final ObjectDetetectorCamera m_BranchCamera;
   private Offset m_Offset;
   private Pose2d targetPose = null;
+  private ChassisSpeeds yoloSpeeds = null;
 
   /** Creates a new AlignToReef. */
   public AlignToReef(
@@ -53,7 +54,7 @@ public class AlignToReef extends Command {
               m_Swerve, new FieldPose(DriverStation.getAlliance().get(), fieldElement, m_Offset));
       m_ChezyController.reset(targetPose);
     }
-    m_YoloController.reset(true);
+    m_YoloController.reset(false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -74,9 +75,10 @@ public class AlignToReef extends Command {
 
     if (yOffset < 0.25 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
       System.out.println("I have switched to YOLO");
-      ChassisSpeeds yoloSpeeds = m_YoloController.update();
+      yoloSpeeds = m_YoloController.update();
       // add yolo speeds to chezy speeds
-      chezySpeeds.vyMetersPerSecond = yoloSpeeds.vyMetersPerSecond;
+      chezySpeeds.vyMetersPerSecond = MathUtil.applyDeadband(yoloSpeeds.vyMetersPerSecond, 0.02);
+      chezySpeeds.vxMetersPerSecond = 0.1;
     } else {
       System.out.println("Not using YOLO");
     }
@@ -94,6 +96,6 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return targetPose == null;
+    return targetPose == null || (yoloSpeeds != null && Math.abs(yoloSpeeds.vyMetersPerSecond) < 0.02);
   }
 }
