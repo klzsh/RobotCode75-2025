@@ -110,7 +110,7 @@ public class YoloController {
     // yController.setI(strafePID[1].getNumber());
     // yController.setD(strafePID[2].getNumber());
     // yController.setTolerance(strafePID[3].getNumber());
-    yController.setSetpoint(finalYawSetpointDegrees);
+    // yController.setSetpoint(finalYawSetpointDegrees);
     // yController.setP(0.07);
     // yController.setTolerance(0.2);
 
