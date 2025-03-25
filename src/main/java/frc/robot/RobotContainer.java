@@ -26,6 +26,7 @@ import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
+import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
@@ -153,6 +154,7 @@ public class RobotContainer {
           m_AlgaeIntake,
           m_ChezyController,
           m_YoloController,
+          m_RotationController,
           m_BranchCamera);
 
   private final AutoSelector m_AutoSelector =
@@ -213,8 +215,8 @@ public class RobotContainer {
             );
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-                new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
-                new YoloBranchAlign(m_Swerve, m_YoloController, true))
+                // new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
+                new YoloBranchAlign(m_Swerve, m_YoloController, true)
             // new AlignToReef(
             //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT)
             );
@@ -223,9 +225,11 @@ public class RobotContainer {
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
     AlignRight.and(() -> !m_CoralIntake.getBeamBreak())
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
+    //debug command
+    // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
-    // SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
+    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 
     YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
 
