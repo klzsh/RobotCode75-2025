@@ -16,13 +16,12 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScoreL4 extends SequentialCommandGroup {
-  public AutoScoreL4(Swerve swerve, Elevator elevator, CoralIntake coralIntake) {
-    addRequirements(swerve, elevator, coralIntake);
+  public AutoScoreL4(Elevator elevator, CoralIntake coralIntake) {
+    addRequirements(elevator, coralIntake);
     addCommands(
-        new IntakeCoral(coralIntake),
+        new IntakeCoral(coralIntake).onlyIf(() -> !coralIntake.getBeamBreak()),
         new ParallelCommandGroup(
             // align to branch color
-            // new RotateToSimilarFace(swerve),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false)),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake, elevator),

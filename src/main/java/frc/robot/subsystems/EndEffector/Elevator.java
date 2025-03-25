@@ -21,6 +21,7 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.dashboard.TunableNumber;
 
@@ -277,17 +278,22 @@ public class Elevator extends SubsystemBase {
             : 0;
     double targetRotations = currentPosition + algaeOffset;
 
+    double multiplier = 1;
+    if (DriverStation.isAutonomous()) {
+      multiplier = 1.1;
+    }
+
     if (getPosition().in(Rotations) < targetRotations) {
-      m_PositionRequest.Velocity = MotionMagicProfileUp[0];
-      m_PositionRequest.Acceleration = MotionMagicProfileUp[1];
+      m_PositionRequest.Velocity = MotionMagicProfileUp[0] * multiplier;
+      m_PositionRequest.Acceleration = MotionMagicProfileUp[1] * multiplier;
       m_PositionRequest.Jerk = MotionMagicProfileUp[2];
 
       // m_PositionRequest.Velocity = mmVelocityUp.getNumber();
       // m_PositionRequest.Acceleration = mmAccelerationUp.getNumber();
       // m_PositionRequest.Jerk = mmJerkUp.getNumber();
     } else {
-      m_PositionRequest.Velocity = MotionMagicProfileDown[0];
-      m_PositionRequest.Acceleration = MotionMagicProfileDown[1];
+      m_PositionRequest.Velocity = MotionMagicProfileDown[0] * multiplier;
+      m_PositionRequest.Acceleration = MotionMagicProfileDown[1] * multiplier;
       m_PositionRequest.Jerk = MotionMagicProfileDown[2];
       // m_PositionRequest.Velocity = mmVelocityDown.getNumber();
       // m_PositionRequest.Acceleration = mmAccelerationDown.getNumber();
