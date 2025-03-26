@@ -28,6 +28,7 @@ import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
@@ -137,7 +138,7 @@ public class RobotContainer {
   private final JoystickButton resetBranchCam =
       new JoystickButton(m_LeftStick, resetBranchCamButton);
 
-  private final JoystickButton YoloAlign = new JoystickButton(m_RightStick, yoloAlignButton);
+  private final JoystickButton HPRotate = new JoystickButton(m_RightStick, hpRotateButton);
 
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
@@ -231,7 +232,9 @@ public class RobotContainer {
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 
-    YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    // YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    HPRotate.whileTrue(new RotateToSimilarCoralStation(m_Swerve, () -> -m_LeftStick.getY(),
+    () -> -m_LeftStick.getX() ));
 
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))

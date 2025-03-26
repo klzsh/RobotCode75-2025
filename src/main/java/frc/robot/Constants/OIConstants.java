@@ -14,7 +14,7 @@ public final class OIConstants {
   public static final int xstanceButton = 5;
   public static final int holdHeadingButton = 3;
   public static final int resetBranchCamButton = 10;
-  public static final int yoloAlignButton = 4;
+  public static final int hpRotateButton = 4;
 
   public static final double translationStickMapValue = 1.5; // 1.5
   public static final double translationJoystickExpo = 1.46; // 1.46
