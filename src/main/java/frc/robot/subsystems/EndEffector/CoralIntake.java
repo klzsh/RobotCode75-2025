@@ -44,6 +44,7 @@ public class CoralIntake extends SubsystemBase {
 
   private DigitalInput m_CoralBeamBreak;
   private boolean m_isL1 = false;
+  private boolean m_isL4 = false;
 
   private final VoltageOut m_CharacterizationRequest;
   private final VelocityVoltage m_VelocityRequest;
@@ -111,6 +112,10 @@ public class CoralIntake extends SubsystemBase {
 
   public void setL1(boolean isL1) {
     m_isL1 = isL1;
+  }
+
+  public void setL4(boolean isL4) {
+    m_isL4 = isL4;
   }
 
   @Logged(name = "Coral State", importance = Importance.CRITICAL)
@@ -181,7 +186,7 @@ public class CoralIntake extends SubsystemBase {
     }
 
     double scoreMultiplier = 1;
-    if (DriverStation.isAutonomous()) {
+    if (DriverStation.isAutonomous() || m_isL4) {
       scoreMultiplier = 2;
     }
 

@@ -44,9 +44,11 @@ public class YoloController {
   // private final TunableNumber inPlaceYP;
   // private final TunableNumber inPlaceYD;
 
+  private final TunableNumber driveIntoReefSpeed = new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
+
   private final double finalYawSetpointDegrees = -2.2;
   private final double finalYawSetpointAutos = -2.5;
-  private final double driveIntoReefSpeed = .5;
+  // private final double driveIntoReefSpeed = .25;
   private final double stallSpeedThreshold = .05;
   double startTime = -1;
 
@@ -91,7 +93,7 @@ public class YoloController {
       yController.setTolerance(.025);
     }
     if (DriverStation.isAutonomous()) {
-      yController.setSetpoint(finalYawSetpointAutos);
+      yController.setSetpoint(finalYawSetpointDegrees);
     } else {
       yController.setSetpoint(finalYawSetpointDegrees);
     }
@@ -106,6 +108,7 @@ public class YoloController {
     if (startTime == -1) {
       startTime = Timer.getFPGATimestamp();
     }
+    
     // yController.setP(strafePID[0].getNumber());
     // yController.setI(strafePID[1].getNumber());
     // yController.setD(strafePID[2].getNumber());
@@ -122,7 +125,7 @@ public class YoloController {
           desiredSpeeds.vyMetersPerSecond = desiredSpeeds.vyMetersPerSecond * .75; // should move in same direction but slower
         }
         else {
-          desiredSpeeds = new ChassisSpeeds(.1, 0, 0);
+          desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed.getNumber(), 0, 0);
         }
       } else {
         
@@ -138,7 +141,7 @@ public class YoloController {
 
         yCommand = yController.calculate(targetYaw);
 
-        desiredSpeeds.vxMetersPerSecond = driveIntoReefSpeed;
+        desiredSpeeds.vxMetersPerSecond = driveIntoReefSpeed.getNumber();
         desiredSpeeds.vyMetersPerSecond = yCommand;
       }
     } else {

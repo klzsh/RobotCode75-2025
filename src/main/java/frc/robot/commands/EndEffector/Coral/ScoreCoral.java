@@ -32,6 +32,7 @@ public class ScoreCoral extends Command {
   @Override
   public void execute() {
     m_Intake.setL1(m_Elevator.getState() == ElevatorPositions.L1);
+    m_Intake.setL4(m_Elevator.getState() == ElevatorPositions.L4);
     m_Intake.setState(CoralStates.SCORING);
   }
 
@@ -41,6 +42,8 @@ public class ScoreCoral extends Command {
     if (interrupted) {
       m_Intake.setState(CoralStates.DEFAULT);
     }
+    m_Intake.setL1(false);
+    m_Intake.setL4(false);
   }
 
   // Returns true when the command should end.
