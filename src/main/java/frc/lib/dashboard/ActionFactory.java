@@ -3,18 +3,13 @@ package frc.lib.dashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.commands.Autonomous.ChoppedPreraiseElevator;
-import frc.robot.commands.Drivetrain.AlignToReef;
-import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
-import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -22,7 +17,6 @@ import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import frc.robot.subsystems.Vision.YoloController;
 
@@ -71,7 +65,8 @@ public class ActionFactory {
         //   return new AutoDealgaefy(
         //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_ChezyController);
       case 3:
-        return new ParallelRaceGroup(new AutoScoreL4(m_Elevator, m_CoralIntake),
+        return new ParallelRaceGroup(
+            new AutoScoreL4(m_Elevator, m_CoralIntake),
             new WaitCommand(1).onlyWhile(() -> !m_CoralIntake.getBeamBreak()));
       case 4:
         return new AutoScoreProcessor(m_Swerve, m_ChezyController, m_AlgaeIntake, m_AlgaePivot);
@@ -83,9 +78,8 @@ public class ActionFactory {
         return new ChoppedPreraiseElevator(m_Swerve, m_Elevator);
       case 8:
         return new ParallelCommandGroup(
-          new YoloBranchAlign(m_Swerve, m_YoloController, true),
-          new AutoScoreL4(m_Elevator, m_CoralIntake)
-        );
+            new YoloBranchAlign(m_Swerve, m_YoloController, true),
+            new AutoScoreL4(m_Elevator, m_CoralIntake));
     }
     return null;
   }

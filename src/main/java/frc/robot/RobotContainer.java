@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -26,7 +25,6 @@ import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
-import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
@@ -105,8 +103,7 @@ public class RobotContainer {
   //   @Logged
   private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
 
-  @Logged
-  private RotationController m_RotationController = new RotationController(m_Swerve);
+  @Logged private RotationController m_RotationController = new RotationController(m_Swerve);
 
   // odometry
   private final OdometryWrapper m_Odometry =
@@ -209,15 +206,15 @@ public class RobotContainer {
     Xstance.whileTrue(new XStance(m_Swerve));
     AlignLeft.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-                new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
-                new YoloBranchAlign(m_Swerve, m_YoloController, false))
+            new RotateToSimilarFace(m_Swerve, m_RotationController)
+                .andThen(new YoloBranchAlign(m_Swerve, m_YoloController, false))
             // new AlignToReef(
             //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT)
             );
     AlignRight.and(() -> m_CoralIntake.getBeamBreak())
         .whileTrue(
-                // new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
-                new YoloBranchAlign(m_Swerve, m_YoloController, true)
+            // new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
+            new YoloBranchAlign(m_Swerve, m_YoloController, true)
             // new AlignToReef(
             //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT)
             );
@@ -226,15 +223,17 @@ public class RobotContainer {
     // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
     AlignRight.and(() -> !m_CoralIntake.getBeamBreak())
         .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
-    //debug command
-    // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT));
+    // debug command
+    // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController,
+    // m_YoloController, m_BranchCamera, Offset.LEFT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 
     // YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
-    HPRotate.whileTrue(new RotateToSimilarCoralStation(m_Swerve, () -> -m_LeftStick.getY(),
-    () -> -m_LeftStick.getX() ));
+    HPRotate.whileTrue(
+        new RotateToSimilarCoralStation(
+            m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
 
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))

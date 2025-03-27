@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems.Vision;
 
-import java.sql.Driver;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -44,7 +42,8 @@ public class YoloController {
   // private final TunableNumber inPlaceYP;
   // private final TunableNumber inPlaceYD;
 
-  private final TunableNumber driveIntoReefSpeed = new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
+  private final TunableNumber driveIntoReefSpeed =
+      new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
 
   private final double finalYawSetpointDegrees = -2.2;
   private final double finalYawSetpointAutos = -2.5;
@@ -108,7 +107,7 @@ public class YoloController {
     if (startTime == -1) {
       startTime = Timer.getFPGATimestamp();
     }
-    
+
     // yController.setP(strafePID[0].getNumber());
     // yController.setI(strafePID[1].getNumber());
     // yController.setD(strafePID[2].getNumber());
@@ -121,16 +120,17 @@ public class YoloController {
 
     if (!isAlignInPlace) {
       if (!m_BranchDetectorCamera.hasTargets()) {
-        if (!desiredSpeeds.equals(new ChassisSpeeds(0,0,0))) { // not fresh command
-          desiredSpeeds.vyMetersPerSecond = desiredSpeeds.vyMetersPerSecond * .75; // should move in same direction but slower
-        }
-        else {
+        if (!desiredSpeeds.equals(new ChassisSpeeds(0, 0, 0))) { // not fresh command
+          desiredSpeeds.vyMetersPerSecond =
+              desiredSpeeds.vyMetersPerSecond * .75; // should move in same direction but slower
+        } else {
           desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed.getNumber(), 0, 0);
         }
       } else {
-        
+
         // potential smoothify code?
-        // if (targetYaw != -100 && Math.abs(targetYaw - m_BranchDetectorCamera.getTargetYaw(0).getAsDouble()) > 10) {
+        // if (targetYaw != -100 && Math.abs(targetYaw -
+        // m_BranchDetectorCamera.getTargetYaw(0).getAsDouble()) > 10) {
         //   targetYaw = targetYaw * .9;
         // }
         // else {

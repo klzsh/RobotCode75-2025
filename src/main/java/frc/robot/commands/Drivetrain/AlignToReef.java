@@ -96,6 +96,7 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return targetPose == null || (yoloSpeeds != null && Math.abs(yoloSpeeds.vyMetersPerSecond) < 0.02);
+    return targetPose == null
+        || (yoloSpeeds != null && Math.abs(yoloSpeeds.vyMetersPerSecond) < 0.02);
   }
 }

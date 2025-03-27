@@ -6,17 +6,12 @@ package frc.robot.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.RotationAlign.*;
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.maxAngularAcceleration;
-import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.maxAngularVelocity;
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.toleranceRadians;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import frc.lib.dashboard.TunableNumber;
 
 /** Add your docs here. */
 
@@ -30,15 +25,14 @@ public class RotationController {
   private final Swerve swerve;
 
   private PIDController controller;
-  
+
   // private TunableNumber kpNumber = new TunableNumber("RotationController/Kp", kp);
   // private TunableNumber kdNumber = new TunableNumber("RotationController/Kd", kd);
 
   public RotationController(Swerve swerve) {
     controller =
         new PIDController(
-            kp,
-            0, // no I term
+            kp, 0, // no I term
             kd);
     controller.enableContinuousInput(-Math.PI, Math.PI);
 

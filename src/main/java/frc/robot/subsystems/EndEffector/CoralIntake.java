@@ -208,7 +208,8 @@ public class CoralIntake extends SubsystemBase {
         }
       }
       case INTAKING -> {
-        m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralIntakeSpeed.times(scoreMultiplier)).withSlot(0));
+        m_CoralMotor.setControl(
+            m_VelocityRequest.withVelocity(coralIntakeSpeed.times(scoreMultiplier)).withSlot(0));
       }
       case POSITIONING -> {
         // m_CoralMotor.setControl(

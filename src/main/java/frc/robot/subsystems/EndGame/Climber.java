@@ -181,7 +181,7 @@ public class Climber extends SubsystemBase {
   public void resetPosition() {
     // m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
     // m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
-    //! what is this for?
+    // ! what is this for?
     if (getLimitSwitch()) {
       m_ClimberMotor1.setPosition(0);
       m_ClimberMotor2.setPosition(0);
