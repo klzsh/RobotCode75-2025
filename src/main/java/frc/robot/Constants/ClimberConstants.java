@@ -17,7 +17,7 @@ public final class ClimberConstants {
   public static final Angle climbPosition = Rotations.of(3.5);
   public static final Angle climbExtendPosition = Rotations.of(130);
   public static final double climbDeadband = 0.5;
-  public static final int limitPort = 7;
+  public static final int limitPort = 8;
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
 
