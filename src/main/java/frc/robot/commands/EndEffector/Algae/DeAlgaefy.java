@@ -45,7 +45,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
        */
       addRequirements(elevator);
       addCommands(
-          new SetElevatorPosition(elevator, ElevatorPositions.L2, true),
+          new SetElevatorPosition(elevator, ElevatorPositions.L2, true, false),
           new ParallelCommandGroup(
                   new InstantCommand(
                           () -> {
@@ -56,7 +56,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                           algaePivot)
                       .repeatedly()
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-                  new SetElevatorPosition(elevator, ElevatorPositions.L2, true))
+                  new SetElevatorPosition(elevator, ElevatorPositions.L2, true, false))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
           new WaitCommand(algaePivot.getPivotDelay()),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))
@@ -65,7 +65,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
     } else {
       /* L3 Algae Intake */
       addCommands(
-          new SetElevatorPosition(elevator, ElevatorPositions.L3, true),
+          new SetElevatorPosition(elevator, ElevatorPositions.L3, true, false),
           new ParallelCommandGroup(
                   new InstantCommand(
                           () -> {
@@ -76,7 +76,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                           algaePivot)
                       .repeatedly()
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-                  new SetElevatorPosition(elevator, ElevatorPositions.L3, true))
+                  new SetElevatorPosition(elevator, ElevatorPositions.L3, true, false))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
           new WaitCommand(algaePivot.getPivotDelay()),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))

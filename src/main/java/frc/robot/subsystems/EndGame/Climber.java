@@ -10,13 +10,9 @@ import static frc.robot.Constants.ClimberConstants.MotorConfigs.*;
 import static frc.robot.Constants.RobotConstants.superstructureCANBusName;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -24,20 +20,15 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.ClimberConstants;
 
 @Logged(name = "Climber", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class Climber extends SubsystemBase {
-
-  public static enum ClimberPositions {
-    DEFAULT,
-    CLIMB
-  }
 
   // @Logged(name = "Climber Motor 1", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor1;
@@ -45,10 +36,7 @@ public class Climber extends SubsystemBase {
   // @Logged(name = "Climber Motor 2", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor2;
 
-  private final DutyCycleEncoder m_ClimberEncoder;
-
-  @Logged(name = "Climber State", importance = Importance.CRITICAL)
-  private ClimberPositions m_ClimberState = ClimberPositions.DEFAULT;
+  // private final DutyCycleEncoder m_ClimberEncoder;
 
   // private Slot0Configs PIDConfig = new Slot0Configs();
   // private final TunableNumber climberKp;
@@ -72,11 +60,16 @@ public class Climber extends SubsystemBase {
 
   private final TorqueCurrentFOC m_TestRequest;
 
+  private final DigitalInput m_ClimberLimitSwitch;
+
+  @Logged(name = "at position", importance = Importance.CRITICAL)
+  private boolean atPosition = false;
+
   public Climber() {
     m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
 
-    m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
+    // m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
 
     // climberMMCruiseVelocity =
     //     new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
@@ -88,8 +81,11 @@ public class Climber extends SubsystemBase {
     m_PositionRequest = new MotionMagicExpoTorqueCurrentFOC(0);
     m_TestRequest = new TorqueCurrentFOC(Amps.of(0));
 
+    m_ClimberLimitSwitch = new DigitalInput(8);
+
     // retractSetpoint = new TunableNumber("Climber/Retract Setpoint", climbPosition.in(Rotations));
-    // extendSetpoint = new TunableNumber("Climber/Extend Setpoint", climbExtendPosition.in(Rotations));
+    // extendSetpoint = new TunableNumber("Climber/Extend Setpoint",
+    // climbExtendPosition.in(Rotations));
 
     // PIDConfig.withKA(kA)
     //     .withKS(kS)
@@ -115,48 +111,34 @@ public class Climber extends SubsystemBase {
     resetPosition();
   }
 
-  public void setState(ClimberPositions state) {
-    m_ClimberState = state;
-  }
-
-  public ClimberPositions getState() {
-    return m_ClimberState;
+  @Logged(name = "Climber Limit Switch", importance = Importance.CRITICAL)
+  public boolean getLimitSwitch() {
+    return m_ClimberLimitSwitch.get();
   }
 
   public double absoluteEncoderToRotations(double x) {
-    return 132.2772 * Math.sin(3.36922 * x);
-  }
-
-  // TODO: rewrite so it does not take in a command xbox controller
-  public void setPositionRequestWithController(CommandXboxController controller) {
-    double leftY = controller.getLeftY();
-    double rightY = controller.getRightY();
-    if (Math.abs(leftY) > 0.2) {
-      runCurrent(-controller.getLeftY() * 75);
-    } else if (rightY > 0.2) {
-      resetPosition();
-      setPositionRequest(climbExtendPosition);
-      // setPositionRequest(Rotations.of(extendSetpoint.getNumber()));
-    } else if (rightY < -0.2) {
-      resetPosition();
-      setPositionRequest(climbPosition);
-      // setPositionRequest(Rotations.of(retractSetpoint.getNumber()));
-    } else {
-      runCurrent(0);
-    }
+    return 132.2772 * Math.sin(3.36922 * x) + 11.17;
   }
 
   public void setPositionRequest(Angle position) {
-    m_ClimberMotor1.setControl(
-        m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
-    m_ClimberMotor2.setControl(
-        m_PositionRequest.withPosition(position).withLimitReverseMotion(getAbsolutePosition() < 0));
+    if ((getLimitSwitch() || atPosition(position))
+        && position.in(Rotations) <= getPositionRotations()) {
+      m_ClimberMotor1.setControl(m_TestRequest.withOutput(0));
+      m_ClimberMotor2.setControl(m_TestRequest.withOutput(0));
+      atPosition = true;
+    } else {
+      m_ClimberMotor1.setControl(
+          m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
+      m_ClimberMotor2.setControl(
+          m_PositionRequest.withPosition(position).withLimitReverseMotion(getLimitSwitch()));
+      atPosition = false;
+    }
   }
 
   // @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
-  public double getAbsolutePosition() {
-    return m_ClimberEncoder.get();
-  }
+  // public double getAbsolutePosition() {
+  //   return m_ClimberEncoder.get();
+  // }
 
   @Logged(name = "Climber Position", importance = Importance.CRITICAL)
   public double getPositionRotations() {
@@ -166,42 +148,59 @@ public class Climber extends SubsystemBase {
   public Angle getPosition() {
     Measure<AngleUnit> motor1Position =
         BaseStatusSignal.getLatencyCompensatedValue(
-            m_ClimberMotor1.getPosition(), m_ClimberMotor1.getVelocity());
+            m_ClimberMotor1.getPosition(true), m_ClimberMotor1.getVelocity(true));
     Measure<AngleUnit> motor2Position =
         BaseStatusSignal.getLatencyCompensatedValue(
-            m_ClimberMotor2.getPosition(), m_ClimberMotor2.getVelocity());
+            m_ClimberMotor2.getPosition(true), m_ClimberMotor2.getVelocity(true));
 
     return Rotations.of((motor1Position.in(Rotations) + motor2Position.in(Rotations)) / 2);
   }
 
-  public boolean atPosition() {
-    return Math.abs(getPosition().in(Rotations) - ClimberConstants.climbPosition.in(Rotations))
+  public boolean atPosition(Angle position) {
+    return Math.abs(getPosition().in(Rotations) - position.in(Rotations))
         < ClimberConstants.climbDeadband;
-  }
-
-  public boolean isAtPositionAbsolute(Angle position) {
-    return Math.abs(position.in(Rotations) - m_ClimberEncoder.get()) < climbDeadbandAbsolute;
   }
 
   public void runCurrent(double current) {
     current = MathUtil.applyDeadband(current, 5);
+
+    if (getLimitSwitch() && current < 0) {
+      System.out.println("Limit Reached");
+      current = 0;
+    }
+    if (current < 0) {
+      System.out.println("reversing");
+    } else if (current > 0) {
+      System.out.println("Forward");
+    }
+
     m_ClimberMotor1.setControl(m_TestRequest.withOutput(current));
     m_ClimberMotor2.setControl(m_TestRequest.withOutput(current));
   }
 
   public void resetPosition() {
-    m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
-    m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    // m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    // m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
+    // ! what is this for?
+    if (getLimitSwitch()) {
+      m_ClimberMotor1.setPosition(0);
+      m_ClimberMotor2.setPosition(0);
+    }
   }
 
   @Override
   public void periodic() {
+    if (getLimitSwitch() && Math.abs(getPosition().in(Rotations)) >= 0.1) {
+      resetPosition();
+    }
+    SmartDashboard.putBoolean("Climber Limit", getLimitSwitch());
     // if (climberKp.getNumber() != PIDConfig.kP
     //     || climberKd.getNumber() != PIDConfig.kD
     //     || climberKs.getNumber() != PIDConfig.kS
     //     || climberKg.getNumber() != PIDConfig.kG
     //     || climberKa.getNumber() != PIDConfig.kA
     //     || climberKv.getNumber() != PIDConfig.kV) {
+
     //   PIDConfig.kP = climberKp.getNumber();
     //   PIDConfig.kD = climberKd.getNumber();
     //   PIDConfig.kS = climberKs.getNumber();
@@ -224,19 +223,6 @@ public class Climber extends SubsystemBase {
 
     //   m_ClimberMotor1.getConfigurator().apply(MMConfig);
     //   m_ClimberMotor2.getConfigurator().apply(MMConfig);
-    // }
-
-    // switch (m_ClimberState) {
-    //   case DEFAULT -> {
-    //     setPositionRequest(Rotations.of(0));
-    //   }
-    //   case CLIMB -> {
-    //     if (getLimitSwitch()) {
-    //       setPositionRequest(getPosition());
-    //     } else {
-    //       setPositionRequest(ClimberConstants.climbPosition);
-    //     }
-    //   }
     // }
   }
 }

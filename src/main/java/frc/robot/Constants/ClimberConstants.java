@@ -14,10 +14,10 @@ import edu.wpi.first.units.measure.Time;
 
 public final class ClimberConstants {
   public static final double climberGearRatio = 39.6 / 1.0;
-  public static final Angle climbPosition = Rotations.of(0);
-  public static final Angle climbExtendPosition = Rotations.of(105);
+  public static final Angle climbPosition = Rotations.of(3.5);
+  public static final Angle climbExtendPosition = Rotations.of(130);
   public static final double climbDeadband = 0.5;
-  public static final int limitPort = 7;
+  public static final int limitPort = 8;
   public static final int climberMotor2CANID = 47;
   public static final int climberMotor1CANID = 46;
 
@@ -39,7 +39,7 @@ public final class ClimberConstants {
     public static final Current statorReverseCurrentLimit = Amps.of(100);
 
     public static final Angle forwardSoftLimit = Rotations.of(104);
-    public static final Angle reverseSoftLimit = Rotations.of(-8);
+    public static final Angle reverseSoftLimit = Rotations.of(0.01);
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
@@ -47,9 +47,9 @@ public final class ClimberConstants {
     public static final double kG = 0; // current to overcome gravity
     public static final double kS = 0; // current to overcome static friction
     public static final double kV = 0.1; // current per unit of requested velocity
-    public static final double kP = 0.000001;
+    public static final double kP = 5;
     public static final double kI = 0;
-    public static final double kD = 7.6;
+    public static final double kD = 2;
 
     public static final double motionMagicCruiseVelocity = 40;
     public static final double motionMagicCruiseAcceleration = 10;
@@ -92,7 +92,7 @@ public final class ClimberConstants {
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
           forwardSoftLimit.in(Rotations);
-      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+      m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
       m_ClimberMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
           reverseSoftLimit.in(Rotations);
 

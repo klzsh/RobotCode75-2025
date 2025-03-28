@@ -1,24 +1,21 @@
 package frc.robot.commands.Drivetrain;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
 public class RotateToSimilarFace extends Command {
   private final Swerve m_Swerve;
   private double targetHeading;
-  private PIDController m_RotationController;
+  private RotationController m_RotationController;
 
-  public RotateToSimilarFace(Swerve swerve) {
+  public RotateToSimilarFace(Swerve swerve, RotationController controller) {
     m_Swerve = swerve;
-    m_RotationController = new PIDController(0.05, 0, 0);
-    m_RotationController.setTolerance(1.5);    
+    m_RotationController = controller;
     addRequirements(m_Swerve);
   }
-
 
   @Override
   public void initialize() {
@@ -27,9 +24,8 @@ public class RotateToSimilarFace extends Command {
 
   @Override
   public void execute() {
-    double rotationOutput =
-        m_RotationController.calculate(m_Swerve.getRotation2D().getDegrees(), targetHeading);
-    m_Swerve.setRobotRelative(new ChassisSpeeds(0, 0, rotationOutput));
+    m_RotationController.update(Rotation2d.fromDegrees(targetHeading));
+    m_Swerve.setRobotRelative(new ChassisSpeeds(0, 0, m_RotationController.getOutput()));
   }
 
   @Override
@@ -39,6 +35,6 @@ public class RotateToSimilarFace extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_RotationController.atSetpoint();
+    return m_RotationController.atGoal();
   }
 }

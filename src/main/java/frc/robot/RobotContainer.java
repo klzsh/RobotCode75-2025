@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.ClimberConstants.climbExtendPosition;
+import static frc.robot.Constants.ClimberConstants.climbPosition;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -19,19 +21,20 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
+import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToCage;
+import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.ResetHeading;
+import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
-import frc.robot.commands.EndEffector.Coral.ScoreL1;
-import frc.robot.commands.EndEffector.Coral.ScoreL2;
-import frc.robot.commands.EndEffector.Coral.ScoreL3;
-import frc.robot.commands.EndEffector.Coral.ScoreL4;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.commands.EndEffector.Coral.ScoreCoral;
+import frc.robot.subsystems.Drivetrain.ChezyController;
+import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -44,6 +47,8 @@ import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.EndGame.Climber;
 import frc.robot.subsystems.Vision.AprilTagCamera;
 import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
+import frc.robot.subsystems.Vision.OdometryWrapper;
+import frc.robot.subsystems.Vision.YoloController;
 import java.util.ArrayList;
 
 /**
@@ -84,15 +89,24 @@ public class RobotContainer {
   @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-  @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
+  // @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
+  // @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
   //   @Logged
-  private final PoseAlignController m_PoseAlignController = new PoseAlignController(m_Swerve);
+  private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
+
+  //   @Logged
+  private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
+
+  @Logged private RotationController m_RotationController = new RotationController(m_Swerve);
+
+  // odometry
+  private final OdometryWrapper m_Odometry =
+      new OdometryWrapper(m_Swerve, m_LeftFacingCamera, m_RightFacingCamera, m_HPCamera);
 
   // define OI controls
   private final Joystick m_LeftStick = new Joystick(leftStickPort);
@@ -110,6 +124,7 @@ public class RobotContainer {
       new JoystickButton(m_LeftStick, autoAlignButton); // trigger
   private final JoystickButton AlignRight =
       new JoystickButton(m_RightStick, autoAlignButton); // trigger
+
   private final JoystickButton SimilarFaceRotate =
       new JoystickButton(m_RightStick, rotateToSimilarFaceButton); // left button
 
@@ -119,11 +134,10 @@ public class RobotContainer {
   private final JoystickButton resetBranchCam =
       new JoystickButton(m_LeftStick, resetBranchCamButton);
 
+  private final JoystickButton HPRotate = new JoystickButton(m_RightStick, hpRotateButton);
+
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
-  // private final AutoFactory m_factory =
-  //     new AutoFactory(
-  //         m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   private final ActionFactory m_ActionFactory =
       new ActionFactory(
@@ -132,8 +146,8 @@ public class RobotContainer {
           m_CoralIntake,
           m_AlgaePivot,
           m_AlgaeIntake,
-          m_PoseAlignController,
-          m_BranchCamera);
+          m_ChezyController,
+          m_YoloController);
 
   private final AutoSelector m_AutoSelector =
       new AutoSelector(
@@ -163,15 +177,13 @@ public class RobotContainer {
         new InstantCommand(() -> m_Elevator.setPosition(ElevatorPositions.HOME, false), m_Elevator)
             .repeatedly());
     m_CoralIntake.setDefaultCommand(
-        new InstantCommand(() -> m_CoralIntake.setState(CoralStates.DEFAULT), m_CoralIntake)
+        new InstantCommand(() -> m_CoralIntake.setState(m_CoralIntake.getState()), m_CoralIntake)
             .repeatedly());
     m_AlgaeIntake.setDefaultCommand(
         new InstantCommand(() -> m_AlgaeIntake.resetAlgaeState(), m_AlgaeIntake).repeatedly());
     m_AlgaePivot.setDefaultCommand(
         new InstantCommand(() -> m_AlgaePivot.resetPivotState(), m_AlgaePivot).repeatedly());
-    m_Climber.setDefaultCommand(
-        new InstantCommand(
-            () -> m_Climber.setPositionRequestWithController(m_Controller), m_Climber));
+    m_Climber.setDefaultCommand(new InstantCommand(() -> m_Climber.runCurrent(0), m_Climber));
   }
 
   /**
@@ -186,16 +198,37 @@ public class RobotContainer {
   private void configureJoystickBinds() {
     resetHeading.onTrue(new ResetHeading(m_Swerve));
     Xstance.whileTrue(new XStance(m_Swerve));
-    AlignLeft.whileTrue(
-        new RotateToSimilarFace(m_Swerve)
-            .andThen(
-                new YoloBranchAlign(
-                    m_Swerve, m_BranchCamera, false))); // rotate then translate on left trigger
-    // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, false));
-    AlignRight.whileTrue(new YoloBranchAlign(m_Swerve, m_BranchCamera, true));
+    AlignLeft.and(() -> m_CoralIntake.getBeamBreak())
+        .whileTrue(
+            new RotateToSimilarFace(m_Swerve, m_RotationController)
+                .andThen(new YoloBranchAlign(m_Swerve, m_YoloController, false))
+            // new AlignToReef(
+            //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.LEFT)
+            );
+    AlignRight.and(() -> m_CoralIntake.getBeamBreak())
+        .whileTrue(
+            // new RotateToSimilarFace(m_Swerve, m_RotationController).andThen(
+            new YoloBranchAlign(m_Swerve, m_YoloController, true)
+            // new AlignToReef(
+            //     m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.RIGHT)
+            );
+    AlignLeft.and(() -> !m_CoralIntake.getBeamBreak())
+        .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.LEFT));
+    // AlignLeft.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    AlignRight.and(() -> !m_CoralIntake.getBeamBreak())
+        .whileTrue(new AlignToCoralStation(m_Swerve, m_ChezyController, Offset.RIGHT));
+    // debug command
+    // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController,
+    // m_YoloController, m_BranchCamera, Offset.LEFT));
     CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
 
-    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve));
+    SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
+
+    // YoloAlign.whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
+    HPRotate.whileTrue(
+        new RotateToSimilarCoralStation(
+            m_Swerve, () -> -m_LeftStick.getY(), () -> -m_LeftStick.getX()));
+
     robotRelative
         .onTrue(new InstantCommand(() -> m_Swerve.toggleRobotRelative()))
         .onFalse(new InstantCommand(() -> m_Swerve.toggleFieldRelative()));
@@ -203,29 +236,48 @@ public class RobotContainer {
     //     .whileTrue(new InstantCommand(() -> m_BranchCamera.setDriverMode(true)))
     //     .whileFalse(new InstantCommand(() -> m_BranchCamera.setDriverMode(false)));
 
-    resetBranchCam.onTrue(new InstantCommand(() -> m_BranchCamera.reloadPipeline()));
+    resetBranchCam.onTrue(
+        new InstantCommand(() -> m_BranchCamera.reloadPipeline()).ignoringDisable(true));
   }
 
   public void configureControllerBinds() {
     // score L* commands
-    m_Controller
-        .a()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
-        .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
-    m_Controller
-        .x()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
-        .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
-    m_Controller
-        .y()
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
-        .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
-    m_Controller
-        .b()
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
-        .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .a()
+    //     .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L1, false),
+    // m_Elevator).repeatedly());
+    // m_Controller
+    //     .x()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no de-algaefy
+    //     .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L2, false),
+    // m_Elevator).repeatedly());
+    // m_Controller
+    //     .y()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no de-algaefy
+    //     .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L3, false),
+    // m_Elevator).repeatedly());
+    // m_Controller
+    //     .b()
+    //     .whileTrue(new InstantCommand(()->m_Elevator.setPosition(ElevatorPositions.L4, false),
+    // m_Elevator).repeatedly());
+    // m_Controller
+    //     .a()
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
+    //     .whileTrue(new ScoreL1(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .x()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
+    //     .whileTrue(new ScoreL2(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .y()
+    //     .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15) // no override
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no dealgaefy
+    //     .whileTrue(new ScoreL3(m_Elevator, m_CoralIntake));
+    // m_Controller
+    //     .b()
+    //     .and(() -> m_Controller.getRightTriggerAxis() <= 0.15) // no override
+    //     .whileTrue(new ScoreL4(m_Elevator, m_CoralIntake));
     // algae commands
     m_Controller
         .povRight()
@@ -246,60 +298,83 @@ public class RobotContainer {
                 .repeatedly()
                 .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
     // coral commands
-    m_Controller.povUp().whileTrue(new IntakeCoral(m_CoralIntake));
+    m_Controller.povUp().onTrue(new IntakeCoral(m_CoralIntake));
     m_Controller
+        // .rightTrigger(0.15)
         .povDown()
-        .whileTrue(
-            new InstantCommand(() -> m_CoralIntake.setState(CoralStates.SCORING), m_CoralIntake)
-                .repeatedly());
+        .whileTrue(new ScoreCoral(m_CoralIntake, m_Elevator));
     m_Controller
         .povLeft()
         .whileTrue(
             new InstantCommand(() -> m_CoralIntake.setState(CoralStates.REVERSING), m_CoralIntake)
                 .repeatedly());
-    // manual elevator overrides
-
+    // overrides
     m_Controller
         .a()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .x()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .y()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
-        .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getLeftTriggerAxis() <= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
                 .repeatedly());
     m_Controller
         .b()
-        .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() >= 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
                 .repeatedly());
+
+    m_Controller.rightTrigger(0.15).whileTrue(new ScoreCoral(m_CoralIntake, m_Elevator));
     // dealgaefy commands
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
+        // .and(() -> m_Controller.getRightTriggerAxis() <= 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
+    // climber commands
+    // Left Y, more than 0.15
+    m_Controller
+        .axisLessThan(1, -0.15)
+        .whileTrue(
+            new InstantCommand(() -> m_Climber.runCurrent(-m_Controller.getLeftY() * 75), m_Climber)
+                .repeatedly());
+    m_Controller
+        .axisGreaterThan(1, 0.15)
+        .whileTrue(
+            new InstantCommand(() -> m_Climber.runCurrent(-m_Controller.getLeftY() * 75), m_Climber)
+                .repeatedly());
+
+    m_Controller
+        .axisLessThan(5, -0.15)
+        .whileTrue(
+            new InstantCommand(() -> m_Climber.setPositionRequest(climbPosition), m_Climber)
+                .repeatedly());
+    m_Controller
+        .axisGreaterThan(5, 0.15)
+        .whileTrue(
+            new InstantCommand(() -> m_Climber.setPositionRequest(climbExtendPosition), m_Climber)
+                .repeatedly());
   }
 
   private void configureChooser() {
@@ -315,16 +390,5 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     m_AutoSelector.generatePaths();
     return m_AutoSelector.getAutoCommand();
-
-    // return new SequentialCommandGroup(
-    //   m_factory.resetOdometry("st-bl-1"),
-    //     m_factory.trajectoryCmd("st-bl-1", 0),
-    //     new YoloBranchAlign(m_Swerve, m_BranchCamera, false),
-    //     new ScoreL4(m_Elevator, m_CoralIntake),
-    //     m_factory.trajectoryCmd("st-bl-1", 1),
-    //     new ParallelRaceGroup(new WaitCommand(0.5), new IntakeCoral(m_CoralIntake)),
-    //     new ParallelCommandGroup(
-    //         m_factory.trajectoryCmd("st-bl-1", 2), new IntakeCoral(m_CoralIntake)),
-    //     new AutoScoreL4(m_Swerve, m_Elevator, m_CoralIntake));
   }
 }

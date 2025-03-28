@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.PeddieBounds;
 import frc.robot.commands.EndEffector.SetElevatorPosition;
-import frc.robot.subsystems.Drivetrain.PoseAlignController;
+import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaeIntake.AlgaeStates;
@@ -34,18 +34,18 @@ public class AutoDealgaefy extends SequentialCommandGroup {
       Elevator elevator,
       AlgaeIntake intake,
       AlgaePivot pivot,
-      PoseAlignController poseController) {
+      ChezyController chezyController) {
     addRequirements(swerve, elevator, intake, pivot);
-    FieldElement elem = CheckBounds.nearestElement(swerve.getPose());
+    FieldElement elem = PeddieBounds.nearestElement(swerve.getPose());
     if (!FieldPose.fieldElementIsReef(elem)) {
       return;
     }
     ElevatorPositions elevatorHeight = algaeHeights.get(elem.toString());
     addCommands(
         new ParallelCommandGroup(
-            // new DriveToPose(swerve, poseController, new
+            // new ChezyPose(swerve, chezyController, new
             // FieldPose(DriverStation.getAlliance().get(), elem, Offset.MID), false),
-            new SetElevatorPosition(elevator, elevatorHeight, true)),
+            new SetElevatorPosition(elevator, elevatorHeight, true, false)),
         new ParallelCommandGroup(
                 new InstantCommand(
                         () -> {
@@ -56,7 +56,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
                         pivot)
                     .repeatedly()
                     .until(() -> intake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-                new SetElevatorPosition(elevator, elevatorHeight, true))
+                new SetElevatorPosition(elevator, elevatorHeight, true, false))
             .until(() -> intake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
         new ParallelCommandGroup(
             new InstantCommand(
@@ -64,7 +64,7 @@ public class AutoDealgaefy extends SequentialCommandGroup {
                   swerve.setRobotRelative(new ChassisSpeeds(-0.25, 0, 0));
                 }),
             new WaitCommand(0.5),
-            new SetElevatorPosition(elevator, elevatorHeight, true)),
+            new SetElevatorPosition(elevator, elevatorHeight, true, false)),
         new InstantCommand(
                 () -> {
                   pivot.setPivotState(PivotState.RETRACTED);

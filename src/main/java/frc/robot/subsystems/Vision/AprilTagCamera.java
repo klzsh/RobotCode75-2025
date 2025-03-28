@@ -35,22 +35,35 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 @Logged(strategy = Strategy.OPT_IN)
 public class AprilTagCamera extends SubsystemBase {
+  private final String cameraName;
   private PhotonCamera m_camera;
   private PhotonPipelineResult m_result;
   private AprilTagFieldLayout m_tagLayout =
       // FMA uses welded field layout
       AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-  private PhotonPoseEstimator m_poseEstimator;
+  public PhotonPoseEstimator m_poseEstimator;
   private EstimatedRobotPose m_pose;
   private Transform3d cameraToRobotPose;
 
+  private final double ambiguityThreshold;
+  private final double distanceThreshold;
+  private final double reprojectionErrorThreshold;
+  private double ambiguity = 0;
+  private double reprojError = 0;
+  private double tagDist = 0;
+
   public AprilTagCamera(String name, Transform3d cameraPose) {
+    cameraName = name;
+
     cameraToRobotPose = cameraPose;
     m_camera = new PhotonCamera(NetworkTableInstance.getDefault(), name);
 
     m_poseEstimator =
         new PhotonPoseEstimator(m_tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cameraPose);
     m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
+    ambiguityThreshold = cameraName == "HP_Cam" ? 0.07 : 0.15;
+    distanceThreshold = maxTagDistanceThreshold;
+    reprojectionErrorThreshold = 0.5;
   }
 
   public boolean hasTarget() {
@@ -233,7 +246,7 @@ public class AprilTagCamera extends SubsystemBase {
           PhotonUtils.calculateDistanceToTargetMeters(
               cameraToRobotPose.getZ(),
               getAprilTagHeight(target.getFiducialId()),
-              0,
+              cameraToRobotPose.getRotation().getY(),
               Units.degreesToRadians(target.getPitch()));
       if (dist > maxDist) {
         maxDist = dist;
@@ -278,17 +291,6 @@ public class AprilTagCamera extends SubsystemBase {
     // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
     //   return null;
     // }
-    if (maxTagDist(currentPose).isPresent()
-        && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
-      return null;
-    }
-    if (m_result.getMultiTagResult().isPresent()
-        && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.2) {
-      return null;
-    }
-    if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.2) {
-      return null;
-    }
     return m_pose;
   }
 
@@ -296,17 +298,6 @@ public class AprilTagCamera extends SubsystemBase {
     // if (minTagArea().isPresent() && minTagArea().getAsDouble() < minTagAreaThreshold) {
     //   return null;
     // }
-    if (maxTagDist(currentPose).isPresent()
-        && maxTagDist(currentPose).getAsDouble() > maxTagDistanceThreshold) {
-      return null;
-    }
-    if (m_result.getMultiTagResult().isPresent()
-        && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr > 0.2) {
-      return null;
-    }
-    if (getBestTarget().isPresent() && getBestTarget().get().poseAmbiguity > 0.2) {
-      return null;
-    }
     if (m_pose != null) {
       return m_pose.estimatedPose.toPose2d();
     } else {
@@ -323,7 +314,7 @@ public class AprilTagCamera extends SubsystemBase {
     return m_result.getTimestampSeconds();
   }
 
-  public void updatePoseEstimator() {
+  public void updatePoseEstimator(Pose2d currentPose) {
     if (m_poseEstimator != null) {
       Optional<EstimatedRobotPose> pose;
       List<PhotonPipelineResult> m_unreadResults;
@@ -331,6 +322,47 @@ public class AprilTagCamera extends SubsystemBase {
       if (!m_unreadResults.isEmpty()) {
         // gets the latest unread result
         m_result = m_unreadResults.get(m_unreadResults.size() - 1);
+        tagDist = 1;
+        reprojError = 1;
+        ambiguity = 1;
+        if (maxTagDist(currentPose).isPresent()) {
+          tagDist = maxTagDist(currentPose).getAsDouble();
+        }
+
+        if (m_result.getMultiTagResult().isPresent()) {
+          reprojError = m_result.getMultiTagResult().get().estimatedPose.bestReprojErr;
+        }
+
+        if (getBestTarget().isPresent()) {
+          ambiguity = getBestTarget().get().poseAmbiguity;
+        }
+
+        for (PhotonTrackedTarget target : m_result.getTargets()) {
+          if (target.getFiducialId() == 3
+              || target.getFiducialId() == 16
+              || target.getFiducialId() == 2) {
+            m_pose = null;
+            return;
+          }
+        }
+        if (maxTagDist(currentPose).isPresent()
+            && maxTagDist(currentPose).getAsDouble() > distanceThreshold) {
+          m_pose = null;
+          return;
+        }
+
+        if (m_result.getMultiTagResult().isPresent()
+            && m_result.getMultiTagResult().get().estimatedPose.bestReprojErr
+                > reprojectionErrorThreshold) {
+          m_pose = null;
+          return;
+        }
+
+        if (getBestTarget().isPresent()
+            && getBestTarget().get().poseAmbiguity > ambiguityThreshold) {
+          m_pose = null;
+          return;
+        }
         pose = m_poseEstimator.update(m_result);
       } else { // Latest result is a duplicate
         pose = Optional.empty();
@@ -345,6 +377,21 @@ public class AprilTagCamera extends SubsystemBase {
 
   private Pose3d getTagPose(int id) {
     return m_tagLayout.getTagPose(id).get();
+  }
+
+  @Logged(name = "Ambiguity", importance = Importance.DEBUG)
+  public double getAmbiguity() {
+    return ambiguity;
+  }
+
+  @Logged(name = "Tag Distance", importance = Importance.DEBUG)
+  public double getTagDist() {
+    return tagDist;
+  }
+
+  @Logged(name = "Reprojection Error", importance = Importance.DEBUG)
+  public double getReprojError() {
+    return reprojError;
   }
 
   /**
@@ -396,7 +443,5 @@ public class AprilTagCamera extends SubsystemBase {
   // }
 
   @Override
-  public void periodic() {
-    updatePoseEstimator();
-  }
+  public void periodic() {}
 }

@@ -28,15 +28,15 @@ public class ElevatorConstants {
   // Distance from GROUND.
   public static final Angle algaeRemovalOffset = Rotations.of(3);
   public static final Angle l1Position = Rotations.of(6.0);
-  public static final Angle l2Position = Rotations.of(7.5);
-  public static final Angle l3Position = Rotations.of(15.7);
+  public static final Angle l2Position = Rotations.of(6.6);
+  public static final Angle l3Position = Rotations.of(14.8);
   public static final Angle l4Position = Rotations.of(25.8);
   public static final Angle homePosition = Rotations.of(0);
   public static final Angle processorPosition = Rotations.of(2);
 
   // velocity, acceleration, jerk
-  public static double[] MotionMagicProfileUp = {130, 130, 1000};
-  public static double[] MotionMagicProfileDown = {40, 50, 400};
+  public static double[] MotionMagicProfileUp = {150, 170, 1200};
+  public static double[] MotionMagicProfileDown = {110, 90, 1000};
 
   public static final Angle deadband = Rotations.of(0.7);
 
@@ -56,11 +56,11 @@ public class ElevatorConstants {
 
     public static final Frequency timeSyncFreq = Hertz.of(250);
 
-    public static final double kA = 0.5; // current per unit of acceleration
-    public static final double kG = 21; // current to overcome gravity
-    public static final double kS = 17; // current to overcome static friction
+    public static final double kA = 0.3; // current per unit of acceleration
+    public static final double kG = 20; // current to overcome gravity
+    public static final double kS = 19; // current to overcome static friction
     public static final double kV = 0.12; // current per unit of requested velocity
-    public static final double kP = 20;
+    public static final double kP = 25;
     public static final double kI = 0;
     public static final double kD = 5;
 

@@ -7,9 +7,9 @@ package frc.robot.commands.Autonomous;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.lib.util.CheckBounds;
 import frc.lib.util.FieldPose;
 import frc.lib.util.FieldPose.FieldElement;
+import frc.lib.util.PeddieBounds;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
@@ -23,12 +23,12 @@ public class AutoIntakeCoral extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addRequirements(swerve, coralIntake);
-    FieldElement elem = CheckBounds.nearestElement(swerve.getPose());
+    FieldElement elem = PeddieBounds.nearestElement(swerve.getPose());
     if (!FieldPose.fieldElementIsHPStation(elem)) {
       elem = FieldElement.HT;
     }
     addCommands(
         new InstantCommand(() -> coralIntake.setState(CoralStates.INTAKING), coralIntake),
-        new WaitCommand(0.95));
+        new WaitCommand(0.1));
   }
 }

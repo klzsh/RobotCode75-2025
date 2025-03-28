@@ -13,12 +13,9 @@ public class AlignToCage extends Command {
   private final Swerve m_Swerve;
   private final ObjectDetetectorCamera m_CageDetector;
 
-  private final double finalYawSetpoint = -8;
-  private final double finalPitchSetpoint = -9;
   private final double intermediatePitchSetpoint = 0; // only used if align needs to be two step
 
   private double yawSetpoint;
-  private double pitchSetpoint;
 
   private OptionalDouble currentYaw;
   private OptionalDouble currentPitch;

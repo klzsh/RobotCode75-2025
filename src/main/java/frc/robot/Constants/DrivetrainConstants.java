@@ -35,24 +35,24 @@ public final class DrivetrainConstants {
   public static final Distance wheelCircumference = Meters.of(wheelDiameter.in(Meters) * Math.PI);
 
   public static final class ControllerConstants {
-    public static final double toleranceRadians = Units.degreesToRadians(2);
+    public static final double toleranceRadians = Units.degreesToRadians(1.5);
     public static final double toleranceTranslation = .01;
 
     public static final class RotationAlign {
 
-      public static final double kp = 0.08;
-      public static final double kd = 0.03;
+      public static final double kp = 2;
+      public static final double kd = 0;
       public static final double maxVelocityMultiplier = 0.8;
       public static final double maxAccelerationMultiplier = 0.8;
       public static final double loopPeriodSeconds = 0.02;
     }
 
     public static final class OdometryAlign {
-      public static final double xP = -1.65;
+      public static final double xP = 2;
       public static final double xI = 0.0;
       public static final double xD = 0.0;
 
-      public static final double tP = -0.8;
+      public static final double tP = 3;
       public static final double tI = 0.0;
       public static final double tD = 0.0;
     }
@@ -62,13 +62,9 @@ public final class DrivetrainConstants {
       public static final double xI = 0.0;
       public static final double xD = 0.0;
 
-      public static final double yP = 0.0;
+      public static final double yP = 0.7;
       public static final double yI = 0.0;
       public static final double yD = 0.0;
-
-      public static final double tP = 0.0;
-      public static final double tI = 0.0;
-      public static final double tD = 0.0;
     }
 
     public static final LinearVelocity maxVelocity = MetersPerSecond.of(1);

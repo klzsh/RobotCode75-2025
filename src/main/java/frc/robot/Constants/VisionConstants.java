@@ -22,7 +22,6 @@ public class VisionConstants {
   public static final Matrix<N3, N1> moduleMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 2, 2, .1);
   public static final Matrix<N3, N1> visionMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
-  // TODO figure out offsets
   public static final Map<String, Translation2d> fieldPoseToCameraAngleOffset =
       // vision can't handle sideloading due to camera placement
 
@@ -53,10 +52,7 @@ public class VisionConstants {
               new Translation2d(0.24, -.1)),
           entry(
               new FieldPose(Alliance.Blue, FieldElement.A, Offset.RIGHT).toString(),
-              new Translation2d(-8, -4))
-
-          // TODO: Auto field flipping for blue side (or red side ig)
-          );
+              new Translation2d(-8, -4)));
 
   public static final Map<Integer, FieldElement> tagIDToFieldElement =
       Map.ofEntries(
@@ -89,13 +85,13 @@ public class VisionConstants {
   public static final Transform3d LeftFacingCameraPose =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(9.398), // X 9.325
-              Units.inchesToMeters(7.551), // Y .3505
+              Units.inchesToMeters(8.966), // X 9.325
+              Units.inchesToMeters(7.951), // Y .3505
               Units.inchesToMeters(8.25)), // Z 5.85
           new Rotation3d(
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
-              Units.degreesToRadians(30))); // 0 0 0
+              Units.degreesToRadians(40))); // 0 0 0
   //   new Transform3d(
   //       new Translation3d(
   //           Units.inchesToMeters(10.382), // X 9.325
@@ -110,7 +106,7 @@ public class VisionConstants {
           new Translation3d(
               Units.inchesToMeters(7.693), // X 7.262
               Units.inchesToMeters(10.815), // Y 10.201
-              Units.inchesToMeters(8.251)), // Z 6.638
+              Units.inchesToMeters(8.25)), // Z 6.638
           new Rotation3d(
               Units.degreesToRadians(0),
               Units.degreesToRadians(-20),
@@ -118,9 +114,11 @@ public class VisionConstants {
   public static final Transform3d HPCameraPose =
       new Transform3d(
           new Translation3d(
-              Units.inchesToMeters(0), Units.inchesToMeters(-6.033), Units.inchesToMeters(40.25)),
+              Units.inchesToMeters(0.863),
+              Units.inchesToMeters(-8.367),
+              Units.inchesToMeters(40.759)),
           new Rotation3d(
-              Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(125)));
+              Units.degreesToRadians(0), Units.degreesToRadians(-10), Units.degreesToRadians(125)));
   public static final Transform3d CageDetectCameraPose =
       new Transform3d(
           new Translation3d(
@@ -142,5 +140,5 @@ public class VisionConstants {
   public static final double finalPitchSetpointRight = -7.88;
 
   public static final double minTagAreaThreshold = 0.15;
-  public static final double maxTagDistanceThreshold = 3;
+  public static final double maxTagDistanceThreshold = 1.5;
 }

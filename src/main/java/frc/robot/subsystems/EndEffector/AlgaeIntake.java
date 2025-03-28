@@ -122,7 +122,8 @@ public class AlgaeIntake extends SubsystemBase {
       }
       case HASGAMEPIECE -> {
         // set the velocity control to a very low value (like 1-2 rps) to hold the algae in
-        m_AlgaeMotor.setControl(currentOut.withOutput(algaeHoldCurrent));
+        // m_AlgaeMotor.setControl(currentOut.withOutput(algaeHoldCurrent));
+        m_AlgaeMotor.setControl(algaeRequest.withVelocity(150));
       }
       case OUTAKING -> {
         m_AlgaeMotor.setControl(algaeRequest.withVelocity(algaeOutakeSpeed));

@@ -1,9 +1,9 @@
 package frc.lib.dashboard;
 
+import choreo.Choreo;
 import choreo.auto.AutoFactory;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.networktables.GenericEntry;
@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -64,16 +64,7 @@ import java.util.Map;
  */
 
 public class AutoSelector {
-
-  private class ChoreoTrajectory {
-    public choreo.trajectory.Trajectory traj;
-
-    public ChoreoTrajectory(choreo.trajectory.Trajectory t) {
-      traj = t;
-    }
-  }
-
-  private List<ChoreoTrajectory> m_trajectories = new ArrayList<>();
+  private List<Trajectory> m_trajectories = new ArrayList<>();
   private Command m_autoCommand = Commands.runOnce(() -> {});
   private Pose2d m_startPose;
   private Field2d m_field;
@@ -110,9 +101,11 @@ public class AutoSelector {
     presetChooser = new SendableChooser<>();
 
     presetChooser.setDefaultOption("Custom", "");
-    presetChooser.addOption("Left Side Two Piece", "st cr 3 ht 5 bl 6 3");
-    presetChooser.addOption("Right Side Two Piece", "sb el 3 hb 5 fl 3");
-    presetChooser.addOption("Middle One Piece", "sm dl 3");
+    presetChooser.addOption("Left Side Two Piece", Presets.LeftSideTwoPiece);
+    presetChooser.addOption("Right Side Two Piece", Presets.RightSideTwoPiece);
+    presetChooser.addOption("Middle One Piece", Presets.MiddleOnePiece);
+    presetChooser.addOption("Left Side Three Piece", Presets.LeftSideThreePiece);
+    presetChooser.addOption("Right Side Three Piece", Presets.RightSideThreePiece);
 
     // define auto factory for autos
     factory =
@@ -121,6 +114,7 @@ public class AutoSelector {
   }
 
   public void clearField() {
+    // for displaying; clears shuffleboard field
     for (int i = 0; i < 100; i++) {
       FieldObject2d obj = m_field.getObject("traj" + i);
       obj.setTrajectory(new edu.wpi.first.math.trajectory.Trajectory());
@@ -128,11 +122,12 @@ public class AutoSelector {
   }
 
   private void drawPaths() {
+    // draws trajectory on shuffleboard field
     clearField();
     for (int i = 0; i < m_trajectories.size(); i++) {
-      ChoreoTrajectory pathTraj = m_trajectories.get(i);
-      List<Pose2d> poses = Arrays.asList(pathTraj.traj.getPoses());
-      Trajectory displayTraj =
+      Trajectory pathTraj = m_trajectories.get(i);
+      List<Pose2d> poses = Arrays.asList(pathTraj.getPoses());
+      edu.wpi.first.math.trajectory.Trajectory displayTraj =
           TrajectoryGenerator.generateTrajectory(
               poses, new TrajectoryConfig(AutoConstants.kMaxSpeed, AutoConstants.kMaxAcceleration));
       m_field.getObject("traj" + i).setTrajectory(displayTraj);
@@ -140,11 +135,13 @@ public class AutoSelector {
   }
 
   public void clearAll() {
+    // clears CHOREO trajectories
     m_trajectories.clear();
     clearField();
   }
 
   public void reset() {
+    // complete reset of everything
     clearAll();
     autoStringEntry.setString("");
     feedbackEntry.setString("Enter a command!");
@@ -207,10 +204,12 @@ public class AutoSelector {
   public void generatePaths() {
     setFeedback("Generating paths...");
 
+    // if there is no preset, just use the string
     if (presetChooser.getSelected() != "") {
       autoStringEntry.setString(presetChooser.getSelected());
     }
 
+    // note that this gets set by preset if a preset is chosen
     String autoString = autoStringEntry.getString("");
     String[] words = autoString.split(" ");
 
@@ -241,7 +240,7 @@ public class AutoSelector {
 
     String lastPose = "";
     for (int i = 0; i < words.length; i++) {
-      ParallelCommandGroup parallelGroup = new ParallelCommandGroup();
+      ParallelRaceGroup parallelGroup = new ParallelRaceGroup();
       StringBuilder pointString = new StringBuilder();
       StringBuilder actionString = new StringBuilder();
       for (int j = 0; j < words[i].length(); j++) {
@@ -268,13 +267,19 @@ public class AutoSelector {
           if (lastPose.charAt(0) >= 'a' && lastPose.charAt(0) <= 'f') {
             lastPose = lastPose.substring(0, 1);
           }
+
           if (!isOdometryReset) {
+            // TODO: Use start pose to set gyro
+            var trajectory = Choreo.loadTrajectory("" + lastPose + "-" + point);
             sequential.addCommands(
                 Commands.runOnce(
                     () ->
                         m_swerve.zeroGyro(
-                            Rotation2d.fromDegrees(
-                                DriverStation.getAlliance().get() == Alliance.Blue ? 180 : 0))),
+                            trajectory
+                                .get()
+                                .getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
+                                .get()
+                                .getRotation())),
                 factory.resetOdometry("" + lastPose + "-" + point));
             isOdometryReset = true;
           }
