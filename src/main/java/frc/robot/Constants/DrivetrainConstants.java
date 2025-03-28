@@ -52,7 +52,7 @@ public final class DrivetrainConstants {
       public static final double xI = 0.0;
       public static final double xD = 0.0;
 
-      public static final double tP = 0.5;
+      public static final double tP = 3;
       public static final double tI = 0.0;
       public static final double tD = 0.0;
     }
