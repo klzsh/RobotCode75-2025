@@ -36,7 +36,7 @@ public class Climber extends SubsystemBase {
   // @Logged(name = "Climber Motor 2", importance = Importance.DEBUG)
   private final TalonFX m_ClimberMotor2;
 
-  private final DutyCycleEncoder m_ClimberEncoder;
+  // private final DutyCycleEncoder m_ClimberEncoder;
 
   // private Slot0Configs PIDConfig = new Slot0Configs();
   // private final TunableNumber climberKp;
@@ -69,7 +69,7 @@ public class Climber extends SubsystemBase {
     m_ClimberMotor1 = new TalonFX(ClimberConstants.climberMotor1CANID, superstructureCANBusName);
     m_ClimberMotor2 = new TalonFX(ClimberConstants.climberMotor2CANID, superstructureCANBusName);
 
-    m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
+    // m_ClimberEncoder = new DutyCycleEncoder(climberEncoderPort, 1, 0.855);
 
     // climberMMCruiseVelocity =
     //     new TunableNumber("Climber/Cruise Velocity", motionMagicCruiseVelocity);
@@ -135,10 +135,10 @@ public class Climber extends SubsystemBase {
     }
   }
 
-  @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
-  public double getAbsolutePosition() {
-    return m_ClimberEncoder.get();
-  }
+  // @Logged(name = "Climber Absolute Encoder", importance = Importance.CRITICAL)
+  // public double getAbsolutePosition() {
+  //   return m_ClimberEncoder.get();
+  // }
 
   @Logged(name = "Climber Position", importance = Importance.CRITICAL)
   public double getPositionRotations() {
@@ -185,9 +185,6 @@ public class Climber extends SubsystemBase {
     if (getLimitSwitch()) {
       m_ClimberMotor1.setPosition(0);
       m_ClimberMotor2.setPosition(0);
-    } else {
-      m_ClimberMotor1.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
-      m_ClimberMotor2.setPosition(absoluteEncoderToRotations(getAbsolutePosition()));
     }
   }
 
