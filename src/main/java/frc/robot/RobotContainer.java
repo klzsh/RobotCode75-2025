@@ -9,7 +9,6 @@ import static frc.robot.Constants.ClimberConstants.climbPosition;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
-import choreo.auto.AutoFactory;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -69,7 +68,7 @@ public class RobotContainer {
   private final AprilTagCamera m_RightFacingCamera =
       new AprilTagCamera("Coral_Cam", RightFacingCameraPose);
 
-  @Logged(name = "HP Cam", importance = Importance.CRITICAL)
+  //   @Logged(name = "HP Cam", importance = Importance.CRITICAL)
   private final AprilTagCamera m_HPCamera = new AprilTagCamera("HP_Cam", HPCameraPose);
 
   private final ObjectDetetectorCamera m_CageDetetectorCamera =
@@ -139,9 +138,6 @@ public class RobotContainer {
 
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
-  private final AutoFactory m_factory =
-      new AutoFactory(
-          m_Swerve::getPose, m_Swerve::setPose, m_Swerve::followSwerveSample, true, m_Swerve);
 
   private final ActionFactory m_ActionFactory =
       new ActionFactory(
@@ -151,9 +147,7 @@ public class RobotContainer {
           m_AlgaePivot,
           m_AlgaeIntake,
           m_ChezyController,
-          m_YoloController,
-          m_RotationController,
-          m_BranchCamera);
+          m_YoloController);
 
   private final AutoSelector m_AutoSelector =
       new AutoSelector(

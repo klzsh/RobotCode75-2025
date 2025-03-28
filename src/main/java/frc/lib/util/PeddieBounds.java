@@ -136,9 +136,9 @@ public class PeddieBounds {
   private static List<Translation2d> badHexagonPoints;
   private static boolean initDone = false;
 
-  private static double cosineSimilarity(Translation2d a, Translation2d b) {
-    return (a.getX() * b.getX() + a.getY() * b.getY()) / (a.getNorm() * b.getNorm());
-  }
+  // private static double cosineSimilarity(Translation2d a, Translation2d b) {
+  //   return (a.getX() * b.getX() + a.getY() * b.getY()) / (a.getNorm() * b.getNorm());
+  // }
 
   public static void init() {
     Translation2d reefCenter;
@@ -253,7 +253,7 @@ public class PeddieBounds {
 
     // closest and second closest tag IDs
     int tag0id = robotToTag.get(0).id;
-    int tag1id = robotToTag.get(1).id;
+    // int tag1id = robotToTag.get(1).id;
 
     return VisionConstants.tagIDToFieldElement.get(tag0id);
 

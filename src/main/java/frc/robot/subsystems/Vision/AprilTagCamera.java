@@ -52,8 +52,6 @@ public class AprilTagCamera extends SubsystemBase {
   private double reprojError = 0;
   private double tagDist = 0;
 
-  private double cameraReliabilityScore;
-
   public AprilTagCamera(String name, Transform3d cameraPose) {
     cameraName = name;
 

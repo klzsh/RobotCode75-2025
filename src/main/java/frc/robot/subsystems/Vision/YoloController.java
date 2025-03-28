@@ -11,7 +11,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
@@ -42,12 +41,11 @@ public class YoloController {
   // private final TunableNumber inPlaceYP;
   // private final TunableNumber inPlaceYD;
 
-  private final TunableNumber driveIntoReefSpeed =
-      new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
+  // private final TunableNumber driveIntoReefSpeed =
+  //     new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
 
   private final double finalYawSetpointDegrees = -2.2;
-  private final double finalYawSetpointAutos = -2.5;
-  // private final double driveIntoReefSpeed = .25;
+  private final double driveIntoReefSpeed = .25;
   private final double stallSpeedThreshold = .05;
   double startTime = -1;
 
@@ -124,7 +122,7 @@ public class YoloController {
           desiredSpeeds.vyMetersPerSecond =
               desiredSpeeds.vyMetersPerSecond * .75; // should move in same direction but slower
         } else {
-          desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed.getNumber(), 0, 0);
+          desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed, 0, 0);
         }
       } else {
 
@@ -141,7 +139,7 @@ public class YoloController {
 
         yCommand = yController.calculate(targetYaw);
 
-        desiredSpeeds.vxMetersPerSecond = driveIntoReefSpeed.getNumber();
+        desiredSpeeds.vxMetersPerSecond = driveIntoReefSpeed;
         desiredSpeeds.vyMetersPerSecond = yCommand;
       }
     } else {

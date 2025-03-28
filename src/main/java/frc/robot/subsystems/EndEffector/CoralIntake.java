@@ -23,7 +23,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
+
+// import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Coral Intake", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class CoralIntake extends SubsystemBase {
@@ -50,8 +51,8 @@ public class CoralIntake extends SubsystemBase {
   private final VelocityVoltage m_VelocityRequest;
   private final PositionVoltage m_PositionRequest;
 
-  private final TunableNumber scoreSpeed;
-  private final TunableNumber rotationsAfterIntake;
+  // private final TunableNumber scoreSpeed;
+  // private final TunableNumber rotationsAfterIntake;
 
   // private final TunableNumber coralVelocitykP;
   // private final TunableNumber coralVelocitykI;
@@ -89,11 +90,11 @@ public class CoralIntake extends SubsystemBase {
 
     m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
 
-    scoreSpeed =
-        new TunableNumber("Coral Intake/Score Speed", coralScoreSpeed.in(RotationsPerSecond));
-    rotationsAfterIntake =
-        new TunableNumber(
-            "Coral Intake/Rotations After Intake", coralRotationsAfterIntake.in(Rotations));
+    // scoreSpeed =
+    //     new TunableNumber("Coral Intake/Score Speed", coralScoreSpeed.in(RotationsPerSecond));
+    // rotationsAfterIntake =
+    //     new TunableNumber(
+    //         "Coral Intake/Rotations After Intake", coralRotationsAfterIntake.in(Rotations));
 
     // coralVelocitykP = new TunableNumber("Coral Intake/Velocity Kp", coralVelocityKP);
     // coralVelocitykI = new TunableNumber("Coral Intake/Velocity Ki", coralVelocityKI);
@@ -204,7 +205,7 @@ public class CoralIntake extends SubsystemBase {
         } else {
           // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
           m_CoralMotor.setControl(
-              m_VelocityRequest.withVelocity(scoreSpeed.getNumber() * scoreMultiplier).withSlot(0));
+              m_VelocityRequest.withVelocity(coralScoreSpeed.times(scoreMultiplier)).withSlot(0));
         }
       }
       case INTAKING -> {

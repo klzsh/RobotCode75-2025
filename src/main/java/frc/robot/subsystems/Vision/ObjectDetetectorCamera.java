@@ -7,13 +7,11 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 
 public class ObjectDetetectorCamera extends SubsystemBase {
   private PhotonCamera m_Camera;
   private Optional<PhotonPipelineResult> m_Result;
-  private List<PhotonTrackedTarget> m_Targets;
 
   public ObjectDetetectorCamera(String name) {
     m_Camera = new PhotonCamera(name);

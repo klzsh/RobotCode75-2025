@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants.BackLeft;
 import frc.robot.Constants.DrivetrainConstants.BackRight;
 import frc.robot.Constants.DrivetrainConstants.FrontLeft;
@@ -48,7 +47,7 @@ public class Swerve extends SubsystemBase {
   public TalonFXSwerveModule[] m_SwerveModules;
 
   // @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
-  private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
+  // private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
@@ -76,26 +75,25 @@ public class Swerve extends SubsystemBase {
   private final PIDController yController;
   private final PIDController rController;
 
-  private final AprilTagCamera m_RightFacingCamera;
-  private final AprilTagCamera m_LeftFacingCamera;
-  private final AprilTagCamera m_HPCamera;
+  // private final AprilTagCamera m_RightFacingCamera;
+  // private final AprilTagCamera m_LeftFacingCamera;
+  // private final AprilTagCamera m_HPCamera;
 
   // do this later
-  private final TunableNumber xKP;
-  private final TunableNumber xKI;
-  private final TunableNumber xKD;
+  // private final TunableNumber xKP;
+  // private final TunableNumber xKI;
+  // private final TunableNumber xKD;
 
-  private final TunableNumber yKP;
-  private final TunableNumber yKI;
-  private final TunableNumber yKD;
+  // private final TunableNumber yKP;
+  // private final TunableNumber yKI;
+  // private final TunableNumber yKD;
 
-  private final TunableNumber rotationKP;
-  private final TunableNumber rotationKI;
-  private final TunableNumber rotationKD;
+  // private final TunableNumber rotationKP;
+  // private final TunableNumber rotationKI;
+  // private final TunableNumber rotationKD;
 
   // private final TunableNumber maxAutosSpeed;
 
-  private double lastUpdatedTime = 0;
   private boolean m_FieldRelative = true;
 
   @Logged(name = "Sample Pose", importance = Importance.CRITICAL)
@@ -109,9 +107,9 @@ public class Swerve extends SubsystemBase {
       AprilTagCamera leftFacingCamera, AprilTagCamera rightFacingCamera, AprilTagCamera HPCamera) {
 
     sample = new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0));
-    m_LeftFacingCamera = leftFacingCamera;
-    m_RightFacingCamera = rightFacingCamera;
-    m_HPCamera = HPCamera;
+    // m_LeftFacingCamera = leftFacingCamera;
+    // m_RightFacingCamera = rightFacingCamera;
+    // m_HPCamera = HPCamera;
 
     // initalize objects in constructor so that they dont get initialized when the
     // subsystem is not initialized
@@ -149,16 +147,16 @@ public class Swerve extends SubsystemBase {
     // driveKD = new TunableNumber("Swerve/DriveMotor/kD", driveTorqueKD);
     // driveKS = new TunableNumber("Swerve/DriveMotor/kS", driveTorqueKS);
 
-    xKP = new TunableNumber("Autos/X-KP", 2.65);
-    xKI = new TunableNumber("Autos/X-KI", 0);
-    xKD = new TunableNumber("Autos/X-KD", 0);
+    // xKP = new TunableNumber("Autos/X-KP", 2.65);
+    // xKI = new TunableNumber("Autos/X-KI", 0);
+    // xKD = new TunableNumber("Autos/X-KD", 0);
 
-    yKP = new TunableNumber("Autos/Y-KP", 3.9);
-    yKI = new TunableNumber("Autos/Y-KI", 0);
-    yKD = new TunableNumber("Autos/Y-KD", 0);
-    rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
-    rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
-    rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
+    // yKP = new TunableNumber("Autos/Y-KP", 3.9);
+    // yKI = new TunableNumber("Autos/Y-KI", 0);
+    // yKD = new TunableNumber("Autos/Y-KD", 0);
+    // rotationKP = new TunableNumber("Autos/Rotation-KP", 3.05);
+    // rotationKI = new TunableNumber("Autos/Rotation-KI", 0);
+    // rotationKD = new TunableNumber("Autos/Rotation-KD", 0);
 
     // maxAutosSpeed = new TunableNumber("Autos/maxSpeed", 1);
 
@@ -210,13 +208,13 @@ public class Swerve extends SubsystemBase {
    * @param speeds
    */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
-    setpointSpeeds = speeds;
+    // setpointSpeeds = speeds;
     var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds);
     setModuleStates(swerveModuleStates, false);
   }
 
   public void setFieldRelative(ChassisSpeeds speeds) {
-    setpointSpeeds = speeds;
+    // setpointSpeeds = speeds;
     var states =
         swerveKinematics.toSwerveModuleStates(
             ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation2D()));
@@ -224,7 +222,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setRobotRelative(ChassisSpeeds speeds) {
-    setpointSpeeds = speeds;
+    // setpointSpeeds = speeds;
     var states =
         swerveKinematics.toSwerveModuleStates(
             ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getRotation2D()));
@@ -320,7 +318,6 @@ public class Swerve extends SubsystemBase {
     //   return;
     // }
 
-    lastUpdatedTime = timestamp;
     if (camera.getEstimatedPose(getPose()) != null) {
       swerveOdometry.addVisionMeasurement(
           camera.getEstimatedPose(getPose()).estimatedPose.toPose2d(),
@@ -390,21 +387,6 @@ public class Swerve extends SubsystemBase {
     return m_gyro.getYaw(true).getValue().in(Degrees);
   }
 
-  // @Logged(name = "Left Facing Camera Estimated Pose", importance = Importance.DEBUG)
-  // public Pose2d leftCameraEstimatedPose() {
-  //   return m_LeftFacingCamera.getEstimatedPose2d(getPose());
-  // }
-
-  // @Logged(name = "Right Facing Camera Estimated Pose", importance = Importance.DEBUG)
-  // public Pose2d rightCameraEstimatedPose() {
-  //   return m_RightFacingCamera.getEstimatedPose2d(getPose());
-  // }
-
-  // @Logged(name = "HP Camera Estimated Pose", importance = Importance.DEBUG)
-  // public Pose2d hpCameraEstimatedPose() {
-  //   return m_HPCamera.getEstimatedPose2d(getPose());
-  // }
-
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
@@ -463,26 +445,26 @@ public class Swerve extends SubsystemBase {
     //     mod.setDrivePIDS(drivePIDS);
     //   }
     // }
-    if (xKP.getNumber() != xController.getP()
-        || xKI.getNumber() != xController.getI()
-        || xKD.getNumber() != xController.getD()) {
-      xController.setP(xKP.getNumber());
-      xController.setI(xKI.getNumber());
-      xController.setD(xKD.getNumber());
-    }
-    if (yKP.getNumber() != yController.getP()
-        || yKI.getNumber() != yController.getI()
-        || yKD.getNumber() != yController.getD()) {
-      yController.setP(yKP.getNumber());
-      yController.setI(yKI.getNumber());
-      yController.setD(yKD.getNumber());
-    }
-    if (rotationKP.getNumber() != rController.getP()
-        || rotationKI.getNumber() != rController.getI()
-        || rotationKD.getNumber() != rController.getD()) {
-      rController.setP(rotationKP.getNumber());
-      rController.setI(rotationKI.getNumber());
-      rController.setD(rotationKD.getNumber());
-    }
+    // if (xKP.getNumber() != xController.getP()
+    //     || xKI.getNumber() != xController.getI()
+    //     || xKD.getNumber() != xController.getD()) {
+    //   xController.setP(xKP.getNumber());
+    //   xController.setI(xKI.getNumber());
+    //   xController.setD(xKD.getNumber());
+    // }
+    // if (yKP.getNumber() != yController.getP()
+    //     || yKI.getNumber() != yController.getI()
+    //     || yKD.getNumber() != yController.getD()) {
+    //   yController.setP(yKP.getNumber());
+    //   yController.setI(yKI.getNumber());
+    //   yController.setD(yKD.getNumber());
+    // }
+    // if (rotationKP.getNumber() != rController.getP()
+    //     || rotationKI.getNumber() != rController.getI()
+    //     || rotationKD.getNumber() != rController.getD()) {
+    //   rController.setP(rotationKP.getNumber());
+    //   rController.setI(rotationKI.getNumber());
+    //   rController.setD(rotationKD.getNumber());
+    // }
   }
 }

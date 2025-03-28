@@ -5,19 +5,18 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
+import frc.robot.commands.Autonomous.AutoL4WithFallback;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
 import frc.robot.commands.Autonomous.ChoppedPreraiseElevator;
 import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.subsystems.Drivetrain.ChezyController;
-import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
 import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
 import frc.robot.subsystems.Vision.YoloController;
 
 /*
@@ -32,8 +31,6 @@ public class ActionFactory {
   private AlgaeIntake m_AlgaeIntake;
   private ChezyController m_ChezyController;
   private YoloController m_YoloController;
-  private RotationController m_RotationController;
-  private ObjectDetetectorCamera m_BranchCamera;
 
   public ActionFactory(
       Swerve swerve,
@@ -42,9 +39,7 @@ public class ActionFactory {
       AlgaePivot pivot,
       AlgaeIntake algaeIntake,
       ChezyController chezyController,
-      YoloController yoloController,
-      RotationController rotationController,
-      ObjectDetetectorCamera branchCam) {
+      YoloController yoloController) {
     m_Swerve = swerve;
     m_Elevator = elevator;
     m_CoralIntake = coralIntake;
@@ -52,8 +47,6 @@ public class ActionFactory {
     m_AlgaeIntake = algaeIntake;
     m_ChezyController = chezyController;
     m_YoloController = yoloController;
-    m_RotationController = rotationController;
-    m_BranchCamera = branchCam;
   }
 
   public Command getCommand(int action) {
@@ -80,6 +73,8 @@ public class ActionFactory {
         return new ParallelCommandGroup(
             new YoloBranchAlign(m_Swerve, m_YoloController, true),
             new AutoScoreL4(m_Elevator, m_CoralIntake));
+      case 9:
+        return new AutoL4WithFallback(m_Swerve, m_Elevator, m_CoralIntake, m_YoloController);
     }
     return null;
   }
@@ -102,6 +97,8 @@ public class ActionFactory {
         return "Preraise Elevator";
       case 8:
         return "YOLO+L4";
+      case 9:
+        return "L4 Fallback";
     }
     return null;
   }

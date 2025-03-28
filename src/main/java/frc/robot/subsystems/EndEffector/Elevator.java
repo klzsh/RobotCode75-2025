@@ -23,7 +23,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -90,8 +89,8 @@ public class Elevator extends SubsystemBase {
   // private final TunableNumber elevatorKg;
   // private Slot0Configs config;
 
-  private final TunableNumber l2Height;
-  private final TunableNumber l3Height;
+  // private final TunableNumber l2Height;
+  // private final TunableNumber l3Height;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -118,8 +117,8 @@ public class Elevator extends SubsystemBase {
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
 
-    l2Height = new TunableNumber("Elevator/L2 Height", l2Position.in(Rotations));
-    l3Height = new TunableNumber("Elevator/L3 Height", l3Position.in(Rotations));
+    // l2Height = new TunableNumber("Elevator/L2 Height", l2Position.in(Rotations));
+    // l3Height = new TunableNumber("Elevator/L3 Height", l3Position.in(Rotations));
 
     // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
     // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
@@ -258,16 +257,17 @@ public class Elevator extends SubsystemBase {
       m_ElevatorMotor2.setPosition(Rotations.of(0));
       // System.out.println("Called");
     }
-    // if (getUpperLimit()) {
-    //   m_ElevatorMotor1.setPosition(Rotations.of(26));
-    //   m_ElevatorMotor2.setPosition(Rotations.of(26));
-    // }
+    if (getUpperLimit()) {
+      m_ElevatorMotor1.setPosition(Rotations.of(26));
+      m_ElevatorMotor2.setPosition(Rotations.of(26));
+    }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
+
     if (m_SetpointPosition == ElevatorPositions.L2) {
-      currentPosition = l2Height.getNumber();
+      currentPosition = l2Position.in(Rotations);
     }
     if (m_SetpointPosition == ElevatorPositions.L3) {
-      currentPosition = l3Height.getNumber();
+      currentPosition = l3Position.in(Rotations);
     }
 
     double algaeOffset =

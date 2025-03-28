@@ -1,9 +1,9 @@
 package frc.lib.dashboard;
 
+import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.networktables.GenericEntry;
@@ -267,14 +267,19 @@ public class AutoSelector {
           if (lastPose.charAt(0) >= 'a' && lastPose.charAt(0) <= 'f') {
             lastPose = lastPose.substring(0, 1);
           }
+
           if (!isOdometryReset) {
             // TODO: Use start pose to set gyro
+            var trajectory = Choreo.loadTrajectory("" + lastPose + "-" + point);
             sequential.addCommands(
                 Commands.runOnce(
                     () ->
                         m_swerve.zeroGyro(
-                            Rotation2d.fromDegrees(
-                                DriverStation.getAlliance().get() == Alliance.Blue ? 240 : 60))),
+                            trajectory
+                                .get()
+                                .getInitialPose(DriverStation.getAlliance().get() == Alliance.Red)
+                                .get()
+                                .getRotation())),
                 factory.resetOdometry("" + lastPose + "-" + point));
             isOdometryReset = true;
           }

@@ -22,7 +22,6 @@ public class VisionConstants {
   public static final Matrix<N3, N1> moduleMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 2, 2, .1);
   public static final Matrix<N3, N1> visionMatrix = MatBuilder.fill(Nat.N3(), Nat.N1(), 5, 5, 100);
 
-  // TODO figure out offsets
   public static final Map<String, Translation2d> fieldPoseToCameraAngleOffset =
       // vision can't handle sideloading due to camera placement
 
@@ -53,10 +52,7 @@ public class VisionConstants {
               new Translation2d(0.24, -.1)),
           entry(
               new FieldPose(Alliance.Blue, FieldElement.A, Offset.RIGHT).toString(),
-              new Translation2d(-8, -4))
-
-          // TODO: Auto field flipping for blue side (or red side ig)
-          );
+              new Translation2d(-8, -4)));
 
   public static final Map<Integer, FieldElement> tagIDToFieldElement =
       Map.ofEntries(

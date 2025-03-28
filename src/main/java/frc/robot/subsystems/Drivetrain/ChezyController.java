@@ -13,14 +13,13 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import frc.lib.dashboard.TunableNumber;
 import frc.robot.Constants.DrivetrainConstants;
 
 /** Add your docs here. */
 public class ChezyController {
 
-  private final TunableNumber driveP = new TunableNumber("ChezyController/Drive P", 2);
-  private final TunableNumber rotationP = new TunableNumber("ChezyController/Rotation P", 3);
+  // private final TunableNumber driveP = new TunableNumber("ChezyController/Drive P", 2);
+  // private final TunableNumber rotationP = new TunableNumber("ChezyController/Rotation P", 3);
 
   private final Swerve m_swerve;
   private final ProfiledPIDController driveController =
@@ -78,6 +77,9 @@ public class ChezyController {
     lastSetpointTranslation = currentPose.getTranslation();
 
     rotationFinished = false;
+
+    driveController.setGoal(0.0);
+    thetaController.setGoal(0.0);
   }
 
   private double wrap(double angle) {
@@ -91,11 +93,8 @@ public class ChezyController {
   }
 
   public ChassisSpeeds update(Pose2d targetPose) {
-    driveController.setP(driveP.getNumber());
-    thetaController.setP(rotationP.getNumber());
+
     Pose2d currentPose = m_swerve.getPose();
-    driveController.setGoal(0.0);
-    thetaController.setGoal(0.0);
 
     target = targetPose;
 
