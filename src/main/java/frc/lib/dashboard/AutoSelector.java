@@ -106,6 +106,8 @@ public class AutoSelector {
     presetChooser.addOption("Middle One Piece", Presets.MiddleOnePiece);
     presetChooser.addOption("Left Side Three Piece", Presets.LeftSideThreePiece);
     presetChooser.addOption("Right Side Three Piece", Presets.RightSideThreePiece);
+    presetChooser.addOption("Left Side Three Piece Fallback", Presets.LeftSide3PieceFallback);
+
 
     // define auto factory for autos
     factory =

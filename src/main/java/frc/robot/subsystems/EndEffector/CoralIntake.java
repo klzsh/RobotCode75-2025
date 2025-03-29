@@ -21,6 +21,7 @@ import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -50,6 +51,8 @@ public class CoralIntake extends SubsystemBase {
   private final VoltageOut m_CharacterizationRequest;
   private final VelocityVoltage m_VelocityRequest;
   private final PositionVoltage m_PositionRequest;
+
+  private double timeSinceIntaking;
 
   // private final TunableNumber scoreSpeed;
   // private final TunableNumber rotationsAfterIntake;
@@ -89,6 +92,8 @@ public class CoralIntake extends SubsystemBase {
     m_PositionRequest.UseTimesync = true;
 
     m_CoralMotor.getConfigurator().apply(getCoralMotorConfiguration());
+
+    timeSinceIntaking = Timer.getFPGATimestamp();
 
     // scoreSpeed =
     //     new TunableNumber("Coral Intake/Score Speed", coralScoreSpeed.in(RotationsPerSecond));
@@ -148,6 +153,10 @@ public class CoralIntake extends SubsystemBase {
     return m_CoralMotor.getPosition(true).getValue().in(Rotations);
   }
 
+  public boolean hasBeenIntakingForTime(double seconds) {
+    return (Timer.getFPGATimestamp() - timeSinceIntaking) > seconds && getState() == CoralStates.INTAKING;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Has Coral", getBeamBreak());
@@ -184,6 +193,10 @@ public class CoralIntake extends SubsystemBase {
 
     if (!getBeamBreak() && m_CoralIntakeState != CoralStates.INTAKING) {
       m_CoralIntakeState = CoralStates.DEFAULT;
+    }
+
+    if (m_CoralIntakeState != CoralStates.INTAKING) {
+      timeSinceIntaking = Timer.getFPGATimestamp();
     }
 
     double scoreMultiplier = 1;

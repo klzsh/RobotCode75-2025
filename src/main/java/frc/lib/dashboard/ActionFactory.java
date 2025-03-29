@@ -74,7 +74,9 @@ public class ActionFactory {
             new YoloBranchAlign(m_Swerve, m_YoloController, true),
             new AutoScoreL4(m_Elevator, m_CoralIntake));
       case 9:
-        return new AutoL4WithFallback(m_Swerve, m_Elevator, m_CoralIntake, m_YoloController);
+        return new ParallelCommandGroup(
+          new YoloBranchAlign(m_Swerve, m_YoloController, true),
+          new AutoScoreL4(m_Elevator, m_CoralIntake)).until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
     }
     return null;
   }

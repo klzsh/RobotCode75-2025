@@ -101,12 +101,14 @@ public class ObjectDetetectorCamera extends SubsystemBase {
     }
     return OptionalDouble.empty();
   }
+
   @Override
-  public void periodic(){
-    if(DriverStation.getAlliance().isPresent()){
-      if(DriverStation.getAlliance().get() == Alliance.Blue && m_Camera.getPipelineIndex() != 1){
+  public void periodic() {
+    if (DriverStation.getAlliance().isPresent()) {
+      if (DriverStation.getAlliance().get() == Alliance.Blue && m_Camera.getPipelineIndex() != 1) {
         m_Camera.setPipelineIndex(1);
-      } else if(DriverStation.getAlliance().get() == Alliance.Red && m_Camera.getPipelineIndex() != 0){
+      } else if (DriverStation.getAlliance().get() == Alliance.Red
+          && m_Camera.getPipelineIndex() != 0) {
         m_Camera.setPipelineIndex(0);
       }
     }
