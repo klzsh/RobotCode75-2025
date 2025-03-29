@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Vision;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
 import java.util.Optional;
@@ -98,5 +100,15 @@ public class ObjectDetetectorCamera extends SubsystemBase {
       return OptionalDouble.of(320 - sum / 4);
     }
     return OptionalDouble.empty();
+  }
+  @Override
+  public void periodic(){
+    if(DriverStation.getAlliance().isPresent()){
+      if(DriverStation.getAlliance().get() == Alliance.Blue && m_Camera.getPipelineIndex() != 1){
+        m_Camera.setPipelineIndex(1);
+      } else if(DriverStation.getAlliance().get() == Alliance.Red && m_Camera.getPipelineIndex() != 0){
+        m_Camera.setPipelineIndex(0);
+      }
+    }
   }
 }
