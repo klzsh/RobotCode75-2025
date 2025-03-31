@@ -165,7 +165,7 @@ public class YoloController {
 
     if (!isAlignInPlace) {
       return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold
-          && Timer.getFPGATimestamp() - startTime >= 0.2;
+          && (Timer.getFPGATimestamp() - startTime) >= 0.2;
     } else {
       return yController.atSetpoint();
     }

@@ -17,6 +17,7 @@ import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
+import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
 import frc.robot.subsystems.Vision.YoloController;
 
 /*
@@ -75,7 +76,7 @@ public class ActionFactory {
             new AutoScoreL4(m_Elevator, m_CoralIntake));
       case 9:
         return new ParallelCommandGroup(
-          new YoloBranchAlign(m_Swerve, m_YoloController, true),
+          new YoloBranchAlign(m_Swerve, m_YoloController, true).until(() -> !m_CoralIntake.getBeamBreak()),
           new AutoScoreL4(m_Elevator, m_CoralIntake)).until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
     }
     return null;
