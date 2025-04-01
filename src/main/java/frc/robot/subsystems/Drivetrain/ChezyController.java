@@ -5,6 +5,8 @@
 package frc.robot.subsystems.Drivetrain;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,6 +18,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.robot.Constants.DrivetrainConstants;
 
 /** Add your docs here. */
+@Logged(strategy = Strategy.OPT_IN, importance = Importance.DEBUG)
 public class ChezyController {
 
   // private final TunableNumber driveP = new TunableNumber("ChezyController/Drive P", 2);
@@ -146,7 +149,7 @@ public class ChezyController {
   public boolean isRotationFinished() {
     return rotationFinished;
   }
-
+  @Logged(name = "At Goal")
   public boolean isFinished() {
     return driveController.atGoal() && thetaController.atGoal();
   }

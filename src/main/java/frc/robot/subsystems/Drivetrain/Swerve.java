@@ -234,6 +234,7 @@ public class Swerve extends SubsystemBase {
    *
    * @return robot relative speeds
    */
+  @Logged
   public ChassisSpeeds getChassisSpeeds() {
     return swerveKinematics.toChassisSpeeds(getModuleStates());
   }
