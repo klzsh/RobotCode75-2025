@@ -154,7 +154,8 @@ public class CoralIntake extends SubsystemBase {
   }
 
   public boolean hasBeenIntakingForTime(double seconds) {
-    return (Timer.getFPGATimestamp() - timeSinceIntaking) > seconds && getState() == CoralStates.INTAKING;
+    return (Timer.getFPGATimestamp() - timeSinceIntaking) > seconds
+        && getState() == CoralStates.INTAKING;
   }
 
   @Override

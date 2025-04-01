@@ -60,7 +60,8 @@ public class RotationController {
     //         maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
 
     controller.setSetpoint(setpoint.getRadians());
-    this.output = controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians()) + 0.03;
+    this.output =
+        controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians()) + 0.03;
   }
 
   public void update(Rotation2d setpoint, double p, double d) {

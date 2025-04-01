@@ -149,6 +149,7 @@ public class ChezyController {
   public boolean isRotationFinished() {
     return rotationFinished;
   }
+
   @Logged(name = "At Goal")
   public boolean isFinished() {
     return driveController.atGoal() && thetaController.atGoal();
