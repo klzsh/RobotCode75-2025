@@ -40,7 +40,7 @@ public final class DrivetrainConstants {
 
     public static final class RotationAlign {
 
-      public static final double kp = 2;
+      public static final double kp = 2.2;
       public static final double kd = 0;
       public static final double maxVelocityMultiplier = 0.8;
       public static final double maxAccelerationMultiplier = 0.8;
