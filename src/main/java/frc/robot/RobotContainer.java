@@ -6,6 +6,7 @@ package frc.robot;
 
 import static frc.robot.Constants.ClimberConstants.climbExtendPosition;
 import static frc.robot.Constants.ClimberConstants.climbPosition;
+import static frc.robot.Constants.FieldConstants.reefAlgaePoseOffset;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -21,10 +22,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
+import frc.lib.util.FieldPose;
+import frc.lib.util.PeddieBounds;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose.Offset;
 import frc.robot.commands.Drivetrain.AlignToCage;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.AlignToReef;
+import frc.robot.commands.Drivetrain.ChezyPose;
 import frc.robot.commands.Drivetrain.ResetHeading;
 import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
@@ -223,6 +228,7 @@ public class RobotContainer {
     // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController,
     // m_YoloController, m_BranchCamera, Offset.LEFT));
     AlgaeAlign.whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.MID));
+    AlgaeAlign.whileTrue(new ChezyPose(m_Swerve, m_ChezyController, new FieldPose(DriverStation.getAlliance().get(), FieldElement.A, Offset.MID), false));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 
