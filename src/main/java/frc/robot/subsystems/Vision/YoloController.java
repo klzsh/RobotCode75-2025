@@ -45,7 +45,7 @@ public class YoloController {
   //     new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
 
   private final double finalYawSetpointDegrees = -2.2;
-  private final double driveIntoReefSpeed = .25;
+  private final double driveIntoReefSpeed = .75;
   private final double stallSpeedThreshold = .05;
   double startTime = -1;
 
@@ -164,8 +164,9 @@ public class YoloController {
     // actual vx less than stall speed
 
     if (!isAlignInPlace) {
-      return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold
-          && (Timer.getFPGATimestamp() - startTime) >= 0.2;
+      return false;
+      // return m_Swerve.getChassisSpeeds().vxMetersPerSecond <= stallSpeedThreshold
+      //     && (Timer.getFPGATimestamp() - startTime) >= 0.2;
     } else {
       return yController.atSetpoint();
     }
