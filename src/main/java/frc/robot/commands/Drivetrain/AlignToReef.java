@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Drivetrain;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -54,7 +55,7 @@ public class AlignToReef extends Command {
               m_Swerve, new FieldPose(DriverStation.getAlliance().get(), fieldElement, m_Offset));
       m_ChezyController.reset(targetPose);
     }
-    m_YoloController.reset(false);
+    m_YoloController.reset(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -73,30 +74,33 @@ public class AlignToReef extends Command {
 
     m_BranchCamera.updateByUnreadResults();
 
-    if (yOffset < 0.25 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
+    if (yOffset < 0.1 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
       System.out.println("I have switched to YOLO");
       yoloSpeeds = m_YoloController.update();
       // add yolo speeds to chezy speeds
-      chezySpeeds.vyMetersPerSecond = MathUtil.applyDeadband(yoloSpeeds.vyMetersPerSecond, 0.02);
-      chezySpeeds.vxMetersPerSecond = 0.1;
+      chezySpeeds.vyMetersPerSecond = MathUtil.applyDeadband(yoloSpeeds.vyMetersPerSecond, 0.04);
+      chezySpeeds.vxMetersPerSecond *= 0.5;
+      chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
+      // chezySpeeds.vxMetersPerSecond = 0.1;
     } else {
       System.out.println("Not using YOLO");
     }
-    chezySpeeds.vxMetersPerSecond = MathUtil.clamp(chezySpeeds.vxMetersPerSecond, -1.5, 1.5);
-    chezySpeeds.vyMetersPerSecond = MathUtil.clamp(chezySpeeds.vyMetersPerSecond, -1.5, 1.5);
+    chezySpeeds.vxMetersPerSecond = MathUtil.clamp(chezySpeeds.vxMetersPerSecond, -2, 2);
+    chezySpeeds.vyMetersPerSecond = MathUtil.clamp(chezySpeeds.vyMetersPerSecond, -2, 2);
     m_Swerve.setChassisSpeeds(chezySpeeds);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_Swerve.stopModules();
+    // m_Swerve.stopModules();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return targetPose == null
-        || (yoloSpeeds != null && Math.abs(yoloSpeeds.vyMetersPerSecond) < 0.02);
+    return false;
+    // return targetPose == null
+    //     || (yoloSpeeds != null && Math.abs(yoloSpeeds.vyMetersPerSecond) < 0.02);
   }
 }
