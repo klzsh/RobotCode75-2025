@@ -46,8 +46,8 @@ public class Swerve extends SubsystemBase {
 
   public TalonFXSwerveModule[] m_SwerveModules;
 
-  // @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
-  // private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
+  @Logged(name = "Chassis Speeds", importance = Importance.DEBUG)
+  private ChassisSpeeds setpointSpeeds = new ChassisSpeeds();
 
   // for logging purposes. they are passed through to the m_SwerveModules array in
   // the constructor
@@ -208,13 +208,13 @@ public class Swerve extends SubsystemBase {
    * @param speeds
    */
   public void setChassisSpeeds(ChassisSpeeds speeds) {
-    // setpointSpeeds = speeds;
+    setpointSpeeds = speeds;
     var swerveModuleStates = swerveKinematics.toSwerveModuleStates(speeds);
     setModuleStates(swerveModuleStates, false);
   }
 
   public void setFieldRelative(ChassisSpeeds speeds) {
-    // setpointSpeeds = speeds;
+    setpointSpeeds = speeds;
     var states =
         swerveKinematics.toSwerveModuleStates(
             ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getRotation2D()));
@@ -222,7 +222,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public void setRobotRelative(ChassisSpeeds speeds) {
-    // setpointSpeeds = speeds;
+    setpointSpeeds = speeds;
     var states =
         swerveKinematics.toSwerveModuleStates(
             ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getRotation2D()));
@@ -238,7 +238,9 @@ public class Swerve extends SubsystemBase {
   public ChassisSpeeds getChassisSpeeds() {
     return swerveKinematics.toChassisSpeeds(getModuleStates());
   }
-
+  public ChassisSpeeds getSetpointSpeeds(){
+    return setpointSpeeds;
+  }
   /** follows an autonomous path provided by choreo */
   public void followSwerveSample(SwerveSample sample) {
     this.sample = sample.getPose();
