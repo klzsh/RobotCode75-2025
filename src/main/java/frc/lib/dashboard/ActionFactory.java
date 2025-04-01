@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
-import frc.robot.commands.Autonomous.AutoL4WithFallback;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Autonomous.AutoScoreProcessor;
@@ -17,7 +16,7 @@ import frc.robot.subsystems.EndEffector.AlgaeIntake;
 import frc.robot.subsystems.EndEffector.AlgaePivot;
 import frc.robot.subsystems.EndEffector.CoralIntake;
 import frc.robot.subsystems.EndEffector.Elevator;
-import frc.robot.subsystems.EndEffector.CoralIntake.CoralStates;
+import frc.robot.subsystems.EndEffector.Elevator.ElevatorPositions;
 import frc.robot.subsystems.Vision.YoloController;
 
 /*
@@ -76,8 +75,10 @@ public class ActionFactory {
             new AutoScoreL4(m_Elevator, m_CoralIntake));
       case 9:
         return new ParallelCommandGroup(
-          new YoloBranchAlign(m_Swerve, m_YoloController, true).until(() -> !m_CoralIntake.getBeamBreak() && m_CoralIntake.getState() != CoralStates.INTAKING),
-          new AutoScoreL4(m_Elevator, m_CoralIntake)).until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
+                new YoloBranchAlign(m_Swerve, m_YoloController, true)
+                    .until(() -> m_Elevator.isAtPosition(ElevatorPositions.L4, false)),
+                new AutoScoreL4(m_Elevator, m_CoralIntake))
+            .until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
     }
     return null;
   }
