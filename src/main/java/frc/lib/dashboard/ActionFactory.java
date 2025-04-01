@@ -76,7 +76,7 @@ public class ActionFactory {
             new AutoScoreL4(m_Elevator, m_CoralIntake));
       case 9:
         return new ParallelCommandGroup(
-          new YoloBranchAlign(m_Swerve, m_YoloController, true).until(() -> !m_CoralIntake.getBeamBreak()),
+          new YoloBranchAlign(m_Swerve, m_YoloController, true).until(() -> !m_CoralIntake.getBeamBreak() && m_CoralIntake.getState() != CoralStates.INTAKING),
           new AutoScoreL4(m_Elevator, m_CoralIntake)).until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
     }
     return null;
