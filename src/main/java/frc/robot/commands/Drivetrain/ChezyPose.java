@@ -7,8 +7,10 @@ package frc.robot.commands.Drivetrain;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.util.FieldPose;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.PeddieBounds;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -46,13 +48,13 @@ public class ChezyPose extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (targetPose2d == null) {
-      // FieldPose nearestPose =
-      //     new FieldPose(
-      //         Alliance.Blue, PeddieBounds.nearestElement(m_Swerve.getPose()), Offset.LEFT);
-      targetPose2d = PeddieBounds.fieldElementToPose2d(m_Swerve, targetPose);
+    FieldElement fieldElement = PeddieBounds.getReefElement(m_Swerve);
+    if (fieldElement != null) {
+      targetPose2d =
+          PeddieBounds.fieldElementToPose2d(
+              m_Swerve, new FieldPose(DriverStation.getAlliance().get(), fieldElement, Offset.MID));
+      m_ChezyController.reset(targetPose2d);
     }
-    m_ChezyController.reset(targetPose2d);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
