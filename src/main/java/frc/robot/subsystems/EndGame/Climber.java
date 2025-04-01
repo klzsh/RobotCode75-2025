@@ -164,13 +164,7 @@ public class Climber extends SubsystemBase {
     current = MathUtil.applyDeadband(current, 5);
 
     if (getLimitSwitch() && current < 0) {
-      System.out.println("Limit Reached");
       current = 0;
-    }
-    if (current < 0) {
-      System.out.println("reversing");
-    } else if (current > 0) {
-      System.out.println("Forward");
     }
 
     m_ClimberMotor1.setControl(m_TestRequest.withOutput(current));
