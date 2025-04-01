@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.Time;
 
 public final class ClimberConstants {
   public static final double climberGearRatio = 39.6 / 1.0;
-  public static final Angle climbPosition = Rotations.of(3.5);
+  public static final Angle climbPosition = Rotations.of(8.1); //5.4
   public static final Angle climbExtendPosition = Rotations.of(130);
   public static final double climbDeadband = 0.5;
   public static final int limitPort = 8;
