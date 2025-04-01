@@ -230,7 +230,7 @@ public class RobotContainer {
     // debug command
     // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController,
     // m_YoloController, m_BranchCamera, Offset.LEFT));
-    AlgaeAlign.whileTrue(new ChezyPose(m_Swerve, m_ChezyController, PeddieBounds.getNearestFieldPose2d(m_Swerve, new FieldPose(DriverStation.getAlliance().get(), FieldElement.A, Offset.MID)), false));
+    AlgaeAlign.whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.MID));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 

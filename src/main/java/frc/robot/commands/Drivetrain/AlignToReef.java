@@ -73,7 +73,7 @@ public class AlignToReef extends Command {
 
     m_BranchCamera.updateByUnreadResults();
 
-    if (yOffset < 0.1 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished()) {
+    if (yOffset < 0.1 && m_BranchCamera.hasTargets() && m_ChezyController.isRotationFinished() && m_Offset != Offset.MID) {
       System.out.println("I have switched to YOLO");
       yoloSpeeds = m_YoloController.update();
       // add yolo speeds to chezy speeds
