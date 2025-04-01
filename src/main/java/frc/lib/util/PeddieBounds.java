@@ -109,6 +109,12 @@ public class PeddieBounds {
           poseToDrive.transformBy(
               new Transform2d(0, reefRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
     }
+    if (FieldPose.fieldElementIsReef(targetPose.fieldElement) && targetPose.offset == Offset.MID) {
+      tagHeading = tagHeading.rotateBy(Rotation2d.kCW_90deg);
+      poseToDrive =
+          poseToDrive.transformBy(
+              new Transform2d(0, reefAlgaePoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
+    }
     if (FieldPose.fieldElementIsReef(targetPose.fieldElement)) {
       return new Pose2d(
           poseToDrive.getX(),

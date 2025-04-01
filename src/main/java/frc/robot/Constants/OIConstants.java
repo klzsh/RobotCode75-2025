@@ -8,7 +8,7 @@ public final class OIConstants {
 
   public static final int autoAlignButton = 1;
   public static final int robotRelativeButton = 2;
-  public static final int cageAlignButton = 2;
+  public static final int algaeAlignButton = 2;
   public static final int rotateToSimilarFaceButton = 3;
   public static final int resetHeadingButton = 3;
   public static final int xstanceButton = 5;

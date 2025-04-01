@@ -130,8 +130,8 @@ public class RobotContainer {
   private final JoystickButton SimilarFaceRotate =
       new JoystickButton(m_RightStick, rotateToSimilarFaceButton); // left button
 
-  private final JoystickButton CageAlign =
-      new JoystickButton(m_LeftStick, cageAlignButton); // center button
+  private final JoystickButton AlgaeAlign =
+      new JoystickButton(m_LeftStick, algaeAlignButton); // center button
 
   private final JoystickButton resetBranchCam =
       new JoystickButton(m_LeftStick, resetBranchCamButton);
@@ -222,7 +222,7 @@ public class RobotContainer {
     // debug command
     // new JoystickButton(m_LeftStick, 8).whileTrue(new AlignToReef(m_Swerve, m_ChezyController,
     // m_YoloController, m_BranchCamera, Offset.LEFT));
-    CageAlign.whileTrue(new AlignToCage(m_Swerve, m_CageDetetectorCamera));
+    AlgaeAlign.whileTrue(new AlignToReef(m_Swerve, m_ChezyController, m_YoloController, m_BranchCamera, Offset.MID));
 
     SimilarFaceRotate.whileTrue(new RotateToSimilarFace(m_Swerve, m_RotationController));
 

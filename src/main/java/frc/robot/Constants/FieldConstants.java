@@ -92,6 +92,7 @@ public class FieldConstants {
 
   public static final Distance reefLeftPoseOffset = Meters.of(0.11);
   public static final Distance reefRightPoseOffset = Meters.of(0.47);
+  public static final Distance reefAlgaePoseOffset = Meters.of(-0.03);
 
   public static final Distance hpLeftPoseOffset = Meters.of(-0.5);
   public static final Distance hpRightPoseOffset = Meters.of(0.5);
