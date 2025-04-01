@@ -6,6 +6,7 @@ package frc.robot;
 
 import static frc.robot.Constants.ClimberConstants.climbExtendPosition;
 import static frc.robot.Constants.ClimberConstants.climbPosition;
+import static frc.robot.Constants.FieldConstants.reefAlgaePoseOffset;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -21,6 +22,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
+import frc.lib.util.FieldPose;
+import frc.lib.util.PeddieBounds;
+import frc.lib.util.FieldPose.FieldElement;
 import frc.lib.util.FieldPose;
 import frc.lib.util.PeddieBounds;
 import frc.lib.util.FieldPose.FieldElement;
