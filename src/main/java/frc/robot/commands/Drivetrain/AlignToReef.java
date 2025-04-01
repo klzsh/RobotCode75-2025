@@ -81,6 +81,7 @@ public class AlignToReef extends Command {
       chezySpeeds.vxMetersPerSecond *= 0.5;
       chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
       // chezySpeeds.vxMetersPerSecond = 0.1;
+      
     } else {
       System.out.println("Not using YOLO");
     }
