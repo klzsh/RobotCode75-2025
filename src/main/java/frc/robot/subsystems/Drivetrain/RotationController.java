@@ -8,6 +8,7 @@ import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.Rotati
 import static frc.robot.Constants.DrivetrainConstants.ControllerConstants.toleranceRadians;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,7 +43,7 @@ public class RotationController {
     //     swerve.getRotation2D().getRadians(), swerve.getChassisSpeeds().omegaRadiansPerSecond);
   }
 
-  // @Logged(name = "output", importance = Importance.INFO)
+  @Logged(name = "output", importance = Importance.INFO)
   public double getOutput() {
     return output;
   }
@@ -59,7 +60,7 @@ public class RotationController {
     //         maxAngularAcceleration.in(RadiansPerSecondPerSecond)));
 
     controller.setSetpoint(setpoint.getRadians());
-    this.output = controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians());
+    this.output = controller.calculate(swerve.getRotation2D().getRadians(), setpoint.getRadians()) + 0.03;
   }
 
   public void update(Rotation2d setpoint, double p, double d) {
@@ -69,6 +70,6 @@ public class RotationController {
   }
 
   public boolean atGoal() {
-    return controller.atSetpoint();
+    return controller.atSetpoint() || this.output <= 0.03;
   }
 }
