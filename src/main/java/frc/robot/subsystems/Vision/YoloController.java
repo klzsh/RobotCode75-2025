@@ -9,7 +9,6 @@ import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -89,11 +88,7 @@ public class YoloController {
       yController.setD(0.005);
       yController.setTolerance(.025);
     }
-    if (DriverStation.isAutonomous()) {
-      yController.setSetpoint(finalYawSetpointDegrees);
-    } else {
-      yController.setSetpoint(finalYawSetpointDegrees);
-    }
+    yController.setSetpoint(finalYawSetpointDegrees);
     desiredSpeeds = new ChassisSpeeds(0, 0, 0);
     startTime = -1;
 
