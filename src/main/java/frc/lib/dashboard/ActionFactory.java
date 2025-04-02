@@ -71,9 +71,9 @@ public class ActionFactory {
         return new ChoppedPreraiseElevator(m_Swerve, m_Elevator);
       case 8:
         return new ParallelCommandGroup(
-          new YoloBranchAlign(m_Swerve, m_YoloController, true)
-          .until(() -> m_Elevator.isAtPosition(ElevatorPositions.L4, false)),
-      new AutoScoreL4(m_Elevator, m_CoralIntake));
+            new YoloBranchAlign(m_Swerve, m_YoloController, true)
+                .until(() -> m_Elevator.isAtPosition(ElevatorPositions.L4, false)),
+            new AutoScoreL4(m_Elevator, m_CoralIntake));
       case 9:
         return new ParallelCommandGroup(
                 new YoloBranchAlign(m_Swerve, m_YoloController, true)

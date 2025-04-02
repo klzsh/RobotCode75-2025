@@ -84,7 +84,7 @@ public class AlignToReef extends Command {
       chezySpeeds.vxMetersPerSecond *= 0.5;
       chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
       // chezySpeeds.vxMetersPerSecond = 0.1;
-      
+
     } else {
       System.out.println("Not using YOLO");
     }
@@ -102,7 +102,8 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(m_Swerve.getSetpointSpeeds().vxMetersPerSecond <= 0.05 && m_Swerve.getSetpointSpeeds().vyMetersPerSecond <= 0.05){
+    if (m_Swerve.getSetpointSpeeds().vxMetersPerSecond <= 0.05
+        && m_Swerve.getSetpointSpeeds().vyMetersPerSecond <= 0.05) {
       return true;
     }
     return false;

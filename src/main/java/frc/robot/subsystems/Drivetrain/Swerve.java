@@ -238,9 +238,11 @@ public class Swerve extends SubsystemBase {
   public ChassisSpeeds getChassisSpeeds() {
     return swerveKinematics.toChassisSpeeds(getModuleStates());
   }
-  public ChassisSpeeds getSetpointSpeeds(){
+
+  public ChassisSpeeds getSetpointSpeeds() {
     return setpointSpeeds;
   }
+
   /** follows an autonomous path provided by choreo */
   public void followSwerveSample(SwerveSample sample) {
     this.sample = sample.getPose();

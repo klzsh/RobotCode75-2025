@@ -6,8 +6,6 @@ package frc.robot.commands.Drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Drivetrain.Swerve;
 
@@ -15,6 +13,7 @@ import frc.robot.subsystems.Drivetrain.Swerve;
 public class ResetHeadingToSimilarFace extends Command {
   /** Creates a new ResetHeading. */
   private final Swerve m_Swerve;
+
   private double targetHeading;
 
   public ResetHeadingToSimilarFace(Swerve swerve) {
@@ -34,7 +33,9 @@ public class ResetHeadingToSimilarFace extends Command {
     m_Swerve.zeroGyro(Rotation2d.fromDegrees(targetHeading));
     m_Swerve.setPose(
         new Pose2d(
-            m_Swerve.getPose().getX(), m_Swerve.getPose().getY(), Rotation2d.fromDegrees(targetHeading)));
+            m_Swerve.getPose().getX(),
+            m_Swerve.getPose().getY(),
+            Rotation2d.fromDegrees(targetHeading)));
     // resets the gyro and pose based on the gyro
   }
 
@@ -47,8 +48,7 @@ public class ResetHeadingToSimilarFace extends Command {
   public boolean isFinished() {
     boolean resetted = false;
     // see if the pose has actually reset
-    if (m_Swerve.getPose().getRotation().getDegrees()
-        == targetHeading) {
+    if (m_Swerve.getPose().getRotation().getDegrees() == targetHeading) {
       resetted = true;
     } else {
       resetted = false;
