@@ -60,7 +60,7 @@ public class FieldConstants {
           entry(FieldElement.E, 22),
           entry(FieldElement.F, 17),
           entry(FieldElement.HT, 13),
-          entry(FieldElement.HB, 14),
+          entry(FieldElement.HB, 12),
           entry(FieldElement.P, 16));
 
   public static final Map<FieldElement, Integer> redTags =
@@ -72,8 +72,8 @@ public class FieldConstants {
           entry(FieldElement.E, 9),
           entry(FieldElement.F, 8),
           entry(FieldElement.P, 3),
-          entry(FieldElement.HT, 1),
-          entry(FieldElement.HB, 2));
+          entry(FieldElement.HT, 2),
+          entry(FieldElement.HB, 1));
 
   public static final Map<FieldPose, Pose2d> fieldPose2d =
       Map.ofEntries(

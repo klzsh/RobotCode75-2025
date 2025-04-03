@@ -19,9 +19,7 @@ public class AutoScoreL4 extends SequentialCommandGroup {
     addRequirements(elevator, coralIntake);
     addCommands(
         new IntakeCoral(coralIntake).onlyIf(() -> !coralIntake.getBeamBreak()),
-        new ParallelCommandGroup(
-            // align to branch color
-            new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false)),
+        new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false),
         new ParallelCommandGroup(
             new ScoreCoral(coralIntake, elevator),
             new SetElevatorPosition(elevator, ElevatorPositions.L4, false, false)),

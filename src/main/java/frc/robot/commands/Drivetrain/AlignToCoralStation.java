@@ -45,10 +45,12 @@ public class AlignToCoralStation extends Command {
 
   @Override
   public void execute() {
-    ChassisSpeeds speeds = m_ChezyController.update(targetPose);
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            m_ChezyController.update(targetPose), m_Swerve.getRotation2D());
     speeds.vxMetersPerSecond = MathUtil.clamp(speeds.vxMetersPerSecond, -1.5, 1.5);
     speeds.vyMetersPerSecond = MathUtil.clamp(speeds.vyMetersPerSecond, -1.5, 1.5);
-    m_Swerve.setFieldRelative(speeds);
+    m_Swerve.setChassisSpeeds(speeds);
   }
 
   @Override

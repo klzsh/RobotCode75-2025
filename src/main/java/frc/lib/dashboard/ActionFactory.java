@@ -58,9 +58,7 @@ public class ActionFactory {
         //   return new AutoDealgaefy(
         //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_ChezyController);
       case 3:
-        return new ParallelRaceGroup(
-            new AutoScoreL4(m_Elevator, m_CoralIntake),
-            new WaitCommand(1).onlyWhile(() -> !m_CoralIntake.getBeamBreak()));
+        return new AutoScoreL4(m_Elevator, m_CoralIntake).until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
       case 4:
         return new AutoScoreProcessor(m_Swerve, m_ChezyController, m_AlgaeIntake, m_AlgaePivot);
       case 5:

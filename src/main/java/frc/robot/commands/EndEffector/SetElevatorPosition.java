@@ -45,7 +45,7 @@ public class SetElevatorPosition extends Command {
   @Override
   public boolean isFinished() {
     if (m_LastAutoCommand) {
-      return m_Elevator.isBelowPosition(ElevatorPositions.L2, false);
+      return m_Elevator.isBelowPosition(ElevatorPositions.L3, false);
     } else {
       return m_Elevator.isAtPosition(m_Position, m_IsAlgae);
     }

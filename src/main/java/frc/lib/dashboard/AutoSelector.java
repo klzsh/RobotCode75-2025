@@ -104,7 +104,7 @@ public class AutoSelector {
     presetChooser.addOption("Left Side Two Piece", Presets.LeftSideTwoPiece);
     presetChooser.addOption("Right Side Two Piece", Presets.RightSideTwoPiece);
     presetChooser.addOption("Middle One Piece", Presets.MiddleOnePiece);
-    presetChooser.addOption("Left Side Three Piece", Presets.LeftSideThreePiece);
+    // presetChooser.addOption("Left Side Three Piece", Presets.LeftSideThreePiece);
     presetChooser.addOption("Right Side Three Piece", Presets.RightSideThreePiece);
     presetChooser.addOption("Left Side Three Piece Fallback", Presets.LeftSide3PieceFallback);
 

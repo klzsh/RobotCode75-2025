@@ -15,30 +15,21 @@ import frc.lib.util.FieldPose.Offset;
 import frc.lib.util.PeddieBounds;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.Swerve;
-import frc.robot.subsystems.Vision.ObjectDetetectorCamera;
-import frc.robot.subsystems.Vision.YoloController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AlignToReef extends Command {
+public class OdometryToReef extends Command {
   private final Swerve m_Swerve;
   private final ChezyController m_ChezyController;
-  private final YoloController m_YoloController;
-  private final ObjectDetetectorCamera m_BranchCamera;
   private Offset m_Offset;
   private Pose2d targetPose = null;
-  private ChassisSpeeds yoloSpeeds = null;
 
   /** Creates a new AlignToReef. */
-  public AlignToReef(
+  public OdometryToReef(
       Swerve swerve,
       ChezyController chezyController,
-      YoloController yoloController,
-      ObjectDetetectorCamera branchCam,
       Offset offset) {
     m_Swerve = swerve;
     m_ChezyController = chezyController;
-    m_YoloController = yoloController;
-    m_BranchCamera = branchCam;
     m_Offset = offset;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_Swerve);
@@ -54,7 +45,6 @@ public class AlignToReef extends Command {
               m_Swerve, new FieldPose(DriverStation.getAlliance().get(), fieldElement, m_Offset));
       m_ChezyController.reset(targetPose);
     }
-    m_YoloController.reset(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -70,29 +60,12 @@ public class AlignToReef extends Command {
 
     // robot relative y distance from center of branch
     double yOffset = Math.abs(targetPose.relativeTo(m_Swerve.getPose()).getY());
-
-    m_BranchCamera.updateByUnreadResults();
  
     if (yOffset < 0.1) {
       chezySpeeds.vxMetersPerSecond *= 0.5;
-      chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
+      chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.08);
     }
 
-    if (yOffset < 0.1
-        && m_BranchCamera.hasTargets()
-        && m_ChezyController.isRotationFinished()
-        && m_Offset != Offset.MID) {
-      System.out.println("I have switched to YOLO");
-      yoloSpeeds = m_YoloController.update();
-      // add yolo speeds to chezy speeds
-      chezySpeeds.vyMetersPerSecond = MathUtil.applyDeadband(yoloSpeeds.vyMetersPerSecond, 0.04);
-      // chezySpeeds.vxMetersPerSecond *= 0.5;
-      // chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
-      // chezySpeeds.vxMetersPerSecond = 0.1;
-
-    } else {
-      System.out.println("Not using YOLO");
-    }
     chezySpeeds.vxMetersPerSecond = MathUtil.clamp(chezySpeeds.vxMetersPerSecond, -2, 2);
     chezySpeeds.vyMetersPerSecond = MathUtil.clamp(chezySpeeds.vyMetersPerSecond, -2, 2);
     m_Swerve.setChassisSpeeds(chezySpeeds);

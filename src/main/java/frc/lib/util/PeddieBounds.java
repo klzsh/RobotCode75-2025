@@ -131,6 +131,7 @@ public class PeddieBounds {
             poseToDrive.transformBy(
                 new Transform2d(0, hpRightPoseOffset.in(Meters), Rotation2d.fromDegrees(0)));
       }
+      poseToDrive = poseToDrive.transformBy(new Transform2d(-0.3, 0, Rotation2d.fromDegrees(0)));
       return new Pose2d(
           poseToDrive.getX(),
           poseToDrive.getY(),
@@ -317,14 +318,14 @@ public class PeddieBounds {
         ChassisSpeeds fieldRelative =
             ChassisSpeeds.fromRobotRelativeSpeeds(
                 swerve.getChassisSpeeds(), swerve.getRotation2D());
-        return fieldRelative.vyMetersPerSecond > 0 ? FieldElement.HT : FieldElement.HB;
+        return fieldRelative.vyMetersPerSecond < 0 ? FieldElement.HB : FieldElement.HT;  // was >, ts wrong i think, y positive is towards top - kp
       }
     } else {
       // RED:
       double distToT =
-          field.getTagPose(1).get().toPose2d().getTranslation().getDistance(odometryPose);
-      double distToB =
           field.getTagPose(2).get().toPose2d().getTranslation().getDistance(odometryPose);
+      double distToB =
+          field.getTagPose(1).get().toPose2d().getTranslation().getDistance(odometryPose);
 
       if (distToT > distToB + hpThreshold) {
         return FieldElement.HB;
@@ -334,7 +335,7 @@ public class PeddieBounds {
         ChassisSpeeds fieldRelative =
             ChassisSpeeds.fromRobotRelativeSpeeds(
                 swerve.getChassisSpeeds(), swerve.getRotation2D());
-        return fieldRelative.vyMetersPerSecond < 0 ? FieldElement.HT : FieldElement.HB;
+        return fieldRelative.vyMetersPerSecond > 0 ? FieldElement.HT : FieldElement.HB;
       }
     }
   }
