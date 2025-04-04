@@ -23,7 +23,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.dashboard.TunableNumber;
 
 /*
  * Cascading elevator driven by 2 Kraken X60s
@@ -263,7 +262,7 @@ public class Elevator extends SubsystemBase {
       m_ElevatorMotor2.setPosition(Rotations.of(26));
     }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
- 
+
     // if (m_SetpointPosition == ElevatorPositions.L2) {
     //   currentPosition = l2Height.getNumber();
     // }

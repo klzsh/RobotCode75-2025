@@ -2,8 +2,6 @@ package frc.lib.dashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Autonomous.AutoIntakeCoral;
 import frc.robot.commands.Autonomous.AutoScoreL1;
 import frc.robot.commands.Autonomous.AutoScoreL4;
@@ -58,7 +56,8 @@ public class ActionFactory {
         //   return new AutoDealgaefy(
         //       m_Swerve, m_Elevator, m_AlgaeIntake, m_AlgaePivot, m_ChezyController);
       case 3:
-        return new AutoScoreL4(m_Elevator, m_CoralIntake).until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
+        return new AutoScoreL4(m_Elevator, m_CoralIntake)
+            .until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
       case 4:
         return new AutoScoreProcessor(m_Swerve, m_ChezyController, m_AlgaeIntake, m_AlgaePivot);
       case 5:

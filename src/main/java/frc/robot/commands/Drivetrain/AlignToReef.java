@@ -72,7 +72,7 @@ public class AlignToReef extends Command {
     double yOffset = Math.abs(targetPose.relativeTo(m_Swerve.getPose()).getY());
 
     m_BranchCamera.updateByUnreadResults();
- 
+
     if (yOffset < 0.1) {
       chezySpeeds.vxMetersPerSecond *= 0.5;
       chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);

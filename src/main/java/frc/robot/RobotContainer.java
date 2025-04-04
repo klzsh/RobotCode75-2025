@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.dashboard.ActionFactory;
 import frc.lib.dashboard.AutoSelector;
 import frc.lib.util.FieldPose.Offset;
-import frc.robot.commands.Autonomous.AutoScoreL4;
 import frc.robot.commands.Drivetrain.AlignToCoralStation;
 import frc.robot.commands.Drivetrain.AlignToReef;
 import frc.robot.commands.Drivetrain.ResetHeading;
@@ -30,7 +29,6 @@ import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
@@ -137,7 +135,6 @@ public class RobotContainer {
   private final JoystickButton HPRotate = new JoystickButton(m_RightStick, hpRotateButton);
   private final JoystickButton HPAlign = new JoystickButton(m_LeftStick, hpRotateButton);
 
-
   //   private final JoystickButton holdButton =
   //       new JoystickButton(m_RightStick, holdHeadingButton); // center button, ts is used twice?
 
@@ -233,7 +230,8 @@ public class RobotContainer {
 
     // m_Controller.povRight().whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
 
-    // m_Controller.rightBumper().whileTrue(new OdometryToReef(m_Swerve, m_ChezyController, Offset.LEFT));
+    // m_Controller.rightBumper().whileTrue(new OdometryToReef(m_Swerve, m_ChezyController,
+    // Offset.LEFT));
 
     // algae commands
     m_Controller
@@ -260,7 +258,7 @@ public class RobotContainer {
             new InstantCommand(
                     () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING), m_AlgaeIntake)
                 .repeatedly()
-                .until(()->m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
+                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
     // coral commands
     m_Controller.povUp().onTrue(new IntakeCoral(m_CoralIntake));
     m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake, m_Elevator));

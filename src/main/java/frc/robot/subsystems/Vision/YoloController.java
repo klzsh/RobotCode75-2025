@@ -120,7 +120,7 @@ public class YoloController {
           desiredSpeeds = new ChassisSpeeds(driveIntoReefSpeed, 0, 0);
         }
       } else {
-        
+
         // potential smoothify code?
         // if (targetYaw != -100 && Math.abs(targetYaw -
         // m_BranchDetectorCamera.getTargetYaw(0).getAsDouble()) > 10) {
@@ -139,7 +139,7 @@ public class YoloController {
       }
     } else {
       if (!m_BranchDetectorCamera.hasTargets()) {
-        desiredSpeeds = //! Took out Y command creep speed
+        desiredSpeeds = // ! Took out Y command creep speed
             new ChassisSpeeds(0, 0.0, 0); // scoot toward direction of last seen target and shi
       } else {
         double targetYaw = m_BranchDetectorCamera.getTargetYaw(0).getAsDouble();

@@ -318,7 +318,9 @@ public class PeddieBounds {
         ChassisSpeeds fieldRelative =
             ChassisSpeeds.fromRobotRelativeSpeeds(
                 swerve.getChassisSpeeds(), swerve.getRotation2D());
-        return fieldRelative.vyMetersPerSecond < 0 ? FieldElement.HB : FieldElement.HT;  // was >, ts wrong i think, y positive is towards top - kp
+        return fieldRelative.vyMetersPerSecond < 0
+            ? FieldElement.HB
+            : FieldElement.HT; // was >, ts wrong i think, y positive is towards top - kp
       }
     } else {
       // RED:
