@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 // import frc.lib.dashboard.TunableNumber;
 
@@ -202,7 +203,7 @@ public class CoralIntake extends SubsystemBase {
 
     double scoreMultiplier = 1;
     if (DriverStation.isAutonomous() || m_isL4) {
-      scoreMultiplier = 2;
+      scoreMultiplier = 1.81;
     }
 
     switch (m_CoralIntakeState) {
@@ -217,9 +218,8 @@ public class CoralIntake extends SubsystemBase {
         if (m_isL1) {
           m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeedL1).withSlot(0));
         } else {
-          // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed).withSlot(0));
-          m_CoralMotor.setControl(
-              m_VelocityRequest.withVelocity(coralScoreSpeed.times(scoreMultiplier)).withSlot(0));
+          // m_CoralMotor.setControl(m_VelocityRequest.withVelocity(scoreSpeed.getNumber() * scoreMultiplier).withSlot(0));
+          m_CoralMotor.setControl(m_VelocityRequest.withVelocity(coralScoreSpeed.times(scoreMultiplier)).withSlot(0));
         }
       }
       case INTAKING -> {

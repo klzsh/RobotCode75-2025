@@ -43,7 +43,7 @@ public class EndEffectorConstants {
   public static final double algaeMotorGearRatio = 25.0;
   public static final double pivotMotorGearRatio = (25.0 * 50.0) / 26.0; // ~48.076
 
-  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(33);
+  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(36.3);
   public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(30);
   public static final AngularVelocity coralScoreSpeedL1 = RotationsPerSecond.of(7);
   public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-30);

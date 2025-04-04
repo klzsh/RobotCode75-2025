@@ -77,7 +77,7 @@ public class ActionFactory {
                 new YoloBranchAlign(m_Swerve, m_YoloController, true)
                     .until(() -> m_Elevator.isAtPosition(ElevatorPositions.L4, false)),
                 new AutoScoreL4(m_Elevator, m_CoralIntake))
-            .until(() -> m_CoralIntake.hasBeenIntakingForTime(.75));
+            .until(() -> m_CoralIntake.hasBeenIntakingForTime(1));
     }
     return null;
   }

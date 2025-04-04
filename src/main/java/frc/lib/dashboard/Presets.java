@@ -5,6 +5,6 @@ public class Presets {
   public static final String RightSideTwoPiece = "sb el 8 hb 5 fl 8";
   public static final String MiddleOnePiece = "sm dl 3";
   public static final String LeftSideThreePiece = "st cl 8 ht 5 bl 9 ht 5 br 8";
-  public static final String RightSideThreePiece = "sb er 3 hb 5 fr 3 hb 5 fl 3";
-  public static final String LeftSide3PieceFallback = "st cl 3 ht 5 bl 3 ht 5 br 3";
+  public static final String RightSideThreePiece = "sb er 8 hb 5 fr 9 hb 5 fl 8";
+  public static final String LeftSide3PieceFallback = "st cl 8 ht 5 bl 9 ht 5 br 8";
 }
