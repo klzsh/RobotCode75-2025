@@ -29,6 +29,6 @@ public class AutoIntakeCoral extends SequentialCommandGroup {
     }
     addCommands(
         new InstantCommand(() -> coralIntake.setState(CoralStates.INTAKING), coralIntake),
-        new WaitCommand(0.1));
+        new WaitCommand(0.2));
   }
 }
