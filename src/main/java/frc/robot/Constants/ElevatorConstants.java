@@ -29,7 +29,7 @@ public class ElevatorConstants {
   public static final Angle algaeRemovalOffset = Rotations.of(3);
   public static final Angle l1Position = Rotations.of(6.0);
   public static final Angle l2Position = Rotations.of(6.6);
-  public static final Angle l3Position = Rotations.of(14);
+  public static final Angle l3Position = Rotations.of(14.375);
   public static final Angle l4Position = Rotations.of(25.8);
   public static final Angle homePosition = Rotations.of(0);
   public static final Angle processorPosition = Rotations.of(2);
