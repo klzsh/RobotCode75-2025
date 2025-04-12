@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.dashboard.TunableNumber;
 
 @Logged(name = "Algae Pivot", strategy = Strategy.OPT_IN, importance = Importance.CRITICAL)
 public class AlgaePivot extends SubsystemBase {
@@ -26,6 +27,8 @@ public class AlgaePivot extends SubsystemBase {
     RETRACTED(pivotHomePosition),
     GROUNDINTAKE(pivotGroundIntakePosition),
     DEALGAEFY(pivotDeAlgifyPosition),
+    PROCESSOR(pivotProcessorPosition),
+    NET(pivotNetPosition),
     NONE(pivotHomePosition);
 
     public final Angle Rotations;
@@ -36,11 +39,15 @@ public class AlgaePivot extends SubsystemBase {
   }
 
   private PivotState m_PivotState;
-  // private final TunableNumber deAlgaefyRotations;
-  // private final TunableNumber PivotRetractDelay;
 
   // @Logged(name = "Algae Pivot Motor", importance = Importance.INFO)
   private TalonFX m_AlgaePivot;
+
+  public final TunableNumber homePosition;
+  public final TunableNumber groundIntakePosition;
+  public final TunableNumber deAlgifyPosition;
+  public final TunableNumber processorPosition;
+  public final TunableNumber netPosition;
 
   private final MotionMagicExpoTorqueCurrentFOC pivotRequest =
       new MotionMagicExpoTorqueCurrentFOC(Rotations.of(0));
@@ -54,15 +61,23 @@ public class AlgaePivot extends SubsystemBase {
 
     pivotRequest.UpdateFreqHz = 0;
     pivotRequest.UseTimesync = true;
-    // deAlgaefyRotations = new TunableNumber("Algae Pivot/DeAlgaefy Position",
-    // pivotDeAlgifyPosition.in(Rotations));
-    // PivotRetractDelay = new TunableNumber("Algae Pivot/Retract Delay Seconds", 0.15);
 
     m_absoluteEncoder =
         new DutyCycleEncoder(algaePivotEncoderPort, 1, algaePivotZeroPoint.in(Rotations));
     Timer.delay(5);
     m_AlgaePivot.setPosition(
         (getAbsolutePosition() - pivotEncoderOffset.in(Rotations)) * pivotMotorGearRatio);
+
+    homePosition = new TunableNumber("Algae Pivot/Home Position", pivotHomePosition.in(Rotations));
+    groundIntakePosition =
+        new TunableNumber(
+            "Algae Pivot/Ground Intake Position", pivotGroundIntakePosition.in(Rotations));
+    deAlgifyPosition =
+        new TunableNumber("Algae Pivot/DeAlgify Position", pivotDeAlgifyPosition.in(Rotations));
+    processorPosition = 
+        new TunableNumber("Algae Pivot/Processor Position", pivotProcessorPosition.in(Rotations));
+    netPosition =
+        new TunableNumber("Algae Pivot/Net Position", pivotNetPosition.in(Rotations));
   }
 
   public void setPivotState(PivotState state) {
@@ -112,6 +127,19 @@ public class AlgaePivot extends SubsystemBase {
     // if(m_PivotState == PivotState.DEALGAEFY){
     // m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgaefyRotations.getNumber()))
     // } else {
+    switch (m_PivotState) {
+      case RETRACTED -> m_AlgaePivot.setControl(pivotRequest.withPosition(homePosition.getNumber()));
+      case GROUNDINTAKE ->
+          m_AlgaePivot.setControl(pivotRequest.withPosition(groundIntakePosition.getNumber()));
+      case DEALGAEFY ->
+          m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgifyPosition.getNumber()));
+      case PROCESSOR ->
+          m_AlgaePivot.setControl(pivotRequest.withPosition(processorPosition.getNumber()));
+      case NET ->
+          m_AlgaePivot.setControl(pivotRequest.withPosition(netPosition.getNumber()));
+      case NONE -> m_AlgaePivot.setControl(pivotRequest.withPosition(homePosition.getNumber()));
+      
+    }
     m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
     // }
   }

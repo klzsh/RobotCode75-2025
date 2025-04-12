@@ -238,7 +238,7 @@ public class RobotContainer {
         .povRight()
         .whileTrue(
             new InstantCommand(
-                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.OUTAKING), m_AlgaeIntake)
+                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.PROCESSOR), m_AlgaeIntake)
                 .repeatedly());
     m_Controller
         .leftBumper()
