@@ -32,7 +32,7 @@ public class AutoScoreProcessor extends SequentialCommandGroup {
         new ChezyPose(swerve, chezyController, poseToDrive, false),
         new InstantCommand(
                 () -> {
-                  intake.setAlgaeState(AlgaeStates.OUTAKING);
+                  intake.setAlgaeState(AlgaeStates.PROCESSOR);
                   pivot.setPivotState(PivotState.RETRACTED);
                 })
             .repeatedly()
