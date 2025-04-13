@@ -74,10 +74,9 @@ public class AlgaePivot extends SubsystemBase {
             "Algae Pivot/Ground Intake Position", pivotGroundIntakePosition.in(Rotations));
     deAlgifyPosition =
         new TunableNumber("Algae Pivot/DeAlgify Position", pivotDeAlgifyPosition.in(Rotations));
-    processorPosition = 
+    processorPosition =
         new TunableNumber("Algae Pivot/Processor Position", pivotProcessorPosition.in(Rotations));
-    netPosition =
-        new TunableNumber("Algae Pivot/Net Position", pivotNetPosition.in(Rotations));
+    netPosition = new TunableNumber("Algae Pivot/Net Position", pivotNetPosition.in(Rotations));
   }
 
   public void setPivotState(PivotState state) {
@@ -128,17 +127,16 @@ public class AlgaePivot extends SubsystemBase {
     // m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgaefyRotations.getNumber()))
     // } else {
     switch (m_PivotState) {
-      case RETRACTED -> m_AlgaePivot.setControl(pivotRequest.withPosition(homePosition.getNumber()));
+      case RETRACTED ->
+          m_AlgaePivot.setControl(pivotRequest.withPosition(homePosition.getNumber()));
       case GROUNDINTAKE ->
           m_AlgaePivot.setControl(pivotRequest.withPosition(groundIntakePosition.getNumber()));
       case DEALGAEFY ->
           m_AlgaePivot.setControl(pivotRequest.withPosition(deAlgifyPosition.getNumber()));
       case PROCESSOR ->
           m_AlgaePivot.setControl(pivotRequest.withPosition(processorPosition.getNumber()));
-      case NET ->
-          m_AlgaePivot.setControl(pivotRequest.withPosition(netPosition.getNumber()));
+      case NET -> m_AlgaePivot.setControl(pivotRequest.withPosition(netPosition.getNumber()));
       case NONE -> m_AlgaePivot.setControl(pivotRequest.withPosition(homePosition.getNumber()));
-      
     }
     m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
     // }

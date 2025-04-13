@@ -14,7 +14,6 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.epilogue.Logged.Importance;
 import edu.wpi.first.epilogue.Logged.Strategy;
@@ -80,8 +79,11 @@ public class AlgaeIntake extends SubsystemBase {
     algaeIntakeKd = new TunableNumber("Algae Intake/kD", algaeKD);
     algaeIntakeKs = new TunableNumber("Algae Intake/kS", algaeKS);
 
-    intakeSpeed = new TunableNumber("Algae Intake/Intake Speed", algaeIntakeSpeed.in(RotationsPerSecond));
-    processorSpeed = new TunableNumber("Algae Intake/Processor Speed", algaeProcessorSpeed.in(RotationsPerSecond));
+    intakeSpeed =
+        new TunableNumber("Algae Intake/Intake Speed", algaeIntakeSpeed.in(RotationsPerSecond));
+    processorSpeed =
+        new TunableNumber(
+            "Algae Intake/Processor Speed", algaeProcessorSpeed.in(RotationsPerSecond));
     netSpeed = new TunableNumber("Algae Intake/Net Speed", algaeNetSpeed.in(RotationsPerSecond));
     holdSpeed = new TunableNumber("Algae Intake/Hold Speed", algaeHoldSpeed.in(RotationsPerSecond));
   }
