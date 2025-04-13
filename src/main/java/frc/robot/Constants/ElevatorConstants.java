@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Frequency;
 import edu.wpi.first.units.measure.Time;
 
@@ -26,13 +27,24 @@ public class ElevatorConstants {
   public static final int backupLimitPort = 3;
 
   // Distance from GROUND.
-  public static final Angle algaeRemovalOffset = Rotations.of(3);
+  public static final Angle algaeRemovalOffset = Rotations.of(4.9); // should be around 5?
   public static final Angle l1Position = Rotations.of(6.0);
   public static final Angle l2Position = Rotations.of(6.6);
   public static final Angle l3Position = Rotations.of(14.375);
   public static final Angle l4Position = Rotations.of(25.8);
   public static final Angle homePosition = Rotations.of(0);
   public static final Angle processorPosition = Rotations.of(2);
+
+  public static final Distance pulleyCircumference =
+      Inches.of(1.751 * Math.PI); // circumference of 22 teeth #25 WCP sprocket
+  public static final double mechanismToMotorRatio =
+      5.0 + (1.0 / 3.0); // 3 motor rotations = 1 shaft rotation
+
+  public static final Distance inchesPerRotation =
+      Inches.of(
+          pulleyCircumference.in(Inches)
+              * 2
+              / mechanismToMotorRatio); // 1 motor rotation = 2.06 inches
 
   // velocity, acceleration, jerk
   public static double[] MotionMagicProfileUp = {150, 170, 1200};
