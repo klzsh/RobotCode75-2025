@@ -20,6 +20,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -249,6 +250,10 @@ public class Elevator extends SubsystemBase {
     return !m_backupLimitSwitch.get();
   }
 
+  private Distance rotationsToInches(Angle rotations) {
+    return Inches.of(rotations.in(Rotations) * inchesPerRotation.in(Inches));
+  }
+
   @Override
   public void periodic() {
     if (getLowerLimit()
@@ -276,7 +281,7 @@ public class Elevator extends SubsystemBase {
                     || m_SetpointPosition == ElevatorPositions.L3))
             ? algaeRemovalOffset.in(Rotations)
             : 0;
-    double targetRotations = currentPosition + algaeOffset;
+    double targetRotations = currentPosition - algaeOffset; // ! new pivot will subtract rotations
 
     double multiplier = 1;
     if (DriverStation.isAutonomous()) {
