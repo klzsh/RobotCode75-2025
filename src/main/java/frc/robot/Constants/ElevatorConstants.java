@@ -5,6 +5,8 @@
 package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.Constants.ElevatorConstants.inchesPerRotation;
+import static frc.robot.Constants.ElevatorConstants.l3Position;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -26,16 +28,6 @@ public class ElevatorConstants {
   public static final int lowerLimitPort = 1;
   public static final int backupLimitPort = 3;
 
-  // Distance from GROUND.
-  public static final Angle algaeRemovalOffset = Rotations.of(4.9); // should be around 5?
-  public static final Angle l1Position = Rotations.of(6.0);
-  public static final Angle l2Position = Rotations.of(6.6);
-  public static final Angle l3Position = Rotations.of(14.375);
-  public static final Angle l4Position = Rotations.of(25.8);
-  public static final Angle netPosition = Rotations.of(26);
-  public static final Angle homePosition = Rotations.of(0);
-  public static final Angle processorPosition = Rotations.of(2);
-
   public static final Distance pulleyCircumference =
       Inches.of(1.751 * Math.PI); // circumference of 22 teeth #25 WCP sprocket
   public static final double mechanismToMotorRatio =
@@ -46,6 +38,16 @@ public class ElevatorConstants {
           pulleyCircumference.in(Inches)
               * 2
               / mechanismToMotorRatio); // 1 motor rotation = 2.06 inches
+
+  // Distance from GROUND.
+  public static final Angle algaeRemovalOffset = Rotations.of(5.5); // should be around 5?
+  public static final Angle l1Position = Rotations.of(2);
+  public static final Angle l2Position = Rotations.of(6.6);
+  public static final Angle l3Position = Rotations.of(14.375);
+  public static final Angle l4Position = Rotations.of(25.8);
+  public static final Angle netPosition = Rotations.of(26);
+  public static final Angle homePosition = Rotations.of(0);
+  public static final Angle processorPosition = Rotations.of(2);
 
   // velocity, acceleration, jerk
   public static double[] MotionMagicProfileUp = {150, 170, 1200};

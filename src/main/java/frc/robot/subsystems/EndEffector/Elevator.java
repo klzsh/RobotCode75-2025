@@ -95,8 +95,8 @@ public class Elevator extends SubsystemBase {
   private final TunableNumber elevatorKg;
   private Slot0Configs config;
 
-  // private final TunableNumber l2Height;
-  // private final TunableNumber l3Height;
+  private final TunableNumber l2Height;
+  private final TunableNumber l3Height;
 
   public Elevator() {
     // initialize motors, using the non drivetrain CANivore bus
@@ -123,8 +123,8 @@ public class Elevator extends SubsystemBase {
     m_PositionRequest.UpdateFreqHz = 0;
     m_PositionRequest.UseTimesync = true;
 
-    // l2Height = new TunableNumber("Elevator/L2 Height", l2Position.in(Rotations));
-    // l3Height = new TunableNumber("Elevator/L3 Height", l3Position.in(Rotations));
+    l2Height = new TunableNumber("Elevator/L2 Height", l2Position.in(Rotations));
+    l3Height = new TunableNumber("Elevator/L3 Height", l3Position.in(Rotations));
 
     // mmVelocityUp = new TunableNumber("Elevator/MM Velocity Up", MotionMagicProfileUp[0]);
     // mmAccelerationUp = new TunableNumber("Elevator/MM Accleration Up", MotionMagicProfileUp[1]);
@@ -274,12 +274,12 @@ public class Elevator extends SubsystemBase {
     }
     double currentPosition = m_SetpointPosition.Rotations.in(Rotations);
 
-    // if (m_SetpointPosition == ElevatorPositions.L2) {
-    //   currentPosition = l2Height.getNumber();
-    // }
-    // if (m_SetpointPosition == ElevatorPositions.L3) {
-    //   currentPosition =l3Height.getNumber();
-    // }
+    if (m_SetpointPosition == ElevatorPositions.L2) {
+      currentPosition = l2Height.getNumber();
+    }
+    if (m_SetpointPosition == ElevatorPositions.L3) {
+      currentPosition =l3Height.getNumber();
+    }
 
     double algaeOffset =
         (m_IsAlgae

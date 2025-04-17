@@ -43,7 +43,7 @@ public class YoloController {
   // private final TunableNumber driveIntoReefSpeed =
   //     new TunableNumber("YOLO Align/driveIntoReefSpeed", .25);
 
-  private final double finalYawSetpointDegrees = -2.2;
+  private final double finalYawSetpointDegrees = 0; // -1.1
   private final double driveIntoReefSpeed = .75;
   private final double stallSpeedThreshold = .05;
   double startTime = -1;

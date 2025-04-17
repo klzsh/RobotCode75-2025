@@ -45,7 +45,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
        */
       addRequirements(elevator);
       addCommands(
-          new SetElevatorPosition(elevator, ElevatorPositions.L2, true, false),
+          new SetElevatorPosition(elevator, ElevatorPositions.L1, true, false),
           new ParallelCommandGroup(
                   new InstantCommand(
                           () -> {
@@ -56,7 +56,7 @@ public class DeAlgaefy extends SequentialCommandGroup {
                           algaePivot)
                       .repeatedly()
                       .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-                  new SetElevatorPosition(elevator, ElevatorPositions.L2, true, false))
+                  new SetElevatorPosition(elevator, ElevatorPositions.L1, true, false))
               .until(() -> algaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
           new WaitCommand(algaePivot.getPivotDelay()),
           new InstantCommand(() -> algaePivot.setPivotState(PivotState.RETRACTED))

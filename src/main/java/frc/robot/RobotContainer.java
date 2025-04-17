@@ -6,6 +6,7 @@ package frc.robot;
 
 import static frc.robot.Constants.ClimberConstants.climbExtendPosition;
 import static frc.robot.Constants.ClimberConstants.climbPosition;
+import static frc.robot.Constants.ElevatorConstants.l1Position;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -255,13 +256,9 @@ public class RobotContainer {
                     },
                     m_AlgaeIntake,
                     m_AlgaePivot)
-                .repeatedly()
-                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-            new ParallelRaceGroup(
-              new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE), m_AlgaePivot),
-              new WaitCommand(0.4)
-            )
-        ));
+                  .repeatedly()
+                .until(()->m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+          new SetElevatorPosition(m_Elevator, ElevatorPositions.L1, false, false)));
     m_Controller
         .rightBumper()
         .whileTrue(
@@ -293,19 +290,19 @@ public class RobotContainer {
                     () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
                 .repeatedly());
     m_Controller
-        .x()
+        .x().and(()->m_Controller.getLeftTriggerAxis() < 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
                 .repeatedly());
     m_Controller
-        .y()
+        .y().and(()->m_Controller.getLeftTriggerAxis() < 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
                 .repeatedly());
     m_Controller
-        .b()
+        .b().and(()->m_Controller.getLeftTriggerAxis() < 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
@@ -316,7 +313,18 @@ public class RobotContainer {
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true));
+        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true)
+          // new SequentialCommandGroup(
+          // new InstantCommand(
+          //         () -> {
+          //           m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
+          //           m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
+          //         },
+          //         m_AlgaeIntake,
+          //         m_AlgaePivot)
+          //
+           //     .repeatedly())
+                );
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
