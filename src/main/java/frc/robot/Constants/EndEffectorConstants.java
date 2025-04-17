@@ -50,12 +50,12 @@ public class EndEffectorConstants {
   public static final Angle coralRotationsAfterIntake = Rotations.of(1.75);
   public static final double coralScoreDelay = 0.15;
 
-  public static final Angle pivotHomePosition = Rotations.of(12.8); // should stay the same
-  public static final Angle pivotGroundIntakePosition = Rotations.of(2.6); // -3.4709401709
-  public static final Angle pivotDeAlgifyPosition = Rotations.of(4.5); // 10.1482905983
-  public static final Angle pivotProcessorPosition = Rotations.of(0); // -2.1354700855
-  public static final Angle pivotNetPosition = Rotations.of(0.5); // 11.4837606838
-  public static final Angle pivotEncoderOffset = Rotations.of(0.135);
+  public static final Angle pivotHomePosition = Rotations.of(10.25); // should stay the same
+  public static final Angle pivotGroundIntakePosition = Rotations.of(-1.5); // -3.4709401709
+  public static final Angle pivotDeAlgifyPosition = Rotations.of(6.7); // 10.1482905983
+  public static final Angle pivotProcessorPosition = Rotations.of(1); // -2.1354700855
+  public static final Angle pivotNetPosition = Rotations.of(9.75); // 11.4837606838
+  public static final Angle pivotEncoderOffset = Rotations.of(0.174);
 
   public static final AngularVelocity algaeIntakeSpeed = RotationsPerSecond.of(125.5);
   public static final AngularVelocity algaeProcessorSpeed = RotationsPerSecond.of(-40);
@@ -64,7 +64,7 @@ public class EndEffectorConstants {
   public static final Current algaeHoldCurrent = Amps.of(25);
 
   public static final double coralPositionDeadband = 0.2;
-  public static final double algaePivotDeadband = 0.1;
+  public static final double algaePivotDeadband = 0.9;
 
   public static final class MotorConfigs {
 

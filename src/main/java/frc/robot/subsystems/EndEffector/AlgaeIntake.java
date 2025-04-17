@@ -47,8 +47,7 @@ public class AlgaeIntake extends SubsystemBase {
   public final TunableNumber processorSpeed;
   public final TunableNumber netSpeed;
   public final TunableNumber holdSpeed;
-
-  private final LidarDistanceSensor m_AlgaeDetector;
+  @Logged private final LidarDistanceSensor m_AlgaeDetector;
 
   // intake speed
   private final VelocityTorqueCurrentFOC algaeRequest =
@@ -89,7 +88,9 @@ public class AlgaeIntake extends SubsystemBase {
   }
 
   public void setAlgaeState(AlgaeStates state) {
-    if (m_AlgaeIntakeState == AlgaeStates.HASGAMEPIECE && state != AlgaeStates.PROCESSOR) {
+    if (m_AlgaeIntakeState == AlgaeStates.HASGAMEPIECE
+        && state != AlgaeStates.PROCESSOR
+        && state != AlgaeStates.NET) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
     } else {
       m_AlgaeIntakeState = state;
@@ -123,7 +124,9 @@ public class AlgaeIntake extends SubsystemBase {
       m_AlgaeMotor.getConfigurator().apply(IntakePIDConfig);
     }
 
-    if (algaeInIntake() && m_AlgaeIntakeState != AlgaeStates.PROCESSOR) {
+    if (algaeInIntake()
+        && m_AlgaeIntakeState != AlgaeStates.PROCESSOR
+        && m_AlgaeIntakeState != AlgaeStates.NET) {
       m_AlgaeIntakeState = AlgaeStates.HASGAMEPIECE;
     }
 

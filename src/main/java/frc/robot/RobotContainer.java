@@ -16,6 +16,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,6 +33,7 @@ import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
+import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
@@ -88,10 +93,10 @@ public class RobotContainer {
   @Logged(name = "Climber", importance = Importance.CRITICAL)
   private final Climber m_Climber = new Climber();
 
-  // @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
+  @Logged(name = "Algae Intake", importance = Importance.CRITICAL)
   private final AlgaeIntake m_AlgaeIntake = new AlgaeIntake();
 
-  // @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
+  @Logged(name = "Algae Pivot", importance = Importance.CRITICAL)
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
@@ -237,12 +242,12 @@ public class RobotContainer {
     m_Controller
         .povRight()
         .whileTrue(
-            new InstantCommand(
-                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.PROCESSOR), m_AlgaeIntake)
+            new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.PROCESSOR), m_AlgaePivot)
                 .repeatedly());
     m_Controller
         .leftBumper()
         .whileTrue(
+            new SequentialCommandGroup(
             new InstantCommand(
                     () -> {
                       m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
@@ -251,14 +256,27 @@ public class RobotContainer {
                     m_AlgaeIntake,
                     m_AlgaePivot)
                 .repeatedly()
-                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
+                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+            new ParallelRaceGroup(
+              new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE), m_AlgaePivot),
+              new WaitCommand(0.4)
+            )
+        ));
     m_Controller
         .rightBumper()
         .whileTrue(
-            new InstantCommand(
-                    () -> m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING), m_AlgaeIntake)
-                .repeatedly()
-                .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE));
+            new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.NET), m_AlgaeIntake)
+                .repeatedly());
+    // m_Controller
+    //     .rightBumper()
+    //     .and(() -> m_Controller.b().getAsBoolean())
+    //     .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //           new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.NET), m_AlgaeIntake)
+    //             .repeatedly(),
+    //           new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.NET), m_AlgaePivot).repeatedly()
+    //         ));
     // coral commands
     m_Controller.povUp().onTrue(new IntakeCoral(m_CoralIntake));
     m_Controller.povDown().whileTrue(new ScoreCoral(m_CoralIntake, m_Elevator));
@@ -303,6 +321,10 @@ public class RobotContainer {
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
         .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, false));
+    m_Controller
+        .b()
+        .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
+        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.NET, false, false).repeatedly());
     // climber commands
     // Left Y, more than 0.15
     m_Controller

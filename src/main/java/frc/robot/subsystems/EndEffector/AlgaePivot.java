@@ -94,7 +94,7 @@ public class AlgaePivot extends SubsystemBase {
 
   public double getPivotDelay() {
     // return PivotRetractDelay.getNumber();
-    return 0.15;
+    return 0.4;
   }
 
   public boolean isAtPositionAbsolute(double absolutePosition) {
@@ -111,7 +111,7 @@ public class AlgaePivot extends SubsystemBase {
     m_AlgaePivot.setPosition(rotations);
   }
 
-  // @Logged
+  @Logged
   public double getAbsolutePosition() {
     return m_absoluteEncoder.get();
   }
@@ -138,7 +138,7 @@ public class AlgaePivot extends SubsystemBase {
       case NET -> m_AlgaePivot.setControl(pivotRequest.withPosition(netPosition.getNumber()));
       case NONE -> m_AlgaePivot.setControl(pivotRequest.withPosition(homePosition.getNumber()));
     }
-    m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
+    // m_AlgaePivot.setControl(pivotRequest.withPosition(m_PivotState.Rotations));
     // }
   }
 }
