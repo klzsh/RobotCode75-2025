@@ -6,7 +6,6 @@ package frc.robot;
 
 import static frc.robot.Constants.ClimberConstants.climbExtendPosition;
 import static frc.robot.Constants.ClimberConstants.climbPosition;
-import static frc.robot.Constants.ElevatorConstants.l1Position;
 import static frc.robot.Constants.OIConstants.*;
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -17,8 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -34,10 +31,11 @@ import frc.robot.commands.Drivetrain.RotateToSimilarCoralStation;
 import frc.robot.commands.Drivetrain.RotateToSimilarFace;
 import frc.robot.commands.Drivetrain.TeleopSwerve;
 import frc.robot.commands.Drivetrain.XStance;
-import frc.robot.commands.EndEffector.SetElevatorPosition;
+import frc.robot.commands.Drivetrain.YoloBranchAlign;
 import frc.robot.commands.EndEffector.Algae.DeAlgaefy;
 import frc.robot.commands.EndEffector.Coral.IntakeCoral;
 import frc.robot.commands.EndEffector.Coral.ScoreCoral;
+import frc.robot.commands.EndEffector.SetElevatorPosition;
 import frc.robot.subsystems.Drivetrain.ChezyController;
 import frc.robot.subsystems.Drivetrain.RotationController;
 import frc.robot.subsystems.Drivetrain.Swerve;
@@ -101,12 +99,14 @@ public class RobotContainer {
   private final AlgaePivot m_AlgaePivot = new AlgaePivot();
 
   // define drivetrain controllers
-  @Logged private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
+  // @Logged
+   private final ChezyController m_ChezyController = new ChezyController(m_Swerve);
 
-  @Logged
+  // @Logged
   private final YoloController m_YoloController = new YoloController(m_Swerve, m_BranchCamera);
 
-  @Logged private final RotationController m_RotationController = new RotationController(m_Swerve);
+  // @Logged 
+  private final RotationController m_RotationController = new RotationController(m_Swerve);
 
   // odometry
   private final OdometryWrapper m_Odometry =
@@ -230,6 +230,8 @@ public class RobotContainer {
 
     resetBranchCam.onTrue(
         new InstantCommand(() -> m_BranchCamera.reloadPipeline()).ignoringDisable(true));
+    // new JoystickButton(m_LeftStick, 8)
+        // .whileTrue(new YoloBranchAlign(m_Swerve, m_YoloController, true));
   }
 
   public void configureControllerBinds() {
@@ -249,16 +251,19 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             new SequentialCommandGroup(
-            new InstantCommand(
-                    () -> {
-                      m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
-                      m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE);
-                    },
-                    m_AlgaeIntake,
-                    m_AlgaePivot)
-                  .repeatedly()
-                .until(()->m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
-          new SetElevatorPosition(m_Elevator, ElevatorPositions.L1, false, false)));
+                new InstantCommand(
+                        () -> {
+                          m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
+                          m_AlgaePivot.setPivotState(PivotState.GROUNDINTAKE);
+                        },
+                        m_AlgaeIntake,
+                        m_AlgaePivot)
+                    .repeatedly()
+                    .until(() -> m_AlgaeIntake.getAlgaeState() == AlgaeStates.HASGAMEPIECE),
+                new WaitCommand(m_AlgaePivot.getPivotDelay()),
+                new SetElevatorPosition(m_Elevator, ElevatorPositions.L1, false, false),
+                new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.NET)).repeatedly()
+                    .until(() -> m_AlgaePivot.isAtPosition(PivotState.NET))));
     m_Controller
         .rightBumper()
         .whileTrue(
@@ -270,9 +275,11 @@ public class RobotContainer {
     //     .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
     //     .whileTrue(
     //         new ParallelCommandGroup(
-    //           new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.NET), m_AlgaeIntake)
+    //           new InstantCommand(() -> m_AlgaeIntake.setAlgaeState(AlgaeStates.NET),
+    // m_AlgaeIntake)
     //             .repeatedly(),
-    //           new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.NET), m_AlgaePivot).repeatedly()
+    //           new InstantCommand(() -> m_AlgaePivot.setPivotState(PivotState.NET),
+    // m_AlgaePivot).repeatedly()
     //         ));
     // coral commands
     m_Controller.povUp().onTrue(new IntakeCoral(m_CoralIntake));
@@ -290,19 +297,22 @@ public class RobotContainer {
                     () -> m_Elevator.setPosition(ElevatorPositions.L1, false), m_Elevator)
                 .repeatedly());
     m_Controller
-        .x().and(()->m_Controller.getLeftTriggerAxis() < 0.15)
+        .x()
+        .and(() -> m_Controller.getLeftTriggerAxis() < 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L2, false), m_Elevator)
                 .repeatedly());
     m_Controller
-        .y().and(()->m_Controller.getLeftTriggerAxis() < 0.15)
+        .y()
+        .and(() -> m_Controller.getLeftTriggerAxis() < 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L3, false), m_Elevator)
                 .repeatedly());
     m_Controller
-        .b().and(()->m_Controller.getLeftTriggerAxis() < 0.15)
+        .b()
+        .and(() -> m_Controller.getLeftTriggerAxis() < 0.15)
         .whileTrue(
             new InstantCommand(
                     () -> m_Elevator.setPosition(ElevatorPositions.L4, false), m_Elevator)
@@ -313,18 +323,19 @@ public class RobotContainer {
     m_Controller
         .x()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .whileTrue(new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true)
-          // new SequentialCommandGroup(
-          // new InstantCommand(
-          //         () -> {
-          //           m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
-          //           m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
-          //         },
-          //         m_AlgaeIntake,
-          //         m_AlgaePivot)
-          //
-           //     .repeatedly())
-                );
+        .whileTrue(
+            new DeAlgaefy(m_Elevator, m_AlgaeIntake, m_AlgaePivot, true)
+            // new SequentialCommandGroup(
+            // new InstantCommand(
+            //         () -> {
+            //           m_AlgaeIntake.setAlgaeState(AlgaeStates.INTAKING);
+            //           m_AlgaePivot.setPivotState(PivotState.DEALGAEFY);
+            //         },
+            //         m_AlgaeIntake,
+            //         m_AlgaePivot)
+            //
+            //     .repeatedly())
+            );
     m_Controller
         .y()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
@@ -332,7 +343,8 @@ public class RobotContainer {
     m_Controller
         .b()
         .and(() -> m_Controller.getLeftTriggerAxis() > 0.15)
-        .whileTrue(new SetElevatorPosition(m_Elevator, ElevatorPositions.NET, false, false).repeatedly());
+        .whileTrue(
+            new SetElevatorPosition(m_Elevator, ElevatorPositions.NET, false, false).repeatedly());
     // climber commands
     // Left Y, more than 0.15
     m_Controller

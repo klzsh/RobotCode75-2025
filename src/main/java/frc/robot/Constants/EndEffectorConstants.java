@@ -43,14 +43,14 @@ public class EndEffectorConstants {
   public static final double algaeMotorGearRatio = 25.0;
   public static final double pivotMotorGearRatio = (25.0 * 50.0) / 26.0; // ~48.076
 
-  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(36.3);
+  public static final AngularVelocity coralScoreSpeed = RotationsPerSecond.of(50);
   public static final AngularVelocity coralIntakeSpeed = RotationsPerSecond.of(30);
   public static final AngularVelocity coralScoreSpeedL1 = RotationsPerSecond.of(7);
   public static final AngularVelocity coralReverseSpeed = RotationsPerSecond.of(-30);
   public static final Angle coralRotationsAfterIntake = Rotations.of(1.75);
   public static final double coralScoreDelay = 0.15;
 
-  public static final Angle pivotHomePosition = Rotations.of(10.25); // should stay the same
+  public static final Angle pivotHomePosition = Rotations.of(12); // should stay the same
   public static final Angle pivotGroundIntakePosition = Rotations.of(-3.5); // -3.4709401709
   public static final Angle pivotDeAlgifyPosition = Rotations.of(6.7); // 10.1482905983
   public static final Angle pivotProcessorPosition = Rotations.of(1); // -2.1354700855
@@ -91,12 +91,12 @@ public class EndEffectorConstants {
     public static final Time coralCurrentThresholdTime = Seconds.of(0.50);
 
     // algae current limiting
-    public static final Current algaeSupplyCurrentLimit = Amps.of(40);
-    public static final Current algaeLowerCurrentThreshold = Amps.of(15);
+    public static final Current algaeSupplyCurrentLimit = Amps.of(50);
+    public static final Current algaeLowerCurrentThreshold = Amps.of(30);
 
-    public static final Current algaeStatorCurrentLimit = Amps.of(40);
-    public static final Current algaeStatorCurrentLimitForward = Amps.of(40);
-    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-40);
+    public static final Current algaeStatorCurrentLimit = Amps.of(50);
+    public static final Current algaeStatorCurrentLimitForward = Amps.of(50);
+    public static final Current algaeStatorCurrentLimitReverse = Amps.of(-50);
 
     public static final Time algaeCurrentThresholdTime = Seconds.of(1);
 
@@ -108,8 +108,8 @@ public class EndEffectorConstants {
     public static final Current pivotStatorCurrentLimitForward = Amps.of(60);
     public static final Current pivotStatorCurrentLimitReverse = Amps.of(-60);
 
-    public static final Angle pivotForwardSoftLimit = Rotations.of(12);
-    public static final Angle pivotReverseSoftLimit = Rotations.of(0);
+    public static final Angle pivotForwardSoftLimit = Rotations.of(12.5);
+    public static final Angle pivotReverseSoftLimit = Rotations.of(-3);
 
     public static final Time pivotCurrentThresholdTime = Seconds.of(0.50);
 
@@ -139,7 +139,7 @@ public class EndEffectorConstants {
 
     public static final double pivotMMKa = 0.1;
     public static final double pivotMMKv = 0.15;
-    public static final double pivotMMAcc = 50;
+    public static final double pivotMMAcc = 30;
     public static final double pivotMMVel = 50;
     public static final double pivotMMJerk = 500;
 

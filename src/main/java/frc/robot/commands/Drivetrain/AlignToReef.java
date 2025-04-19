@@ -74,25 +74,25 @@ public class AlignToReef extends Command {
     m_BranchCamera.updateByUnreadResults();
 
     if (yOffset < 0.1) {
-      chezySpeeds.vxMetersPerSecond *= 0.5;
+      chezySpeeds.vxMetersPerSecond *= 0.8; // 0.5 before
       chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
     }
 
-    if (yOffset < 0.1
-        && m_BranchCamera.hasTargets()
-        && m_ChezyController.isRotationFinished()
-        && m_Offset != Offset.MID) {
-      System.out.println("I have switched to YOLO");
-      yoloSpeeds = m_YoloController.update();
-      // add yolo speeds to chezy speeds
-      chezySpeeds.vyMetersPerSecond = MathUtil.applyDeadband(yoloSpeeds.vyMetersPerSecond, 0.04);
-      // chezySpeeds.vxMetersPerSecond *= 0.5;
-      // chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
-      // chezySpeeds.vxMetersPerSecond = 0.1;
+    // if (yOffset < 0.1
+    //     && m_BranchCamera.hasTargets()
+    //     && m_ChezyController.isRotationFinished()
+    //     && m_Offset != Offset.MID) {
+    //   System.out.println("I have switched to YOLO");
+    //   yoloSpeeds = m_YoloController.update();
+    //   // add yolo speeds to chezy speeds
+    //   chezySpeeds.vyMetersPerSecond = MathUtil.applyDeadband(yoloSpeeds.vyMetersPerSecond, 0.04);
+    //   // chezySpeeds.vxMetersPerSecond *= 0.5;
+    //   // chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.1);
+    //   // chezySpeeds.vxMetersPerSecond = 0.1;
 
-    } else {
-      System.out.println("Not using YOLO");
-    }
+    // } else {
+    //   System.out.println("Not using YOLO");
+    // }
     chezySpeeds.vxMetersPerSecond = MathUtil.clamp(chezySpeeds.vxMetersPerSecond, -2, 2);
     chezySpeeds.vyMetersPerSecond = MathUtil.clamp(chezySpeeds.vyMetersPerSecond, -2, 2);
     m_Swerve.setChassisSpeeds(chezySpeeds);
@@ -107,6 +107,11 @@ public class AlignToReef extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // can we j do yolocontroller at goal?   below uses vx speed <= .05 and branch yaw is < 1 degree
+    // from 0
+    // return (m_Swerve.getSetpointSpeeds().vxMetersPerSecond <= .05 &&
+    // m_YoloController.getError().isPresent() && m_YoloController.getError().getAsDouble() <= 1);
+    // return (m_Swerve.getSetpointSpeeds().vxMetersPerSecond <= .1 && m_YoloController.atGoal());
     if (m_Swerve.getSetpointSpeeds().vxMetersPerSecond <= 0.05
         && m_Swerve.getSetpointSpeeds().vyMetersPerSecond <= 0.05) {
       return true;

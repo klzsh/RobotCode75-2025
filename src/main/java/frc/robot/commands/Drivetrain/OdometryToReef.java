@@ -24,10 +24,7 @@ public class OdometryToReef extends Command {
   private Pose2d targetPose = null;
 
   /** Creates a new AlignToReef. */
-  public OdometryToReef(
-      Swerve swerve,
-      ChezyController chezyController,
-      Offset offset) {
+  public OdometryToReef(Swerve swerve, ChezyController chezyController, Offset offset) {
     m_Swerve = swerve;
     m_ChezyController = chezyController;
     m_Offset = offset;
@@ -60,7 +57,7 @@ public class OdometryToReef extends Command {
 
     // robot relative y distance from center of branch
     double yOffset = Math.abs(targetPose.relativeTo(m_Swerve.getPose()).getY());
- 
+
     if (yOffset < 0.1) {
       chezySpeeds.vxMetersPerSecond *= 0.5;
       chezySpeeds.vxMetersPerSecond = Math.max(chezySpeeds.vxMetersPerSecond, 0.08);

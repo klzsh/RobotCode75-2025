@@ -5,8 +5,6 @@
 package frc.robot.Constants;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.ElevatorConstants.inchesPerRotation;
-import static frc.robot.Constants.ElevatorConstants.l3Position;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
